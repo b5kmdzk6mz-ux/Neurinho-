@@ -187,6 +187,10 @@ textarea{min-height:92px; resize:vertical}
 .tab[aria-current="page"]{color:var(--accent); background:var(--accent-soft)}
 #toast{position:fixed; left:50%; bottom:calc(86px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:14px; font-weight:700; font-size:14px; z-index:30; max-width:90vw; text-align:center}
 /* ---------- acessibilidade ---------- */
+@font-face{font-family:'OpenDyslexic';src:url('OpenDyslexic-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'OpenDyslexic';src:url('OpenDyslexic-Bold.otf') format('opentype');font-weight:700;font-style:normal;font-display:swap}
+:root.a-font-dis{--font-body:'OpenDyslexic',Verdana,sans-serif; --font-display:'OpenDyslexic',Verdana,sans-serif}
+:root.a-font-dis body{font-size:.92em}
 :root.a-font-leg{--font-body:'Atkinson Hyperlegible',Verdana,Tahoma,sans-serif; --font-display:'Atkinson Hyperlegible',Verdana,Tahoma,sans-serif}
 :root.a-font-ver{--font-body:Verdana,Tahoma,'DejaVu Sans',sans-serif; --font-display:Verdana,Tahoma,'DejaVu Sans',sans-serif}
 .a-z115 body{zoom:1.15}
@@ -862,8 +866,9 @@ function setTtsLabel(){var t=document.getElementById('ttsb');if(t)t.textContent=
 function applyAcc(){
   var el=document.documentElement;if(!el||!el.classList)return;
   var cl=el.classList;
-  ['a-font-leg','a-font-ver','a-z115','a-z130','a-z150','a-space','a-left','a-contrast','a-nomotion','a-big','a-ruler','a-tts'].forEach(function(c){cl.remove(c)});
+  ['a-font-leg','a-font-ver','a-font-dis','a-z115','a-z130','a-z150','a-space','a-left','a-contrast','a-nomotion','a-big','a-ruler','a-tts'].forEach(function(c){cl.remove(c)});
   if(ACC.font==='leg')cl.add('a-font-leg');
+  if(ACC.font==='dis')cl.add('a-font-dis');
   if(ACC.font==='ver')cl.add('a-font-ver');
   if(ACC.size>100)cl.add('a-z'+ACC.size);
   if(ACC.space)cl.add('a-space');
@@ -896,7 +901,7 @@ function accCard(){
   function seg(k,opts){return '<div class="seg" style="grid-template-columns:repeat('+opts.length+',1fr)">'+opts.map(function(o){return '<button data-act="acc" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(ACC[k])===String(o[0]))+'">'+o[1]+'</button>'}).join('')+'</div>'}
   function row(k,t,d){return '<button class="acc-row" data-act="acc" data-k="'+k+'" data-v="'+(ACC[k]?0:1)+'" aria-pressed="'+(!!ACC[k])+'"><span><b>'+t+'</b><small>'+d+'</small></span><span class="st">'+(ACC[k]?'Ligado':'Desligado')+'</span></button>'}
   var h='<div class="card" id="acc" style="display:flex;flex-direction:column;gap:14px"><h3>Acessibilidade e leitura</h3><p class="muted small">Ajustes para facilitar a leitura, inclusive para quem tem dislexia ou baixa visão. Cada pessoa se adapta de um jeito, então teste e fique com o que ajuda. Tudo fica salvo neste aparelho.</p>';
-  h+='<div class="field"><span>Fonte</span>'+seg('font',[['pad','Padrão'],['leg','Legível'],['ver','Verdana']])+'<span class="muted small">Legível usa a Atkinson Hyperlegible, criada para diferenciar bem letras parecidas (b, d, p, q). Na primeira vez precisa de internet para carregar; sem ela, usa a Verdana.</span></div>';
+  h+='<div class="field"><span>Fonte</span>'+seg('font',[['pad','Padrão'],['leg','Legível'],['dis','OpenDyslexic'],['ver','Verdana']])+'<span class="muted small">Legível usa a Atkinson Hyperlegible, criada para diferenciar bem letras parecidas (b, d, p, q). Na primeira vez precisa de internet para carregar; sem ela, usa a Verdana. OpenDyslexic é uma fonte desenhada para leitores com dislexia e funciona sem internet.</span></div>';
   h+='<div class="field"><span>Tamanho do texto</span>'+seg('size',[[100,'Normal'],[115,'Maior'],[130,'Grande'],[150,'Muito']])+'</div>';
   h+=row('space','Mais espaço entre letras, palavras e linhas','Deixa o texto mais arejado e fácil de acompanhar.');
   h+=row('left','Texto alinhado à esquerda','Tira o centralizado dos textos de estudo.');

@@ -1,6 +1,6 @@
-/* Neurinho: service worker. Versao do conteudo: 525165a092 */
-var VER='neurinho-525165a092';
-var CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png'];
+/* Neurinho: service worker. Versao do conteudo: 428276d0ee */
+var VER='neurinho-428276d0ee';
+var CORE=['./','index.html','OpenDyslexic-Regular.otf','OpenDyslexic-Bold.otf','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VER).then(function(c){return c.addAll(CORE)}).then(function(){return self.skipWaiting()}));
 });

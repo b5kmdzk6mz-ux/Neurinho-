@@ -15,7 +15,7 @@
 <title>Neurinho</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
 <style>
 /* Layout: app de uma coluna feito para celular, conteúdo rolável e barra de abas fixa embaixo. */
 :root{
@@ -186,6 +186,36 @@ textarea{min-height:92px; resize:vertical}
 .tab svg{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
 .tab[aria-current="page"]{color:var(--accent); background:var(--accent-soft)}
 #toast{position:fixed; left:50%; bottom:calc(86px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:14px; font-weight:700; font-size:14px; z-index:30; max-width:90vw; text-align:center}
+/* ---------- acessibilidade ---------- */
+:root.a-font-leg{--font-body:'Atkinson Hyperlegible',Verdana,Tahoma,sans-serif; --font-display:'Atkinson Hyperlegible',Verdana,Tahoma,sans-serif}
+:root.a-font-ver{--font-body:Verdana,Tahoma,'DejaVu Sans',sans-serif; --font-display:Verdana,Tahoma,'DejaVu Sans',sans-serif}
+.a-z115 body{zoom:1.15}
+.a-z130 body{zoom:1.3}
+.a-z150 body{zoom:1.5}
+.a-space body{letter-spacing:.05em; word-spacing:.16em}
+.a-space p,.a-space li,.a-space .face .q,.a-space .face .a,.a-space .rs-box,.a-space .note,.a-space .bubble,.a-space td{line-height:1.8}
+.a-space .tab,.a-space .label{letter-spacing:0; word-spacing:0}
+.a-left .face,.a-left .face .q,.a-left .face .a,.a-left [style*="text-align:center"]{text-align:left!important}
+:root.a-contrast{--bg:#FFFFFF; --surface:#FFFFFF; --ink:#000000; --muted:#2B2B2B; --line:#555555; --accent:#8A2A10; --on-accent:#FFFFFF; --accent-soft:#FBE9E2; --sage:#2F5D31; --sage-soft:#E4F1E4; --rose:#8A2A10; --rose-soft:#FBE9E2; --sand:#E9E2D9; --good:#14561F; --good-soft:#DDF3DD; --bad:#9C1C10; --bad-soft:#FBE0DC; --warn-soft:#FFF1C2}
+@media (prefers-color-scheme: dark){
+  :root.a-contrast:not([data-theme="light"]){--bg:#000000; --surface:#101010; --ink:#FFFFFF; --muted:#E6E6E6; --line:#BDBDBD; --accent:#FFB59E; --on-accent:#000000; --accent-soft:#3A1A10; --sage:#9FD39F; --sage-soft:#12301A; --rose:#FFB59E; --rose-soft:#3A1A10; --sand:#2A2A2A; --good:#7DE08A; --good-soft:#0F3017; --bad:#FF8F84; --bad-soft:#40130E; --warn-soft:#3F3200}
+}
+:root[data-theme="dark"].a-contrast{--bg:#000000; --surface:#101010; --ink:#FFFFFF; --muted:#E6E6E6; --line:#BDBDBD; --accent:#FFB59E; --on-accent:#000000; --accent-soft:#3A1A10; --sage:#9FD39F; --sage-soft:#12301A; --rose:#FFB59E; --rose-soft:#3A1A10; --sand:#2A2A2A; --good:#7DE08A; --good-soft:#0F3017; --bad:#FF8F84; --bad-soft:#40130E; --warn-soft:#3F3200}
+.a-contrast .card{border-width:2px}
+.a-nomotion *{animation:none!important; transition:none!important; scroll-behavior:auto!important}
+.a-big .btn{min-height:56px; font-size:18px}
+.a-big .chip,.a-big .seg button,.a-big .acc-row{min-height:48px; font-size:16px}
+.a-big .tab{padding:10px 0}
+#rl-t,#rl-b{position:fixed; left:0; right:0; background:rgba(40,25,25,.5); z-index:40; pointer-events:none; display:none}
+.a-ruler #rl-t,.a-ruler #rl-b{display:block}
+#ttsb{position:fixed; right:max(14px,env(safe-area-inset-right,0px)); bottom:calc(92px + env(safe-area-inset-bottom,0px)); z-index:35; display:none; box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.a-tts #ttsb{display:inline-flex}
+.acc-row{display:flex; justify-content:space-between; align-items:center; gap:12px; width:100%; text-align:left; border:1.5px solid var(--line); background:var(--surface); border-radius:14px; padding:12px 14px}
+.acc-row b{display:block; font-size:15px}
+.acc-row small{display:block; color:var(--muted); font-weight:600; font-size:13px; margin-top:2px}
+.acc-row .st{flex:none; font-weight:800; color:var(--muted); font-size:13px}
+.acc-row[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+.acc-row[aria-pressed="true"] .st{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -517,6 +547,7 @@ function viewHome(){
   });
   h+='</div></div>';
   h+='<button class="btn soft" data-act="tab" data-t="progresso">Ver meu progresso</button>';
+  h+='<button class="btn ghost" data-act="accgo">Acessibilidade e leitura</button>';
   h+='<div class="card"><h3>Desafio de hoje</h3><div class="note '+(lg.n>0?'good':'info')+'" style="margin-top:10px">'+(lg.n>0?'Feito: ':'')+'1 microsessão de estudo</div><div class="note '+(lg.pause>0?'good':'info')+'" style="margin-top:8px">'+(lg.pause>0?'Feito: ':'')+'1 pausa de respiração</div></div>';
   return h;
 }
@@ -787,6 +818,7 @@ function viewProgresso(){
     });
     h+='</div>';
   }
+  h+=accCard();
   h+='<div class="card" style="display:flex;flex-direction:column;gap:14px"><h3>Ajustes</h3><div class="field"><span>Seu nome</span><input type="text" id="nome" data-bind="S.nome" value="'+esc(S.nome)+'" placeholder="Como o Neurinho deve te chamar?"></div>';
   var hasEx=S.cards.some(function(c){return c.ex});
   if(hasEx)h+='<button class="btn ghost" data-act="rmex">'+(confirmKey==='rmex'?'Confirmar: remover exemplos':'Remover cartões de exemplo')+'</button>';
@@ -795,6 +827,88 @@ function viewProgresso(){
   h+='<div class="field"><span>Restaurar backup</span><textarea id="bkin" data-bind="draft.bkin" placeholder="Cole aqui o backup copiado antes">'+esc(draft.bkin)+'</textarea></div><button class="btn ghost" data-act="bkrest">Restaurar</button>';
   h+='<button class="btn '+(confirmKey==='reset'?'danger':'ghost')+'" data-act="reset">'+(confirmKey==='reset'?'Confirmar: apagar tudo':'Apagar todos os dados')+'</button></div>';
   h+='<p class="muted small" style="text-align:center">Seus dados ficam salvos neste aparelho e navegador.</p>';
+  return h;
+}
+
+/* ---------- acessibilidade ---------- */
+var ACCK='neurinho.acc';
+var ACCD={font:'pad',size:100,space:0,left:0,contrast:0,motion:0,big:0,ruler:0,tts:0,slow:0};
+var ACC=(function(){var o={};try{o=JSON.parse(localStorage.getItem(ACCK)||'{}')||{}}catch(e){}var r={};Object.keys(ACCD).forEach(function(k){r[k]=(o[k]!==undefined)?o[k]:ACCD[k]});return r})();
+function saveAcc(){try{localStorage.setItem(ACCK,JSON.stringify(ACC))}catch(e){}}
+var rulerBound=false,speaking=false;
+function hasTts(){return typeof window!=='undefined'&&('speechSynthesis' in window)&&typeof SpeechSynthesisUtterance!=='undefined'}
+function placeRuler(y){
+  var a=document.getElementById('rl-t'),b=document.getElementById('rl-b');if(!a||!b||!a.style)return;
+  a.style.top='0';a.style.height=Math.max(0,y-36)+'px';b.style.top=(y+36)+'px';b.style.bottom='0';
+}
+function ensureAccEls(){
+  var root=document.documentElement;if(!root||!root.appendChild||!document.createElement)return;
+  if(!document.getElementById('rl-t')){
+    var a=document.createElement('div');a.id='rl-t';a.setAttribute('aria-hidden','true');
+    var b=document.createElement('div');b.id='rl-b';b.setAttribute('aria-hidden','true');
+    root.appendChild(a);root.appendChild(b);
+  }
+  if(!document.getElementById('ttsb')){
+    var t=document.createElement('button');t.id='ttsb';t.type='button';t.className='btn sm';t.setAttribute('data-act','tts');t.setAttribute('aria-label','Ouvir esta tela em voz alta');t.textContent='Ouvir';
+    root.appendChild(t);
+  }
+  if(!rulerBound){
+    rulerBound=true;
+    document.addEventListener('pointermove',function(e){if(ACC.ruler&&e.clientY!=null)placeRuler(e.clientY)},{passive:true});
+    document.addEventListener('touchmove',function(e){if(ACC.ruler&&e.touches&&e.touches[0])placeRuler(e.touches[0].clientY)},{passive:true});
+  }
+}
+function setTtsLabel(){var t=document.getElementById('ttsb');if(t)t.textContent=speaking?'Parar':'Ouvir'}
+function applyAcc(){
+  var el=document.documentElement;if(!el||!el.classList)return;
+  var cl=el.classList;
+  ['a-font-leg','a-font-ver','a-z115','a-z130','a-z150','a-space','a-left','a-contrast','a-nomotion','a-big','a-ruler','a-tts'].forEach(function(c){cl.remove(c)});
+  if(ACC.font==='leg')cl.add('a-font-leg');
+  if(ACC.font==='ver')cl.add('a-font-ver');
+  if(ACC.size>100)cl.add('a-z'+ACC.size);
+  if(ACC.space)cl.add('a-space');
+  if(ACC.left)cl.add('a-left');
+  if(ACC.contrast)cl.add('a-contrast');
+  if(ACC.motion)cl.add('a-nomotion');
+  if(ACC.big)cl.add('a-big');
+  if(ACC.ruler||ACC.tts)ensureAccEls();
+  if(ACC.ruler){cl.add('a-ruler');placeRuler((window.innerHeight||600)/2)}
+  if(ACC.tts&&hasTts())cl.add('a-tts');
+}
+function ttsStop(){if(hasTts()){try{window.speechSynthesis.cancel()}catch(e){}}speaking=false;setTtsLabel()}
+function ttsToggle(){
+  if(!hasTts())return;
+  if(speaking||window.speechSynthesis.speaking){ttsStop();return}
+  var a=document.getElementById('app');var txt=((a&&(a.innerText||a.textContent))||'').replace(/\s+/g,' ').trim();
+  if(!txt)return;
+  var parts=txt.match(/[^.!?:;]+[.!?:;]*/g)||[txt],chunks=[],cur='';
+  parts.forEach(function(p){if((cur+p).length>200&&cur){chunks.push(cur);cur=p}else cur+=p});
+  if(cur)chunks.push(cur);
+  speaking=true;setTtsLabel();
+  chunks.forEach(function(c,i){
+    var u=new SpeechSynthesisUtterance(c);u.lang='pt-BR';u.rate=ACC.slow?0.8:1;
+    if(i===chunks.length-1){u.onend=function(){speaking=false;setTtsLabel()}}
+    u.onerror=function(){if(i===chunks.length-1){speaking=false;setTtsLabel()}};
+    window.speechSynthesis.speak(u);
+  });
+}
+function accCard(){
+  function seg(k,opts){return '<div class="seg" style="grid-template-columns:repeat('+opts.length+',1fr)">'+opts.map(function(o){return '<button data-act="acc" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(ACC[k])===String(o[0]))+'">'+o[1]+'</button>'}).join('')+'</div>'}
+  function row(k,t,d){return '<button class="acc-row" data-act="acc" data-k="'+k+'" data-v="'+(ACC[k]?0:1)+'" aria-pressed="'+(!!ACC[k])+'"><span><b>'+t+'</b><small>'+d+'</small></span><span class="st">'+(ACC[k]?'Ligado':'Desligado')+'</span></button>'}
+  var h='<div class="card" id="acc" style="display:flex;flex-direction:column;gap:14px"><h3>Acessibilidade e leitura</h3><p class="muted small">Ajustes para facilitar a leitura, inclusive para quem tem dislexia ou baixa visão. Cada pessoa se adapta de um jeito, então teste e fique com o que ajuda. Tudo fica salvo neste aparelho.</p>';
+  h+='<div class="field"><span>Fonte</span>'+seg('font',[['pad','Padrão'],['leg','Legível'],['ver','Verdana']])+'<span class="muted small">Legível usa a Atkinson Hyperlegible, criada para diferenciar bem letras parecidas (b, d, p, q). Na primeira vez precisa de internet para carregar; sem ela, usa a Verdana.</span></div>';
+  h+='<div class="field"><span>Tamanho do texto</span>'+seg('size',[[100,'Normal'],[115,'Maior'],[130,'Grande'],[150,'Muito']])+'</div>';
+  h+=row('space','Mais espaço entre letras, palavras e linhas','Deixa o texto mais arejado e fácil de acompanhar.');
+  h+=row('left','Texto alinhado à esquerda','Tira o centralizado dos textos de estudo.');
+  h+=row('contrast','Alto contraste','Cores mais fortes para separar texto e fundo.');
+  h+=row('motion','Menos animações','Para o mascote e os efeitos pararem de se mexer.');
+  h+=row('big','Botões maiores','Mais fácil de tocar.');
+  h+=row('ruler','Régua de leitura','Escurece o resto da tela e destaca a linha que você está lendo. Acompanha o dedo ou o mouse.');
+  if(hasTts()){
+    h+=row('tts','Botão Ouvir','Mostra um botão para o aparelho ler a tela em voz alta. Depende das vozes do seu celular.');
+    if(ACC.tts)h+=row('slow','Leitura mais lenta','Reduz a velocidade da voz.');
+  }
+  h+='<button class="btn ghost" data-act="accreset">Voltar ao padrão</button></div>';
   return h;
 }
 
@@ -808,7 +922,7 @@ function render(){
     return '<button class="tab" data-act="tab" data-t="'+t[0]+'"'+(t[0]===tab?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[t[0]]+'</svg>'+t[1]+'</button>';
   }).join('');
 }
-function go(t){tab=t;render();window.scrollTo(0,0)}
+function go(t){tab=t;ttsStop();render();window.scrollTo(0,0)}
 
 
 
@@ -1029,6 +1143,14 @@ document.addEventListener('click',function(e){
   if(a!=='del'&&a!=='deld'&&a!=='rmex'&&a!=='reset'&&a!=='delev'&&a!=='delh')confirmKey=null;
   switch(a){
     case 'tab':go(D.t);break;
+    case 'acc':
+      var ak=D.k,av=D.v;
+      if(ak==='font')ACC.font=av;else if(ak==='size')ACC.size=+av;else ACC[ak]=(+av?1:0);
+      if(ak==='tts'&&!ACC.tts){ACC.slow=0;ttsStop()}
+      saveAcc();applyAcc();render();break;
+    case 'accreset':ACC=JSON.parse(JSON.stringify(ACCD));ttsStop();saveAcc();applyAcc();render();break;
+    case 'accgo':go('progresso');var ax=document.getElementById('acc');if(ax&&ax.scrollIntoView)ax.scrollIntoView();break;
+    case 'tts':ttsToggle();break;
     case 'go-start':startSession(D.disc,D.sub);break;
     case 'ssub':setup.sub=D.s;render();break;
     case 'per':
@@ -1147,6 +1269,7 @@ function importCards(){
   draft.imp='';save();render();toast(list.length+' '+plural(list.length,'cartão criado','cartões criados')+'.');
 }
 
+applyAcc();
 render();
 })();
 </script>

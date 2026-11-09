@@ -1,6 +1,6 @@
 # Neurinho: A Jornada das Sinapses
 
-Documento de design do jogo do Neurinho. O jogo fica dentro do app (botão **Jogar** na tela Início) e usa as próprias questões de múltipla escolha do banco de estudo. Ou seja: jogar é estudar.
+Documento de design do jogo do Neurinho. O jogo fica em uma aba própria do app (aba **Jogo**, na barra de baixo) e usa as próprias questões de múltipla escolha do banco de estudo. Ou seja: jogar é estudar.
 
 ---
 

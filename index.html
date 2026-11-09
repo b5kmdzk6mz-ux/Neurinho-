@@ -181,7 +181,7 @@ textarea{min-height:92px; resize:vertical}
 .two{display:grid; grid-template-columns:1fr 1fr; gap:10px}
 .tabs{position:fixed; left:0; right:0; bottom:0; z-index:20; background:var(--surface); border-top:1px solid var(--line);
   padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
-.tabs-in{max-width:520px; margin:0 auto; display:grid; grid-template-columns:repeat(6,1fr); gap:2px}
+.tabs-in{max-width:520px; margin:0 auto; display:grid; grid-template-columns:repeat(7,1fr); gap:2px}
 .tab{background:none; border:0; color:var(--muted); font-weight:800; font-size:10.5px; display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 0; border-radius:12px}
 .tab svg{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round}
 .tab[aria-current="page"]{color:var(--accent); background:var(--accent-soft)}
@@ -379,9 +379,10 @@ var ICONS={
  estudar:'<rect x="4" y="6" width="13" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13"/>',
  cartoes:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
  cuidar:'<path d="M12 21s-8-5-9.500-10A5 5 0 0 1 12 6.500 5 5 0 0 1 21.500 11C20 16 12 21 12 21z"/>',
- progresso:'<path d="M5 20V10M12 20V4M19 20v-7"/>'
+ progresso:'<path d="M5 20V10M12 20V4M19 20v-7"/>',
+ jogo:'<rect x="2" y="7" width="20" height="12" rx="5"/><path d="M7 11v4M5 13h4"/><circle cx="15.5" cy="12" r="1"/><circle cx="18" cy="14.5" r="1"/>'
 };
-var TABS=[['home','Início'],['estudar','Estudar'],['resumos','Resumos'],['agenda','Agenda'],['cartoes','Cartões'],['cuidar','Cuidar']];
+var TABS=[['home','Início'],['estudar','Estudar'],['resumos','Resumos'],['agenda','Agenda'],['cartoes','Cartões'],['cuidar','Cuidar'],['jogo','Jogo']];
 
 /* ---------- utilidades ---------- */
 function pad(n){return String(n).padStart(2,'0')}
@@ -585,8 +586,6 @@ function viewHome(){
     h+='<div class="disc"><span class="dot" style="background:'+d.cor+'"></span><div style="min-width:0"><div class="name">'+esc(d.nome)+'</div><div class="muted small">'+k.tot+' '+plural(k.tot,'cartão','cartões')+(k.due?', '+k.due+' para revisar':'')+'</div><div class="bar" style="margin-top:6px"><i style="width:'+pct+'%"></i></div></div><button class="btn soft sm" data-act="go-start" data-disc="'+esc(d.id)+'"'+(k.tot?'':' disabled')+'>Estudar</button></div>';
   });
   h+='</div></div>';
-  var gf=gFrags();
-  h+='<div class="card g-zone"><div class="g-art">'+GART.boss+'</div><div style="min-width:0"><h3>A Jornada das Sinapses</h3><p class="muted small" style="margin:4px 0 8px">'+(gs().fim?'Você reacendeu a Grande Sinapse! Encare o Modo Plantão.':'Ajude o Neurinho a derrotar Lorde Apagão respondendo questões. Fragmentos: '+gf+' de 5.')+'</p><button class="btn sm" data-act="g-open">Jogar</button></div></div>';
   h+='<button class="btn soft" data-act="tab" data-t="progresso">Ver meu progresso</button>';
   h+='<button class="btn ghost" data-act="accgo">Acessibilidade e leitura</button>';
   h+='<div class="card"><h3>Desafio de hoje</h3><div class="note '+(lg.n>0?'good':'info')+'" style="margin-top:10px">'+(lg.n>0?'Feito: ':'')+'1 microsessão de estudo</div><div class="note '+(lg.pause>0?'good':'info')+'" style="margin-top:8px">'+(lg.pause>0?'Feito: ':'')+'1 pausa de respiração</div></div>';
@@ -1102,7 +1101,7 @@ function viewJogo(){
 }
 function gIntro(){
   var last=gpage>=GSTORY.length-1;
-  var h='<div class="row between"><button class="btn ghost sm" data-act="g-home">Início</button><span class="muted small" style="font-weight:800">'+(gpage+1)+' de '+GSTORY.length+'</span></div>';
+  var h='<div class="row between"><h1>Jogo</h1><span class="muted small" style="font-weight:800">'+(gpage+1)+' de '+GSTORY.length+'</span></div>';
   h+='<div class="card g-story"><div class="label">A Jornada das Sinapses</div>'+mascot(120,stageIdx(S.xp),gpage===1?'think':'cheer')+'<p>'+esc(GSTORY[gpage])+'</p></div>';
   if(gpage===2)h+='<div class="g-gang">'+GZ.map(function(z){return '<div>'+GART[z.id]+'<small>'+esc(z.vilao)+'</small></div>'}).join('')+'</div>';
   h+='<button class="btn big" data-act="g-intro">'+(last?'Começar a jornada':'Continuar')+'</button>';
@@ -1110,8 +1109,8 @@ function gIntro(){
 }
 function gMap(){
   var g=gs(),m=gMapDisc(),fr=gFrags();
-  var h='<div class="row between"><button class="btn ghost sm" data-act="g-home">Início</button><span class="pill">Fragmentos: '+fr+' de 5</span></div>';
-  h+='<div><h1>A Jornada das Sinapses</h1><p class="muted">Responda certo para atacar. Cada vilão guarda um fragmento da Grande Sinapse.</p></div>';
+  var h='<div class="row between"><h1>A Jornada das Sinapses</h1><span class="pill">Fragmentos: '+fr+' de 5</span></div>';
+  h+='<div><p class="muted">Responda certo para atacar. Cada vilão guarda um fragmento da Grande Sinapse.</p></div>';
   h+='<div class="g-frags" aria-label="'+fr+' de 5 fragmentos">'+GZ.map(function(z){return '<span class="g-frag'+(g.won[z.id]?' on':'')+'" style="--c:'+z.cor+'"></span>'}).join('')+'</div>';
   GZ.forEach(function(z){
     var d=m[z.id],dn=d?dshort(discOf(d)):'',n=d?gQs(d).length:0,won=g.won[z.id];

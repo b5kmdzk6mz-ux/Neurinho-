@@ -13,4 +13,6 @@ Na aba **Cartões > Anexar**, envie um PDF, Word (.docx), foto (JPG/PNG) ou text
 - **Resumo grátis:** escolhe as frases principais do texto e cria cartões a partir das definições.
 - **Resumo com IA (opcional):** usa a Claude, da Anthropic, com a chave de API da própria pessoa (uso pago, cobrado na conta da Anthropic). Reescreve o conteúdo em tópicos e cria cartões e questões de prova.
 
+- **Resumo pelo Claude, sem chave:** o botão **Copiar pedido** copia um pedido pronto. A pessoa cola no Claude junto com o arquivo e depois cola a resposta em **Colar texto**: o resumo vai para a aba Resumos e os cartões para a biblioteca.
+
 Os resumos salvos aparecem na aba Resumos, com a etiqueta "Meu". As bibliotecas usadas estão em `vendor/`.

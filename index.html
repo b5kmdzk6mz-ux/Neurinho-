@@ -228,6 +228,8 @@ textarea{min-height:92px; resize:vertical}
 .att-in{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 label.btn{text-align:center;cursor:pointer}
 .att-ia summary,.att-x summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.att-steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px}
+a.btn{text-decoration:none}
 .att-c{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--line)}
 .att-c:first-of-type{border-top:0}
 /* jogo */
@@ -714,20 +716,47 @@ function viewCriar(){
   return h;
 }
 
+function impCount(txt){
+  var n=parseImport(txt).length,r=parseResumo(txt);
+  return n+' '+plural(n,'cartão pronto','cartões prontos')+(r?' e 1 resumo':'')+' para criar';
+}
 function viewColar(){
-  var n=parseImport(draft.imp).length;
-  var h='<div class="card" style="display:flex;flex-direction:column;gap:14px"><div><h3>Colar texto</h3><p class="muted small" style="margin-top:4px">Os cartões vão para a disciplina escolhida acima.</p></div>';
+  var h='<div class="card" style="display:flex;flex-direction:column;gap:14px"><div><h3>Colar texto</h3><p class="muted small" style="margin-top:4px">Cole aqui a resposta do Claude ou o seu próprio resumo. Tudo vai para a disciplina escolhida acima.</p></div>';
   h+='<div class="field"><span>Cole seu resumo, uma pergunta por linha</span><textarea id="imp" style="min-height:180px" data-bind="draft.imp" placeholder="O que é mitose? | Divisão que gera 2 células idênticas&#10;Onde é produzida a insulina? | Nas células beta do pâncreas">'+esc(draft.imp)+'</textarea></div>';
-  h+='<p class="muted small">Separe a pergunta e a resposta com o símbolo |. Cada linha vira um cartão.</p><button class="btn" data-act="importar">Criar cartões</button><p class="muted small" id="impn">'+n+' '+plural(n,'cartão pronto','cartões prontos')+' para criar</p></div>';
+  h+='<p class="muted small">Separe a pergunta e a resposta com o símbolo |. Cada linha vira um cartão.</p><button class="btn" data-act="importar">Criar cartões</button><p class="muted small" id="impn">'+impCount(draft.imp)+'</p></div>';
   return h;
 }
+function mdClean(l){return l.replace(/\*\*|__/g,'').replace(/^\s*(?:[-*•]\s+|\d+[.)]\s+)/,'').trim()}
 function parseImport(txt){
   return String(txt||'').split(/\n/).map(function(l){
+    l=mdClean(l);
     var i=l.indexOf('|');
     if(i<1)return null;
-    var q=l.slice(0,i).trim(),a=l.slice(i+1).trim();
+    var q=l.slice(0,i).trim(),a=l.slice(i+1).replace(/\|\s*$/,'').trim();
     return q&&a?{q:q,a:a}:null;
   }).filter(Boolean);
+}
+/* Resumo colado (por exemplo, a resposta do Claude): linhas sem | antes da linha CARTÕES. */
+var CARDMARK=/^\W*cart[õo]es\W*$/i;
+function parseResumo(txt){
+  var lines=String(txt||'').replace(/\r/g,'').split('\n'),out=[],stop=false;
+  lines.forEach(function(l){if(stop)return;if(CARDMARK.test(l.trim())){stop=true;return}if(l.indexOf('|')<0)out.push(l)});
+  var body=out.map(function(l){return l.trim()}).filter(Boolean);
+  if(body.length<2||body.join(' ').length<80)return null;
+  var t='',b=[],li=[];
+  function flush(){if(li.length){b.push(['l',li]);li=[]}}
+  body.forEach(function(l){
+    var h=l.match(/^(#{1,6})\s*(.+)$/),x;
+    if(h){flush();x=h[2].replace(/\*\*|__/g,'').trim();if(h[1].length===1&&!t){t=x}else b.push(['p','<b>'+esc(x)+'</b>']);return}
+    if(/^\*\*[^*]+\*\*:?$/.test(l)){flush();b.push(['p','<b>'+esc(l.replace(/\*\*|:$/g,''))+'</b>']);return}
+    if(/^[-*•]\s+/.test(l)){li.push(esc(mdClean(l)));return}
+    flush();x=mdClean(l);
+    var bz=x.match(/^bizu\s*:?\s*(.+)$/i),nc=x.match(/^n[ãa]o confunda\s*:?\s*(.+)$/i);
+    if(bz)b.push(['bz',' '+esc(bz[1])]);else if(nc)b.push(['nc',' '+esc(nc[1])]);else b.push(['p',esc(x)]);
+  });
+  flush();
+  if(!b.length)return null;
+  return {t:(t||mdClean(body[0])).slice(0,90),b:b};
 }
 
 var BRT=[
@@ -1274,6 +1303,35 @@ function genIA(){
   },function(){att.busy='';att.err='Não consegui carregar a IA. Na primeira vez, este recurso precisa de internet.';render()});
 }
 
+/* ---- pedido pronto para colar no Claude ---- */
+function claudePrompt(dn){
+  return 'Estou estudando Enfermagem, disciplina '+dn+'. Leia o material que estou enviando e responda SOMENTE no formato abaixo, sem nenhum texto antes ou depois.\n\n'+
+  '# Título curto do assunto\n'+
+  '## Subtítulo\n'+
+  'Parágrafos curtos e listas com "- " no começo de cada item.\n'+
+  'Bizu: uma dica para memorizar (de 1 a 3 linhas assim, onde fizer sentido).\n'+
+  'Não confunda: conceitos parecidos que costumam confundir (se houver).\n\n'+
+  'CARTÕES\n'+
+  'Pergunta | Resposta curta\n\n'+
+  'Regras:\n'+
+  '- Faça de 10 a 20 cartões, um por linha, com o símbolo | separando a pergunta da resposta.\n'+
+  '- Não use o símbolo | em nenhum outro lugar e não use tabelas.\n'+
+  '- Use somente o que está no material. Não invente dados, doses ou valores.\n'+
+  '- Escreva em português do Brasil, com frases claras.';
+}
+function copyText(t){
+  if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t).catch(function(){return copyOld(t)});
+  return copyOld(t);
+}
+function copyOld(t){
+  return new Promise(function(res,rej){
+    var x=document.createElement('textarea');x.value=t;x.setAttribute('readonly','');x.style.position='fixed';x.style.opacity='0';
+    document.body.appendChild(x);x.select();x.setSelectionRange(0,t.length);
+    var ok=false;try{ok=document.execCommand('copy')}catch(e){}
+    document.body.removeChild(x);ok?res():rej();
+  });
+}
+
 /* ---- salvar ---- */
 function resOf(d){return (RES[d]||[]).concat((S.mres&&S.mres[d])||[])}
 function attSave(all){
@@ -1299,6 +1357,7 @@ function attAct(a,D){
       att.err='';att.res=r;render();window.scrollTo(0,0);break;
     case 'att-ia':var tx2=document.getElementById('attx');if(tx2)att.text=tx2.value;genIA();break;
     case 'att-save':attSave(D.all==='1');break;
+    case 'att-copy':copyText(claudePrompt(dshort(discOf(attDisc())))).then(function(){toast('Pedido copiado! Agora abra o Claude e cole.')},function(){toast('Não consegui copiar. Toque e segure no texto para copiar.')});break;
     case 'att-back':att.res=null;att.err='';render();break;
     case 'att-clear':att={name:'',kind:'',busy:'',err:'',text:'',b64:'',mime:'',res:null};render();break;
     case 'ia-save':
@@ -1337,6 +1396,9 @@ function viewAnexar(){
     }
   }
   h+='</div>';
+  h+='<div class="card" style="display:flex;flex-direction:column;gap:12px"><div><h3>Resumo pelo Claude, sem chave</h3><p class="muted small" style="margin-top:4px">Usa a sua assinatura do Claude. Não precisa de chave nem paga nada a mais.</p></div>';
+  h+='<ol class="att-steps"><li>Toque em <b>Copiar pedido</b>.</li><li>Toque em <b>Abrir o Claude</b>, anexe o arquivo da aula e cole o pedido.</li><li>Copie a resposta inteira do Claude e cole em <b>Colar texto</b>, aqui embaixo. O resumo vai para a aba Resumos e os cartões para a biblioteca.</li></ol>';
+  h+='<button class="btn" data-act="att-copy">Copiar pedido</button><a class="btn soft" href="https://claude.ai/new" target="_blank" rel="noopener">Abrir o Claude</a></div>';
   h+='<details class="card att-ia"'+(att.text&&!k?' open':'')+'><summary><b>Resumo com IA (opcional)</b><span class="muted small">'+(k?'Configurado':'Não configurado')+'</span></summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">';
   h+='<p class="small">O resumo com IA usa a Claude, da Anthropic. Ele lê o arquivo inteiro (inclusive imagens e PDFs digitalizados), reescreve o conteúdo em tópicos e cria cartões e questões de prova.</p>';
   h+='<div class="note info small">Precisa de uma <b>chave de API</b> criada em console.anthropic.com. O uso é <b>pago</b> e cobrado na sua conta da Anthropic, por resumo gerado. A chave fica salva só neste aparelho e o arquivo vai direto daqui para a Anthropic.</div>';
@@ -1742,7 +1804,7 @@ function viewResumos(){
   var k=counts(rs.d,a.id);
   h+='<div class="row"><button class="btn soft" data-act="rs-back">‹ Assuntos</button><span class="tag">'+esc(d.nome)+'</span></div>';
   h+='<div class="card"><h2 style="margin-top:0">'+esc(a.t)+'</h2>'+a.b.map(blk).join('')+'</div>';
-  if(a.u)h+='<div class="row between"><span class="muted small">'+(a.ia?'Resumo com IA':'Resumo grátis')+(a.src?' de '+esc(a.src):'')+'</span><button class="btn ghost sm" data-act="delres" data-id="'+esc(a.id)+'">'+(resDelAsk===a.id?'Toque de novo para excluir':'Excluir resumo')+'</button></div>';
+  if(a.u)h+='<div class="row between"><span class="muted small">'+(a.ia?'Resumo com IA':a.src==='Texto colado'?'Resumo colado':'Resumo grátis')+(a.src&&a.src!=='Texto colado'?' de '+esc(a.src):'')+'</span><button class="btn ghost sm" data-act="delres" data-id="'+esc(a.id)+'">'+(resDelAsk===a.id?'Toque de novo para excluir':'Excluir resumo')+'</button></div>';
   h+='<button class="btn big" data-act="rs-study" data-disc="'+esc(rs.d)+'" data-sub="'+a.id+'"'+(k.tot?'':' disabled')+'>Praticar este assunto<small>'+k.tot+' '+plural(k.tot,'cartão','cartões')+'</small></button>';
   if(idx<lista.length-1)h+='<button class="btn soft" data-act="rs-s" data-s="'+lista[idx+1].id+'">Próximo: '+esc(lista[idx+1].t)+'</button>';
   return h;
@@ -1816,7 +1878,7 @@ function setPath(path,val){
   var o=p[0]==='lib'?lib:draft;
   if(p[0]==='lib'){o[p[1]]=val;render();return}
   if(p.length===3){o[p[1]][+p[2]]=val}else{o[p[1]]=val}
-  if(path==='draft.imp'){var el=document.getElementById('impn');if(el){var n=parseImport(val).length;el.textContent=n+' '+plural(n,'cartão pronto','cartões prontos')+' para criar'}}
+  if(path==='draft.imp'){var el=document.getElementById('impn');if(el)el.textContent=impCount(val)}
 }
 document.addEventListener('input',function(e){
   var b=e.target&&e.target.getAttribute&&e.target.getAttribute('data-bind');
@@ -1955,9 +2017,14 @@ function createCard(){
 function importCards(){
   var list=parseImport(draft.imp),d=attDisc();
   if(!d){toast('Crie uma disciplina primeiro.');return}
-  if(!list.length){toast('Nenhuma linha no formato pergunta | resposta.');return}
-  list.forEach(function(x){S.cards.push({id:uid(),d:d,t:'c',q:x.q,a:x.a,box:0,due:today(),seen:false,tries:0,ok:0,ex:false})});
-  draft.imp='';save();render();toast(list.length+' '+plural(list.length,'cartão criado','cartões criados')+'.');
+  var r=parseResumo(draft.imp),sid='';
+  if(!list.length&&!r){toast('Nenhuma linha no formato pergunta | resposta.');return}
+  if(r){sid='u'+uid();S.mres=S.mres||{};(S.mres[d]=S.mres[d]||[]).push({id:sid,t:r.t,b:r.b,u:1,src:'Texto colado',dt:today(),ia:0})}
+  list.forEach(function(x){var c={id:uid(),d:d,t:'c',q:x.q,a:x.a,box:0,due:today(),seen:false,tries:0,ok:0,ex:false};if(sid)c.s=sid;S.cards.push(c)});
+  draft.imp='';save();
+  var msg=list.length+' '+plural(list.length,'cartão criado','cartões criados');
+  if(r){rs.d=d;rs.s=sid;go('resumos');toast('Resumo salvo'+(list.length?' com '+msg:'')+'.');return}
+  render();toast(msg+'.');
 }
 
 applyAcc();

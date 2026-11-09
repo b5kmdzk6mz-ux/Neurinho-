@@ -220,6 +220,41 @@ textarea{min-height:92px; resize:vertical}
 .acc-row .st{flex:none; font-weight:800; color:var(--muted); font-size:13px}
 .acc-row[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
 .acc-row[aria-pressed="true"] .st{color:var(--accent)}
+
+/* jogo */
+.g-story{display:grid;justify-items:center;text-align:center;gap:10px}
+.g-story p{font-size:16px;line-height:1.6}
+.g-gang{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center}
+.g-gang svg{width:100%;max-width:64px;height:auto}
+.g-gang small{display:block;font-size:11px;font-weight:700;color:var(--muted)}
+.g-frags{display:flex;gap:10px;justify-content:center}
+.g-frag{width:26px;height:26px;transform:rotate(45deg);border-radius:6px;border:2px dashed var(--line);background:transparent}
+.g-frag.on{border:2px solid var(--c);background:var(--c);box-shadow:0 0 12px var(--c)}
+.g-zone{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:start}
+.g-zone h3{margin:2px 0 0}
+.g-zone.won{border-color:var(--good)}
+.g-zone.locked .g-art{filter:grayscale(1) brightness(.6);opacity:.7}
+.g-art svg{width:72px;height:72px;display:block}
+.g-art.sm svg{width:52px;height:52px}
+.g-art.lg svg{width:110px;height:110px}
+.g-pop{display:grid;grid-template-columns:52px 1fr;gap:12px;border:2px solid #D9473A}
+.g-arena{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;text-align:center}
+.g-side{display:grid;justify-items:center;gap:4px;min-width:0}
+.g-side .bar{width:100%}
+.g-foe svg{width:84px;height:84px;display:block}
+.g-me,.g-foe{height:86px;display:flex;align-items:flex-end;justify-content:center}
+.g-vs{font-weight:900;color:var(--muted);font-size:14px}
+.g-pips{display:flex;gap:4px}
+.g-hp{width:12px;height:12px;border-radius:50%;border:2px solid var(--accent);display:inline-block}
+.g-hp.on{background:var(--accent)}
+.g-shield svg{filter:drop-shadow(0 0 6px #7F9BAE) drop-shadow(0 0 2px #7F9BAE)}
+.g-pow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g-pow small{display:block;font-weight:600;font-size:12px;opacity:.8}
+.opt.g-off{opacity:.35;text-decoration:line-through}
+.g-hit{animation:g-shake .45s ease}
+.g-down svg{transform:rotate(-12deg);opacity:.8}
+.g-final{background:linear-gradient(180deg,var(--accent-soft),var(--surface))}
+@keyframes g-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
 </style>
 </head>
 <body>
@@ -550,6 +585,8 @@ function viewHome(){
     h+='<div class="disc"><span class="dot" style="background:'+d.cor+'"></span><div style="min-width:0"><div class="name">'+esc(d.nome)+'</div><div class="muted small">'+k.tot+' '+plural(k.tot,'cartão','cartões')+(k.due?', '+k.due+' para revisar':'')+'</div><div class="bar" style="margin-top:6px"><i style="width:'+pct+'%"></i></div></div><button class="btn soft sm" data-act="go-start" data-disc="'+esc(d.id)+'"'+(k.tot?'':' disabled')+'>Estudar</button></div>';
   });
   h+='</div></div>';
+  var gf=gFrags();
+  h+='<div class="card g-zone"><div class="g-art">'+GART.boss+'</div><div style="min-width:0"><h3>A Jornada das Sinapses</h3><p class="muted small" style="margin:4px 0 8px">'+(gs().fim?'Você reacendeu a Grande Sinapse! Encare o Modo Plantão.':'Ajude o Neurinho a derrotar Lorde Apagão respondendo questões. Fragmentos: '+gf+' de 5.')+'</p><button class="btn sm" data-act="g-open">Jogar</button></div></div>';
   h+='<button class="btn soft" data-act="tab" data-t="progresso">Ver meu progresso</button>';
   h+='<button class="btn ghost" data-act="accgo">Acessibilidade e leitura</button>';
   h+='<div class="card"><h3>Desafio de hoje</h3><div class="note '+(lg.n>0?'good':'info')+'" style="margin-top:10px">'+(lg.n>0?'Feito: ':'')+'1 microsessão de estudo</div><div class="note '+(lg.pause>0?'good':'info')+'" style="margin-top:8px">'+(lg.pause>0?'Feito: ':'')+'1 pausa de respiração</div></div>';
@@ -921,7 +958,7 @@ function accCard(){
 function stopBreath(){if(breathTimer){clearTimeout(breathTimer);breathTimer=null}}
 function render(){
   stopBreath();stopStretch();
-  var v={home:viewHome,estudar:viewEstudar,resumos:viewResumos,agenda:viewAgenda,cartoes:viewCartoes,cuidar:viewCuidar,progresso:viewProgresso}[tab]();
+  var v={home:viewHome,estudar:viewEstudar,resumos:viewResumos,agenda:viewAgenda,cartoes:viewCartoes,cuidar:viewCuidar,progresso:viewProgresso,jogo:viewJogo}[tab]();
   document.getElementById('app').innerHTML=v;
   document.getElementById('tabs').innerHTML=TABS.map(function(t){
     return '<button class="tab" data-act="tab" data-t="'+t[0]+'"'+(t[0]===tab?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[t[0]]+'</svg>'+t[1]+'</button>';
@@ -930,6 +967,258 @@ function render(){
 function go(t){tab=t;ttsStop();render();window.scrollTo(0,0)}
 
 
+
+/* ---------- jogo: A Jornada das Sinapses ---------- */
+var GART={
+ bio:'<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M18 96c0-34 16-62 42-62s42 28 42 62c0 6-6 8-10 4-3 6-9 6-12 0-4 6-12 6-16 0-4 6-12 6-16 0-3 6-9 6-12 0-4 4-18 2-18-4z" fill="#9C6B4E"/><path d="M38 66q7 5 14 0M68 66q7 5 14 0" stroke="#2B1A12" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M50 82q10 6 20 0" stroke="#2B1A12" stroke-width="3.5" fill="none" stroke-linecap="round"/><ellipse cx="60" cy="40" rx="10" ry="4" fill="#B98563"/><text x="86" y="30" font-size="16" font-weight="800" fill="#7F9BAE" font-family="sans-serif">z</text><text x="96" y="18" font-size="12" font-weight="800" fill="#7F9BAE" font-family="sans-serif">z</text></svg>',
+ imu:'<svg viewBox="0 0 120 120" aria-hidden="true"><rect x="34" y="18" width="52" height="88" rx="10" fill="#5B4A78"/><rect x="40" y="28" width="40" height="64" rx="4" fill="#C8B8E6"/><circle cx="52" cy="54" r="7" fill="#fff"/><circle cx="68" cy="54" r="7" fill="#fff"/><circle cx="54" cy="55" r="3.5" fill="#1E1630"/><circle cx="70" cy="53" r="3.5" fill="#1E1630"/><path d="M52 74q8-5 16 0" stroke="#1E1630" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="88" cy="20" r="10" fill="#D9473A"/><text x="88" y="25" text-anchor="middle" font-size="12" font-weight="800" fill="#fff" font-family="sans-serif">9+</text><circle cx="24" cy="40" r="7" fill="#D9473A"/><circle cx="98" cy="64" r="6" fill="#D9473A"/><circle cx="20" cy="82" r="5" fill="#D9473A"/></svg>',
+ mor:'<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M72 30a38 38 0 1 0 22 62 32 32 0 1 1-22-62z" fill="#33406B"/><rect x="34" y="14" width="34" height="22" rx="3" fill="#1C1F33"/><rect x="26" y="34" width="50" height="6" rx="3" fill="#1C1F33"/><rect x="34" y="28" width="34" height="5" fill="#B3485A"/><circle cx="46" cy="62" r="6" fill="#F3E9C8"/><circle cx="64" cy="62" r="6" fill="#F3E9C8"/><circle cx="46" cy="63" r="3" fill="#1C1F33"/><circle cx="64" cy="63" r="3" fill="#1C1F33"/><path d="M39 71q7 5 14 0M57 71q7 5 14 0" stroke="#8A7FB0" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M48 84q7-3 14 0" stroke="#F3E9C8" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
+ gen:'<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M60 12l8 16 16-8-2 18 18 2-12 14 12 14-18 2 2 18-16-8-8 16-8-16-16 8 2-18-18-2 12-14-12-14 18-2-2-18 16 8z" fill="#A592B5"/><circle cx="60" cy="62" r="26" fill="#C7B6D6"/><circle cx="50" cy="56" r="9" fill="#fff"/><circle cx="70" cy="56" r="9" fill="#fff"/><circle cx="50" cy="56" r="3" fill="#2A1F35"/><circle cx="70" cy="56" r="3" fill="#2A1F35"/><path d="M48 76q4-4 8 0t8 0 8 0" stroke="#2A1F35" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M86 40q4 6 0 10q-4-4 0-10z" fill="#7FB3D9"/></svg>',
+ gqs:'<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M22 30h76l-10 18H32zM30 52h60l-9 18H39zM38 74h44l-8 18H46zM48 96h24l-6 12h-12z" fill="#7F9BAE"/><rect x="12" y="20" width="18" height="14" rx="2" fill="#F2D26B" transform="rotate(-18 21 27)"/><rect x="90" y="56" width="18" height="14" rx="2" fill="#E3A9A1" transform="rotate(16 99 63)"/><rect x="14" y="70" width="16" height="12" rx="2" fill="#fff" transform="rotate(12 22 76)"/><circle cx="50" cy="40" r="6" fill="#fff"/><circle cx="70" cy="40" r="6" fill="#fff"/><circle cx="52" cy="41" r="3" fill="#1D2A35"/><circle cx="68" cy="39" r="3" fill="#1D2A35"/><path d="M48 60q12 8 24 0" stroke="#1D2A35" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>',
+ boss:'<svg viewBox="0 0 120 120" aria-hidden="true"><path d="M20 86c-12 0-14-20 0-22-4-18 16-26 24-14 4-16 30-18 34 0 10-10 28 0 22 16 14 2 12 20 0 20z" fill="#2A2533"/><path d="M38 30l8 14 14-16 14 16 8-14 2 22H36z" fill="#D9AE6B"/><path d="M40 62l14 6M80 62l-14 6" stroke="#fff" stroke-width="4" stroke-linecap="round"/><ellipse cx="50" cy="72" rx="6" ry="4" fill="#fff"/><ellipse cx="70" cy="72" rx="6" ry="4" fill="#fff"/><path d="M50 84q10-5 20 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/><circle cx="100" cy="98" r="9" fill="#55505F"/><rect x="96" y="106" width="8" height="6" rx="1" fill="#55505F"/><path d="M92 90l16 16" stroke="#D9473A" stroke-width="3" stroke-linecap="round"/></svg>',
+ plantao:'<svg viewBox="0 0 120 120" aria-hidden="true"><circle cx="60" cy="60" r="44" fill="#E3A9A1"/><rect x="52" y="30" width="16" height="60" rx="3" fill="#fff"/><rect x="30" y="52" width="60" height="16" rx="3" fill="#fff"/></svg>'
+};
+var GZ=[
+ {id:'bio',pref:'bio',vilao:'Procrastino',titulo:'o Senhor do Amanhã',lugar:'Lamaçal do Amanhã',hp:7,cor:'#9C6B4E',
+  fala:'Pra que estudar agora? Amanhã é um dia tão bonito...',derrota:'Tá bom, tá bom... o difícil era só começar.',
+  poder:'Deixa pra depois: a cada 3 rodadas ele recupera 1 de vida.'},
+ {id:'imu',pref:'imu',fem:1,vilao:'Distrax',titulo:'a Rainha das Notificações',lugar:'Pântano dos Micróbios',hp:7,cor:'#5B4A78',
+  fala:'Só uma olhadinha no celular... só mais um vídeo...',derrota:'Modo foco ativado?! Isso não vale!',
+  poder:'Notificação!: a cada 3 rodadas um pop-up cobre a questão. Ignore antes de responder.'},
+ {id:'mor',pref:'mor',vilao:'Barão Insônia',titulo:'o Senhor da Noite em Claro',lugar:'Cidade dos Sistemas',hp:8,cor:'#33406B',
+  fala:'Durma depois! Vire a noite comigo, só mais um capítulo...',derrota:'Uma boa noite de sono... meu pior pesadelo.',
+  poder:'Noite em claro: a cada 4 rodadas ele drena 1 de energia (nunca abaixo de 1).'},
+ {id:'gen',pref:'gen',vilao:'Ansiax',titulo:'o Sussurro do "E se?"',lugar:'Labirinto do DNA',hp:8,cor:'#A592B5',
+  fala:'E se você esquecer tudo? E se cair justo o que você não estudou?',derrota:'Você respirou... e lembrou. Como?!',
+  poder:'Coração acelerado: cada erro tira 2 de energia. Use o Respiro!'},
+ {id:'gqs',pref:'gqs',fem:1,vilao:'Dona Bagunça',titulo:'a Mestra do Caos',lugar:'Torre da Qualidade',hp:9,cor:'#7F9BAE',
+  fala:'Cronograma? Checklist? Eu prefiro o caos!',derrota:'Tudo organizado... que horror!',
+  poder:'Escudo do Caos: só quebra com 2 acertos seguidos e volta quando você erra.'}
+];
+var GBOSS={id:'boss',vilao:'Lorde Apagão',titulo:'o Senhor do Esquecimento',lugar:'Cidadela do Esquecimento',hp:12,cor:'#2A2533',
+  fala:'Tudo o que não é revisado, um dia é meu.',derrota:'Você me venceu hoje... mas eu volto sempre que você parar de revisar.',
+  poder:'Apagão total: com metade da vida, cada erro tira 2 de energia. Ele usa as questões que você mais errou.'};
+var GPLANT={id:'plantao',vilao:'Modo Plantão',titulo:'o desafio sem fim',lugar:'Hospital de Sinápsia',hp:0,cor:'#E3A9A1',
+  fala:'Plantão puxado! Quantas questões você aguenta?',derrota:'',poder:'3 de energia, sem Água e sem Respiro. Bata o seu recorde.'};
+var GSTORY=[
+ 'Dentro da sua cabeça existe um reino chamado Sinápsia. Lá vive o Neurinho, um neurônio pequeno e curioso. Cada coisa que você aprende acende uma luz nas estradas do reino: as sinapses.',
+ 'No centro do reino brilha a Grande Sinapse, que guarda tudo o que você estudou. Mas, na véspera da Grande Prova, Lorde Apagão, o senhor do Esquecimento, quebrou a Grande Sinapse em cinco fragmentos e entregou cada um a um de seus capangas.',
+ 'Procrastino, Distrax, Barão Insônia, Ansiax e Dona Bagunça guardam os fragmentos. A arma do Neurinho é o conhecimento: cada resposta certa é um impulso elétrico. Recupere os cinco fragmentos, enfrente Lorde Apagão e reacenda a Grande Sinapse!'
+];
+var GEND='A Grande Sinapse reacendeu! A luz voltou para todas as estradas de Sinápsia, e o Neurinho agora é o Guardião da Sinapse. Mas lembre: o esquecimento sempre tenta voltar. Revisar um pouco todo dia é o que mantém a luz acesa.';
+var gb=null,gpage=0,gview='mapa';
+
+function gs(){
+  var g=S.game||(S.game={});
+  g.won=g.won||{};g.err=g.err||{};g.best=g.best||0;g.intro=g.intro||0;g.fim=g.fim||0;
+  return g;
+}
+function gQs(d){return S.cards.filter(function(c){return c.t==='q'&&c.o&&c.o.length>=2&&c.o[c.c]!=null&&(!d||c.d===d)})}
+/* cada vilão usa a disciplina preferida; se ela tiver poucas questões, pega a próxima disponível */
+function gMapDisc(){
+  var used={},out={},cnt={};
+  S.cards.forEach(function(c){if(c.t==='q'&&c.o&&c.o.length>=2)cnt[c.d]=(cnt[c.d]||0)+1});
+  GZ.forEach(function(z){if((cnt[z.pref]||0)>=5){out[z.id]=z.pref;used[z.pref]=1}});
+  var free=S.disc.filter(function(d){return (cnt[d.id]||0)>=5&&!used[d.id]}).map(function(d){return d.id});
+  GZ.forEach(function(z){if(!out[z.id]&&free.length)out[z.id]=free.shift()});
+  return out;
+}
+function gZone(id){if(id==='boss')return GBOSS;if(id==='plantao')return GPLANT;for(var i=0;i<GZ.length;i++)if(GZ[i].id===id)return GZ[i];return null}
+function gFrags(){var g=gs();return GZ.filter(function(z){return g.won[z.id]}).length}
+function gPips(n,max,cls){var h='';for(var i=0;i<max;i++)h+='<i class="'+cls+(i<n?' on':'')+'"></i>';return h}
+
+function gStart(id){
+  var z=gZone(id),pl=id==='plantao',lg=S.log[today()]||{};
+  if(!z||!gQs().length){toast('Ainda não há questões de múltipla escolha para jogar.');return}
+  gb={z:id,foe:z.hp,foeMax:z.hp,hp:pl?3:5,max:pl?3:5,turn:0,combo:0,ok:0,miss:0,xp:0,
+      water:pl?0:1,breath:pl?0:1+((lg.pause||0)>0?1:0),used:{},wrong:[],shield:id==='gqs',
+      disc:id==='boss'||pl?null:gMapDisc()[id],msg:z.fala,ev:'',result:null};
+  gNext();tab='jogo';ttsStop();render();window.scrollTo(0,0);
+}
+function gPickQ(){
+  var g=gs(),pool;
+  if(gb.z==='boss'||gb.z==='plantao'){
+    var m=gMapDisc(),ds={};Object.keys(m).forEach(function(k){ds[m[k]]=1});
+    pool=gQs().filter(function(c){return ds[c.d]});
+    if(!pool.length)pool=gQs();
+  }else pool=gQs(gb.disc);
+  var fresh=pool.filter(function(c){return !gb.used[c.id]});
+  if(!fresh.length){gb.used={};fresh=pool}
+  if(gb.z==='boss'){
+    var hard=fresh.filter(function(c){return (g.err[c.id]||0)>0});
+    if(hard.length&&Math.random()<0.6)fresh=hard;
+  }
+  return fresh[Math.floor(Math.random()*fresh.length)];
+}
+function gNext(){
+  gb.turn++;gb.ev='';
+  var c=gPickQ();gb.qid=c.id;gb.used[c.id]=1;
+  gb.order=shuffle(c.o.map(function(_,i){return i}));
+  gb.phase='q';gb.pick=-1;gb.hide=[];gb.popup=false;
+  if(gb.z==='bio'&&gb.turn%3===0&&gb.foe<gb.foeMax){gb.foe++;gb.ev='Procrastino deixou pra depois e recuperou 1 de vida.'}
+  if(gb.z==='mor'&&gb.turn%4===0&&gb.hp>1){gb.hp--;gb.ev='Barão Insônia te fez virar a noite: -1 de energia.'}
+  if(gb.z==='imu'&&gb.turn%3===0){gb.popup=true}
+}
+function gAnswer(i){
+  var c=cardOf(gb.qid),g=gs(),right=i===c.c,lg=logOf(today());
+  gb.pick=i;gb.phase='a';lg.n++;
+  if(right){
+    lg.ok++;gb.ok++;gb.combo++;gb.xp+=1;
+    if(g.err[c.id])g.err[c.id]--;
+    if(gb.z==='plantao'){gb.ev='Acertou! Paciente atendido.'}
+    else{
+      var dmg=gb.combo>=3?2:1;
+      if(gb.shield){
+        if(gb.combo>=2){gb.shield=false;gb.ev='Escudo do Caos quebrado! '}
+        else{dmg=0;gb.ev='O Escudo do Caos bloqueou. Acerte 2 seguidas para quebrar.'}
+      }
+      if(dmg){gb.foe=Math.max(0,gb.foe-dmg);gb.ev+=(dmg>1?'Sinapse turbo! -2 de vida.':'Impulso certeiro! -1 de vida.')}
+    }
+  }else{
+    gb.miss++;gb.combo=0;g.err[c.id]=(g.err[c.id]||0)+1;
+    if(gb.wrong.indexOf(c.id)<0)gb.wrong.push(c.id);
+    var loss=(gb.z==='gen'||(gb.z==='boss'&&gb.foe<=gb.foeMax/2))?2:1;
+    gb.hp=Math.max(0,gb.hp-loss);
+    gb.ev=loss>1?(gb.z==='gen'?'Ansiax acelerou seu coração: -2 de energia.':'Apagão total: -2 de energia.'):'O vilão acertou o Neurinho: -1 de energia.';
+    if(gb.z==='gqs'&&!gb.shield){gb.shield=true;gb.ev+=' O escudo voltou.'}
+  }
+  save();
+}
+function gFinish(win){
+  var g=gs(),first=win&&gb.z!=='plantao'&&!g.won[gb.z],bonus=0;
+  if(win){bonus=gb.z==='boss'?(first?40:10):(first?15:5);g.won[gb.z]=1;if(gb.z==='boss')g.fim=1}
+  if(gb.z==='plantao'){gb.record=gb.ok>g.best;if(gb.record)g.best=gb.ok}
+  gb.xp+=bonus;gb.first=first;
+  var before=stageIdx(S.xp);S.xp+=gb.xp;gb.levelUp=stageIdx(S.xp)>before;
+  gb.result=win?'win':'lose';save();
+}
+
+function viewJogo(){
+  var g=gs();
+  if(!g.intro)return gIntro();
+  if(gb)return gb.result?gResult():gBattle();
+  if(gview==='fim')return gEnding();
+  return gMap();
+}
+function gIntro(){
+  var last=gpage>=GSTORY.length-1;
+  var h='<div class="row between"><button class="btn ghost sm" data-act="g-home">Início</button><span class="muted small" style="font-weight:800">'+(gpage+1)+' de '+GSTORY.length+'</span></div>';
+  h+='<div class="card g-story"><div class="label">A Jornada das Sinapses</div>'+mascot(120,stageIdx(S.xp),gpage===1?'think':'cheer')+'<p>'+esc(GSTORY[gpage])+'</p></div>';
+  if(gpage===2)h+='<div class="g-gang">'+GZ.map(function(z){return '<div>'+GART[z.id]+'<small>'+esc(z.vilao)+'</small></div>'}).join('')+'</div>';
+  h+='<button class="btn big" data-act="g-intro">'+(last?'Começar a jornada':'Continuar')+'</button>';
+  return h;
+}
+function gMap(){
+  var g=gs(),m=gMapDisc(),fr=gFrags();
+  var h='<div class="row between"><button class="btn ghost sm" data-act="g-home">Início</button><span class="pill">Fragmentos: '+fr+' de 5</span></div>';
+  h+='<div><h1>A Jornada das Sinapses</h1><p class="muted">Responda certo para atacar. Cada vilão guarda um fragmento da Grande Sinapse.</p></div>';
+  h+='<div class="g-frags" aria-label="'+fr+' de 5 fragmentos">'+GZ.map(function(z){return '<span class="g-frag'+(g.won[z.id]?' on':'')+'" style="--c:'+z.cor+'"></span>'}).join('')+'</div>';
+  GZ.forEach(function(z){
+    var d=m[z.id],dn=d?dshort(discOf(d)):'',n=d?gQs(d).length:0,won=g.won[z.id];
+    h+='<div class="card g-zone'+(won?' won':'')+'"><div class="g-art">'+GART[z.id]+'</div><div style="min-width:0"><div class="label">'+esc(z.lugar)+'</div><h3>'+esc(z.vilao)+(won?' <span class="tag">'+(z.fem?'Derrotada':'Derrotado')+'</span>':'')+'</h3><p class="muted small">'+esc(z.titulo)+'</p>';
+    h+='<p class="small" style="margin-top:6px">'+esc(z.poder)+'</p>';
+    if(d)h+='<p class="muted small" style="margin-top:4px">Questões de '+esc(dn)+' ('+n+')</p>';
+    h+=d?'<button class="btn '+(won?'soft':'')+' sm" style="margin-top:8px" data-act="g-start" data-z="'+z.id+'">'+(won?'Revanche':'Enfrentar')+'</button>':'<p class="muted small" style="margin-top:6px">Faltam questões de múltipla escolha para liberar este covil.</p>';
+    h+='</div></div>';
+  });
+  var bossOk=fr>=5;
+  h+='<div class="card g-zone boss'+(bossOk?'':' locked')+'"><div class="g-art">'+GART.boss+'</div><div style="min-width:0"><div class="label">'+esc(GBOSS.lugar)+'</div><h3>'+esc(GBOSS.vilao)+(g.won.boss?' <span class="tag">Derrotado</span>':'')+'</h3><p class="muted small">'+esc(GBOSS.titulo)+'. Chefe final.</p><p class="small" style="margin-top:6px">'+esc(GBOSS.poder)+'</p>';
+  h+=bossOk?'<button class="btn sm" style="margin-top:8px" data-act="g-start" data-z="boss">'+(g.won.boss?'Revanche':'Enfrentar Lorde Apagão')+'</button>':'<p class="muted small" style="margin-top:6px">Recupere os 5 fragmentos para abrir a cidadela.</p>';
+  h+='</div></div>';
+  if(g.fim)h+='<div class="card g-zone"><div class="g-art">'+GART.plantao+'</div><div><div class="label">'+esc(GPLANT.lugar)+'</div><h3>'+esc(GPLANT.vilao)+'</h3><p class="small" style="margin-top:6px">'+esc(GPLANT.poder)+'</p><p class="muted small" style="margin-top:4px">Recorde: '+g.best+' '+plural(g.best,'acerto','acertos')+'</p><button class="btn sm" style="margin-top:8px" data-act="g-start" data-z="plantao">Começar plantão</button></div></div>';
+  h+='<button class="btn ghost" data-act="g-story">Rever a história</button>';
+  if(g.fim)h+='<button class="btn ghost" data-act="g-end">Ver o final</button>';
+  return h;
+}
+function gBattle(){
+  var z=gZone(gb.z),c=cardOf(gb.qid),ans=gb.phase==='a',right=ans&&gb.pick===c.c,pl=gb.z==='plantao';
+  var mood=ans?(right?'cheer':'think'):'study';
+  var h='<div class="row between"><button class="btn ghost sm" data-act="g-flee">Fugir</button><span class="muted small" style="font-weight:800">Rodada '+gb.turn+(gb.combo>=2?' · '+gb.combo+' seguidas':'')+'</span></div>';
+  h+='<div class="card g-arena"><div class="g-side"><div class="g-me'+(ans&&!right?' g-hit':'')+'">'+mascot(78,stageIdx(S.xp),mood)+'</div><b class="small">Neurinho</b><div class="g-pips" aria-label="Energia '+gb.hp+' de '+gb.max+'">'+gPips(gb.hp,gb.max,'g-hp')+'</div></div>';
+  h+='<div class="g-vs">VS</div><div class="g-side"><div class="g-foe'+(ans&&right&&!pl?' g-hit':'')+(gb.shield?' g-shield':'')+'">'+GART[gb.z]+'</div><b class="small">'+esc(z.vilao)+'</b>';
+  h+=pl?'<span class="muted small">Acertos: '+gb.ok+'</span>':'<div class="bar g-life" aria-label="Vida do vilão '+gb.foe+' de '+gb.foeMax+'"><i style="width:'+Math.round(gb.foe/gb.foeMax*100)+'%;background:'+z.cor+'"></i></div><span class="muted small">'+gb.foe+' / '+gb.foeMax+'</span>';
+  h+='</div></div>';
+  var said=gb.ev||(gb.turn===1?z.fala:'');
+  if(said)h+='<div class="note '+(ans?(right?'good':'bad'):'info')+' small"><b>'+(gb.ev?'':esc(z.vilao)+': ')+'</b>'+esc(said)+'</div>';
+  if(gb.popup){
+    h+='<div class="card g-pop" role="alert"><div class="g-art sm">'+GART.imu+'</div><div><b>Distrax: Você tem 47 notificações novas!</b><p class="muted small" style="margin-top:4px">Um vídeo engraçado, uma mensagem no grupo, uma promoção imperdível...</p><button class="btn sm" style="margin-top:8px" data-act="g-pop">Ignorar e voltar ao foco</button></div></div>';
+    return h;
+  }
+  h+='<div class="card face" style="min-height:0"><div class="label" style="margin-bottom:6px">'+esc(dshort(discOf(c.d)))+'</div><div class="q">'+esc(c.q)+'</div></div><div class="opts">';
+  gb.order.forEach(function(oi,pos){
+    var cls='opt',off=gb.hide.indexOf(oi)>=0;
+    if(ans){if(oi===c.c)cls+=' right';else if(oi===gb.pick)cls+=' wrong'}
+    if(off)cls+=' g-off';
+    h+='<button class="'+cls+'" data-act="g-pick" data-i="'+oi+'"'+(ans||off?' disabled':'')+'><b>'+String.fromCharCode(65+pos)+'</b><span>'+esc(c.o[oi])+'</span></button>';
+  });
+  h+='</div>';
+  if(ans){
+    h+='<div class="note '+(right?'good':'bad')+'"><b>'+(right?'Você acertou.':'Resposta certa: '+esc(c.o[c.c])+'.')+'</b>'+(c.e?'<div style="margin-top:4px">'+esc(c.e)+'</div>':'')+'</div>';
+    h+='<button class="btn big" data-act="g-next">Continuar</button>';
+  }else if(!pl){
+    h+='<div class="g-pow"><button class="btn soft sm" data-act="g-water"'+(gb.water&&gb.hp<gb.max?'':' disabled')+'>Água ('+gb.water+')<small>+2 de energia</small></button><button class="btn soft sm" data-act="g-breath"'+(gb.breath&&!gb.hide.length?'':' disabled')+'>Respiro ('+gb.breath+')<small>tira 2 erradas</small></button></div>';
+    if(gb.turn===1&&gb.breath<2)h+='<p class="muted small" style="text-align:center">Dica: faça uma pausa de respiração na aba Cuidar e ganhe +1 Respiro nas batalhas de hoje.</p>';
+  }
+  return h;
+}
+function gResult(){
+  var z=gZone(gb.z),win=gb.result==='win',pl=gb.z==='plantao',g=gs();
+  var h='<div class="card hero" style="grid-template-columns:1fr;justify-items:center;text-align:center">';
+  if(pl){
+    h+=mascot(120,stageIdx(S.xp),'sleep')+'<h1>Fim do plantão</h1><p>Você atendeu '+gb.ok+' '+plural(gb.ok,'paciente','pacientes')+(gb.record?'. Novo recorde!':'. Recorde: '+g.best+'.')+'</p>';
+  }else if(win){
+    h+='<div class="g-art lg g-down">'+GART[gb.z]+'</div><h1>'+esc(z.vilao)+' foi '+(z.fem?'derrotada':'derrotado')+'!</h1><p class="muted">"'+esc(z.derrota)+'"</p>';
+    if(gb.first&&gb.z!=='boss')h+='<div class="note good" style="width:100%"><b>Você recuperou um fragmento da Grande Sinapse!</b> ('+gFrags()+' de 5)'+(gFrags()>=5?' A Cidadela do Esquecimento está aberta.':'')+'</div>';
+  }else{
+    h+=mascot(120,stageIdx(S.xp),'sleep')+'<h1>O Neurinho precisa descansar</h1><p>Sem problema: errar mostra o que revisar. Descanse um pouco e tente de novo.</p>';
+  }
+  h+='</div>';
+  h+='<div class="stats"><div class="stat"><span class="muted small">Acertos</span><b>'+gb.ok+' de '+(gb.ok+gb.miss)+'</b></div><div class="stat"><span class="muted small">XP ganho</span><b>+'+gb.xp+'</b></div></div>';
+  if(gb.levelUp)h+='<div class="note good"><b>Seu Neurinho evoluiu!</b> Agora ele é o '+esc(STAGES[stageIdx(S.xp)].nome)+'.</div>';
+  if(gb.wrong.length){
+    h+='<div class="card"><h3>Para revisar</h3>'+gb.wrong.slice(0,8).map(function(id){var c=cardOf(id);return c?'<div class="note info small" style="margin-top:8px"><div>'+esc(c.q)+'</div><b style="display:block;margin-top:4px">Resposta: '+esc(c.o[c.c])+'</b></div>':''}).join('')+'</div>';
+  }
+  if(win&&gb.z==='boss'&&gb.first)h+='<button class="btn big" data-act="g-end">Ver o final</button>';
+  h+='<button class="btn '+(win&&gb.z==='boss'&&gb.first?'soft':'big')+'" data-act="g-start" data-z="'+gb.z+'">'+(pl?'Novo plantão':win?'Jogar de novo':'Tentar de novo')+'</button>';
+  h+='<button class="btn ghost" data-act="g-map">Voltar ao mapa</button>';
+  return h;
+}
+function gEnding(){
+  var h='<div class="card g-story g-final">'+mascot(140,stageIdx(S.xp),'hero')+'<div class="label">Final</div><h1>Guardião da Sinapse</h1><p>'+esc(GEND)+'</p></div>';
+  h+='<div class="note good"><b>Modo Plantão liberado!</b> Questões de todas as disciplinas até a energia acabar. Bata o seu recorde.</div>';
+  h+='<button class="btn big" data-act="g-start" data-z="plantao">Começar plantão</button>';
+  h+='<button class="btn ghost" data-act="g-map">Voltar ao mapa</button>';
+  return h;
+}
+function gameAct(a,D){
+  var g=gs();
+  switch(a){
+    case 'g-open':gb=null;gview='mapa';gpage=0;go('jogo');break;
+    case 'g-home':gb=null;go('home');break;
+    case 'g-intro':if(gpage<GSTORY.length-1){gpage++;render()}else{g.intro=1;gpage=0;save();render()}window.scrollTo(0,0);break;
+    case 'g-story':g.intro=0;gpage=0;save();render();window.scrollTo(0,0);break;
+    case 'g-start':gview='mapa';gStart(D.z);break;
+    case 'g-pick':if(gb&&gb.phase==='q'&&!gb.popup){gAnswer(+D.i);render()}break;
+    case 'g-next':
+      if(!gb)break;
+      if(gb.z!=='plantao'&&gb.foe<=0)gFinish(true);
+      else if(gb.hp<=0)gFinish(false);
+      else gNext();
+      render();window.scrollTo(0,0);break;
+    case 'g-water':if(gb&&gb.water&&gb.phase==='q'){gb.water--;gb.hp=Math.min(gb.max,gb.hp+2);gb.ev='Um gole de água! +2 de energia.';render()}break;
+    case 'g-breath':
+      if(gb&&gb.breath&&gb.phase==='q'&&!gb.hide.length){
+        var c=cardOf(gb.qid),wr=shuffle(c.o.map(function(_,i){return i}).filter(function(i){return i!==c.c}));
+        gb.hide=wr.slice(0,Math.min(2,wr.length-1));if(!gb.hide.length)break;gb.breath--;gb.ev='Respire fundo... duas alternativas erradas sumiram.';render();
+      }break;
+    case 'g-pop':if(gb){gb.popup=false;gb.ev='Notificação ignorada. Foco total!';render()}break;
+    case 'g-flee':
+      if(gb&&gb.ok+gb.miss>0){var b=stageIdx(S.xp);S.xp+=gb.xp;save();if(stageIdx(S.xp)>b)toast('Seu Neurinho evoluiu!')}
+      gb=null;render();window.scrollTo(0,0);break;
+    case 'g-map':gb=null;gview='mapa';render();window.scrollTo(0,0);break;
+    case 'g-end':gb=null;gview='fim';render();window.scrollTo(0,0);break;
+  }
+}
 
 /* ---------- agenda ---------- */
 var MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
@@ -1146,6 +1435,7 @@ document.addEventListener('click',function(e){
   var el=e.target.closest('[data-act]');if(!el)return;
   var a=el.getAttribute('data-act'),D=el.dataset,t=today();
   if(a!=='del'&&a!=='deld'&&a!=='rmex'&&a!=='reset'&&a!=='delev'&&a!=='delh')confirmKey=null;
+  if(a.slice(0,2)==='g-'){gameAct(a,D);return}
   switch(a){
     case 'tab':go(D.t);break;
     case 'acc':

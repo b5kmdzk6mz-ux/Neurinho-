@@ -15,7 +15,7 @@
 <title>Neurinho</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
 /* Layout: app de uma coluna feito para celular, conteúdo rolável e barra de abas fixa embaixo. */
 :root{
@@ -187,6 +187,8 @@ textarea{min-height:92px; resize:vertical}
 .tab[aria-current="page"]{color:var(--accent); background:var(--accent-soft)}
 #toast{position:fixed; left:50%; bottom:calc(86px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--bg); padding:10px 16px; border-radius:14px; font-weight:700; font-size:14px; z-index:30; max-width:90vw; text-align:center}
 /* ---------- acessibilidade ---------- */
+@font-face{font-family:'Atkinson Hyperlegible';src:url('AtkinsonHyperlegible-Regular.woff2') format('woff2');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'Atkinson Hyperlegible';src:url('AtkinsonHyperlegible-Bold.woff2') format('woff2');font-weight:700;font-style:normal;font-display:swap}
 @font-face{font-family:'OpenDyslexic';src:url('OpenDyslexic-Regular.otf') format('opentype');font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:'OpenDyslexic';src:url('OpenDyslexic-Bold.otf') format('opentype');font-weight:700;font-style:normal;font-display:swap}
 :root.a-font-dis{--font-body:'OpenDyslexic',Verdana,sans-serif; --font-display:'OpenDyslexic',Verdana,sans-serif}
@@ -836,14 +838,19 @@ function viewProgresso(){
 
 /* ---------- acessibilidade ---------- */
 var ACCK='neurinho.acc';
-var ACCD={font:'pad',size:100,space:0,left:0,contrast:0,motion:0,big:0,ruler:0,tts:0,slow:0};
+function sysReduce(){try{return !!(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches)}catch(e){return false}}
+/* "Menos animações" começa ligado se o aparelho já pede menos movimento. */
+var ACCD={font:'pad',size:100,space:0,left:0,contrast:0,motion:sysReduce()?1:0,big:0,ruler:0,tts:0,slow:0};
 var ACC=(function(){var o={};try{o=JSON.parse(localStorage.getItem(ACCK)||'{}')||{}}catch(e){}var r={};Object.keys(ACCD).forEach(function(k){r[k]=(o[k]!==undefined)?o[k]:ACCD[k]});return r})();
 function saveAcc(){try{localStorage.setItem(ACCK,JSON.stringify(ACC))}catch(e){}}
-var rulerBound=false,speaking=false;
+var rulerBound=false,speaking=false,rulerY=null;
 function hasTts(){return typeof window!=='undefined'&&('speechSynthesis' in window)&&typeof SpeechSynthesisUtterance!=='undefined'}
 function placeRuler(y){
   var a=document.getElementById('rl-t'),b=document.getElementById('rl-b');if(!a||!b||!a.style)return;
-  a.style.top='0';a.style.height=Math.max(0,y-36)+'px';b.style.top=(y+36)+'px';b.style.bottom='0';
+  rulerY=y;
+  /* a faixa clara acompanha o tamanho do texto e o espaçamento escolhidos */
+  var half=Math.round(36*(ACC.size||100)/100*(ACC.space?1.25:1));
+  a.style.top='0';a.style.height=Math.max(0,y-half)+'px';b.style.top=(y+half)+'px';b.style.bottom='0';
 }
 function ensureAccEls(){
   var root=document.documentElement;if(!root||!root.appendChild||!document.createElement)return;
@@ -877,16 +884,42 @@ function applyAcc(){
   if(ACC.motion)cl.add('a-nomotion');
   if(ACC.big)cl.add('a-big');
   if(ACC.ruler||ACC.tts)ensureAccEls();
-  if(ACC.ruler){cl.add('a-ruler');placeRuler((window.innerHeight||600)/2)}
+  if(ACC.ruler){cl.add('a-ruler');placeRuler(rulerY!=null?rulerY:(window.innerHeight||600)/2)}
   if(ACC.tts&&hasTts())cl.add('a-tts');
+}
+/* Texto para o Ouvir: só o conteúdo de estudo. Pula botões de ação, campos,
+   ícones e o que estiver escondido; as alternativas das questões são lidas. */
+function ttsText(root){
+  if(!root)return '';
+  var SKIP={BUTTON:1,INPUT:1,TEXTAREA:1,SELECT:1,OPTION:1,SCRIPT:1,STYLE:1,SVG:1,svg:1,IMG:1,NOSCRIPT:1};
+  var BLOCK={DIV:1,P:1,LI:1,H1:1,H2:1,H3:1,H4:1,TD:1,TH:1,TR:1,SECTION:1,ARTICLE:1,BLOCKQUOTE:1,LABEL:1};
+  var out=[];
+  function vis(el){try{var cs=window.getComputedStyle&&window.getComputedStyle(el);return !cs||(cs.display!=='none'&&cs.visibility!=='hidden')}catch(e){return true}}
+  function end(){var l=out.length?out[out.length-1]:'';if(l&&!/[.!?:;]\s*$/.test(l))out[out.length-1]=l.replace(/\s+$/,'')+'.';}
+  function walk(n){
+    if(n.nodeType===3){var t=n.nodeValue.replace(/\s+/g,' ');if(t.trim())out.push(t);return}
+    if(n.nodeType!==1)return;
+    if(n.getAttribute&&n.getAttribute('aria-hidden')==='true')return;
+    var cls=n.classList;
+    if(cls&&cls.contains('opt')){
+      var b=n.querySelector('b'),sp=n.querySelector('span');
+      end();out.push('Alternativa '+((b&&b.textContent)||'').trim()+': '+((sp&&sp.textContent)||n.textContent||'').trim());end();return;
+    }
+    if(SKIP[n.tagName]||!vis(n))return;
+    var blk=BLOCK[n.tagName];if(blk)end();
+    for(var c=n.firstChild;c;c=c.nextSibling)walk(c);
+    if(blk)end();
+  }
+  walk(root);
+  return out.join(' ').replace(/\s+/g,' ').replace(/\s+([.,!?:;])/g,'$1').replace(/([.!?:;])\.+/g,'$1').trim();
 }
 function ttsStop(){if(hasTts()){try{window.speechSynthesis.cancel()}catch(e){}}speaking=false;setTtsLabel()}
 function ttsToggle(){
   if(!hasTts())return;
   if(speaking||window.speechSynthesis.speaking){ttsStop();return}
-  var a=document.getElementById('app');var txt=((a&&(a.innerText||a.textContent))||'').replace(/\s+/g,' ').trim();
+  var txt=ttsText(document.getElementById('app'));
   if(!txt)return;
-  var parts=txt.match(/[^.!?:;]+[.!?:;]*/g)||[txt],chunks=[],cur='';
+  var parts=txt.match(/[^.!?;]+[.!?;]*/g)||[txt],chunks=[],cur='';
   parts.forEach(function(p){if((cur+p).length>200&&cur){chunks.push(cur);cur=p}else cur+=p});
   if(cur)chunks.push(cur);
   speaking=true;setTtsLabel();
@@ -901,7 +934,7 @@ function accCard(){
   function seg(k,opts){return '<div class="seg" style="grid-template-columns:repeat('+opts.length+',1fr)">'+opts.map(function(o){return '<button data-act="acc" data-k="'+k+'" data-v="'+o[0]+'" aria-pressed="'+(String(ACC[k])===String(o[0]))+'">'+o[1]+'</button>'}).join('')+'</div>'}
   function row(k,t,d){return '<button class="acc-row" data-act="acc" data-k="'+k+'" data-v="'+(ACC[k]?0:1)+'" aria-pressed="'+(!!ACC[k])+'"><span><b>'+t+'</b><small>'+d+'</small></span><span class="st">'+(ACC[k]?'Ligado':'Desligado')+'</span></button>'}
   var h='<div class="card" id="acc" style="display:flex;flex-direction:column;gap:14px"><h3>Acessibilidade e leitura</h3><p class="muted small">Ajustes para facilitar a leitura, inclusive para quem tem dislexia ou baixa visão. Cada pessoa se adapta de um jeito, então teste e fique com o que ajuda. Tudo fica salvo neste aparelho.</p>';
-  h+='<div class="field"><span>Fonte</span>'+seg('font',[['pad','Padrão'],['leg','Legível'],['dis','OpenDyslexic'],['ver','Verdana']])+'<span class="muted small">Legível usa a Atkinson Hyperlegible, criada para diferenciar bem letras parecidas (b, d, p, q). Na primeira vez precisa de internet para carregar; sem ela, usa a Verdana. OpenDyslexic é uma fonte desenhada para leitores com dislexia e funciona sem internet.</span></div>';
+  h+='<div class="field"><span>Fonte</span>'+seg('font',[['pad','Padrão'],['leg','Legível'],['dis','OpenDyslexic'],['ver','Verdana']])+'<span class="muted small">Legível usa a Atkinson Hyperlegible, criada para diferenciar bem letras parecidas (b, d, p, q). OpenDyslexic é uma fonte desenhada para leitores com dislexia. As duas funcionam sem internet.</span></div>';
   h+='<div class="field"><span>Tamanho do texto</span>'+seg('size',[[100,'Normal'],[115,'Maior'],[130,'Grande'],[150,'Muito']])+'</div>';
   h+=row('space','Mais espaço entre letras, palavras e linhas','Deixa o texto mais arejado e fácil de acompanhar.');
   h+=row('left','Texto alinhado à esquerda','Tira o centralizado dos textos de estudo.');

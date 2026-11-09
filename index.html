@@ -102,7 +102,7 @@ button{cursor:pointer}
 
 .field{display:flex; flex-direction:column; gap:6px}
 .field>span{font-weight:800; font-size:14px}
-input[type=text],input[type=time],textarea,select{width:100%; border:1.5px solid var(--line); background:var(--bg); border-radius:14px; padding:12px 14px; min-width:0}
+input[type=text],input[type=time],input[type=password],textarea,select{width:100%; border:1.5px solid var(--line); background:var(--bg); border-radius:14px; padding:12px 14px; min-width:0}
 textarea{min-height:92px; resize:vertical}
 
 .seg{display:grid; grid-template-columns:repeat(3,1fr); gap:4px; background:var(--sand); padding:4px; border-radius:14px}
@@ -221,6 +221,15 @@ textarea{min-height:92px; resize:vertical}
 .acc-row[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
 .acc-row[aria-pressed="true"] .st{color:var(--accent)}
 
+
+/* anexar */
+.btn.stk{flex-direction:column;gap:2px}
+.btn.stk small{font-weight:700;font-size:12.5px;opacity:.85}
+.att-in{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+label.btn{text-align:center;cursor:pointer}
+.att-ia summary,.att-x summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.att-c{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--line)}
+.att-c:first-of-type{border-top:0}
 /* jogo */
 .g-story{display:grid;justify-items:center;text-align:center;gap:10px}
 .g-story p{font-size:16px;line-height:1.6}
@@ -602,9 +611,9 @@ function viewEstudar(){
   h+='</div></div>'+perField()+'<div class="field"><span>Disciplina</span><div class="chips"><button class="chip" aria-pressed="'+(setup.disc==='todas')+'" data-act="sdisc" data-d="todas">Todas</button>';
   DP().forEach(function(d){h+='<button class="chip" aria-pressed="'+(setup.disc===d.id)+'" data-act="sdisc" data-d="'+esc(d.id)+'">'+esc(dshort(d))+'</button>'});
   h+='</div></div>';
-  if(RES[setup.disc]){
+  if(resOf(setup.disc).length){
     h+='<div class="field"><span>Assunto</span><div class="chips"><button class="chip" aria-pressed="'+(!setup.sub)+'" data-act="ssub" data-s="">Todos</button>';
-    RES[setup.disc].forEach(function(a){h+='<button class="chip" aria-pressed="'+(setup.sub===a.id)+'" data-act="ssub" data-s="'+a.id+'">'+esc(a.t)+'</button>'});
+    resOf(setup.disc).forEach(function(a){h+='<button class="chip" aria-pressed="'+(setup.sub===a.id)+'" data-act="ssub" data-s="'+a.id+'">'+esc(a.t)+'</button>'});
     h+='</div></div>';
   }
   h+='<p class="muted small">Prontos: '+k.due+' para revisar e '+k.fresh+' '+plural(k.fresh,'novo','novos')+'. O que você erra volta mais vezes. O que você acerta volta em intervalos cada vez maiores.</p>';
@@ -661,9 +670,9 @@ function viewResumo(){
 
 function viewCartoes(){
   var h='<div><h1>Cartões</h1><p class="muted">Crie o seu material ou cole direto do resumo.</p></div>';
-  h+='<div class="seg"><button data-act="lview" data-v="lista" aria-pressed="'+(lib.view==='lista')+'">Biblioteca</button><button data-act="lview" data-v="criar" aria-pressed="'+(lib.view==='criar')+'">Criar</button><button data-act="lview" data-v="colar" aria-pressed="'+(lib.view==='colar')+'">Colar</button></div>';
+  h+='<div class="seg"><button data-act="lview" data-v="lista" aria-pressed="'+(lib.view==='lista')+'">Biblioteca</button><button data-act="lview" data-v="criar" aria-pressed="'+(lib.view==='criar')+'">Criar</button><button data-act="lview" data-v="colar" aria-pressed="'+(lib.view==='colar')+'">Anexar</button></div>';
   if(lib.view==='criar')return h+viewCriar();
-  if(lib.view==='colar')return h+viewColar();
+  if(lib.view==='colar')return h+viewAnexar();
   var list=S.cards.filter(function(c){return lib.filtro==='todas'?perOf(c.d)===S.per:c.d===lib.filtro});
   h+=perField();
   h+='<div class="field"><span>Filtrar</span><select data-bind="lib.filtro" id="filtro"><option value="todas"'+(lib.filtro==='todas'?' selected':'')+'>Todas as disciplinas</option>'+DP().map(function(d){return '<option value="'+esc(d.id)+'"'+(lib.filtro===d.id?' selected':'')+'>'+esc(dshort(d))+'</option>'}).join('')+'</select></div>';
@@ -707,7 +716,7 @@ function viewCriar(){
 
 function viewColar(){
   var n=parseImport(draft.imp).length;
-  var h='<div class="card" style="display:flex;flex-direction:column;gap:14px"><div class="field"><span>Disciplina</span><select id="id" data-bind="draft.impd">'+dsel(draft.impd)+'</select></div>';
+  var h='<div class="card" style="display:flex;flex-direction:column;gap:14px"><div><h3>Colar texto</h3><p class="muted small" style="margin-top:4px">Os cartões vão para a disciplina escolhida acima.</p></div>';
   h+='<div class="field"><span>Cole seu resumo, uma pergunta por linha</span><textarea id="imp" style="min-height:180px" data-bind="draft.imp" placeholder="O que é mitose? | Divisão que gera 2 células idênticas&#10;Onde é produzida a insulina? | Nas células beta do pâncreas">'+esc(draft.imp)+'</textarea></div>';
   h+='<p class="muted small">Separe a pergunta e a resposta com o símbolo |. Cada linha vira um cartão.</p><button class="btn" data-act="importar">Criar cartões</button><p class="muted small" id="impn">'+n+' '+plural(n,'cartão pronto','cartões prontos')+' para criar</p></div>';
   return h;
@@ -853,7 +862,7 @@ function viewProgresso(){
   if(wl.length){
     h+='<div class="card"><h3>Pontos para reforçar</h3><p class="muted small" style="margin:4px 0 8px">Assuntos em que você mais erra. Vale uma rodada curta.</p>';
     wl.forEach(function(o){
-      var d=discOf(o.d),title=o.s,r=(RES[o.d]||[]).filter(function(x){return x.id===o.s})[0];if(r)title=r.t;
+      var d=discOf(o.d),title=o.s,r=resOf(o.d).filter(function(x){return x.id===o.s})[0];if(r)title=r.t;
       h+='<div class="disc"><span class="dot" style="background:'+d.cor+'"></span><div style="min-width:0"><div class="name">'+esc(title)+'</div><div class="muted small">'+esc(d.nome)+', '+Math.round(o.ok/o.t*100)+'% de acerto</div></div><button class="btn soft sm" data-act="go-start" data-disc="'+esc(o.d)+'" data-sub="'+esc(o.s)+'">Reforçar</button></div>';
     });
     h+='</div>';
@@ -966,6 +975,391 @@ function render(){
 function go(t){tab=t;ttsStop();render();window.scrollTo(0,0)}
 
 
+
+/* ---------- anexar arquivo e gerar resumo ---------- */
+/* Bibliotecas ficam em vendor/ e só carregam quando a pessoa anexa um arquivo. */
+var IAKEY='neurinho.ia';
+var IAMODEL='claude-opus-5-5';
+function iaKey(){try{return localStorage.getItem(IAKEY)||''}catch(e){return ''}}
+function iaSet(k){try{if(k)localStorage.setItem(IAKEY,k);else localStorage.removeItem(IAKEY)}catch(e){}}
+var att={name:'',kind:'',busy:'',err:'',text:'',b64:'',mime:'',res:null};
+var resDelAsk='';
+function vurl(p){return new URL('vendor/'+p,location.href).href}
+var libP={};
+function loadScript(src,glob){
+  if(window[glob])return Promise.resolve(window[glob]);
+  if(libP[src])return libP[src];
+  libP[src]=new Promise(function(res,rej){
+    var s=document.createElement('script');s.src=vurl(src);
+    s.onload=function(){window[glob]?res(window[glob]):rej(new Error('lib'))};
+    s.onerror=function(){rej(new Error('lib'))};
+    document.head.appendChild(s);
+  });
+  libP[src].catch(function(){delete libP[src]});
+  return libP[src];
+}
+function loadMod(key,file,setup){
+  if(!libP[key]){
+    libP[key]=import(vurl(file)).then(function(m){if(setup)setup(m);return m},function(){throw new Error('lib')});
+    libP[key].catch(function(){delete libP[key]});
+  }
+  return libP[key];
+}
+function loadPdf(){return loadMod('pdf','pdf.min.mjs',function(m){m.GlobalWorkerOptions.workerSrc=vurl('pdf.worker.min.mjs')})}
+function loadSDK(){return loadMod('sdk','anthropic-sdk.mjs')}
+var ocrP=null;
+function ocrWorker(){
+  if(ocrP)return ocrP;
+  ocrP=loadScript('tesseract/tesseract.min.js','Tesseract').then(function(T){
+    attStatus('Preparando o leitor de imagens (só demora na primeira vez)...');
+    return T.createWorker('por',1,{
+      workerPath:vurl('tesseract/worker.min.js'),corePath:vurl('tesseract/tesseract-core-simd-lstm.wasm.js'),langPath:vurl('tesseract'),
+      gzip:true,workerBlobURL:false,
+      logger:function(m){if(m&&m.status==='recognizing text')attStatus('Reconhecendo o texto... '+Math.round((m.progress||0)*100)+'%')}
+    });
+  });
+  ocrP.catch(function(){ocrP=null});
+  return ocrP;
+}
+function attStatus(t){att.busy=t;var el=document.getElementById('attst');if(el)el.textContent=t}
+function attDisc(){var L=DP();return L.some(function(d){return d.id===draft.impd})?draft.impd:(L[0]&&L[0].id)}
+function toB64(buf){
+  var u=new Uint8Array(buf),s='',CH=0x8000;
+  for(var i=0;i<u.length;i+=CH)s+=String.fromCharCode.apply(null,u.subarray(i,i+CH));
+  return btoa(s);
+}
+function cleanText(t){
+  return String(t||'').replace(/\r/g,'').replace(/[ \t ]+/g,' ').replace(/(\w)-\n(?=[a-zà-ú])/g,'$1')
+    .replace(/ *\n */g,'\n').replace(/\n{3,}/g,'\n\n').trim();
+}
+
+/* ---- leitura dos arquivos ---- */
+function attKind(f){
+  var nm=(f.name||'').toLowerCase(),ext=nm.indexOf('.')>=0?nm.split('.').pop():'',mime=f.type||'';
+  if(ext==='pdf'||mime==='application/pdf')return 'pdf';
+  if(ext==='docx')return 'docx';
+  if(ext==='doc')return 'doc';
+  if(ext==='heic'||ext==='heif'||/heic|heif/.test(mime))return 'heic';
+  if(/^image\//.test(mime)||/^(jpe?g|png|webp|gif|bmp)$/.test(ext))return 'img';
+  if(/^(txt|md)$/.test(ext)||mime.indexOf('text/')===0)return 'txt';
+  return '';
+}
+function attFile(f){
+  if(!f)return;
+  var kind=attKind(f);
+  att={name:f.name||'arquivo',kind:kind,busy:'Lendo o arquivo...',err:'',text:'',b64:'',mime:'',res:null};
+  var fail=function(m){att.busy='';att.err=m;render()};
+  if(f.size>25*1024*1024)return fail('Arquivo muito grande. O limite é 25 MB.');
+  if(kind==='doc')return fail('Arquivos .doc (Word antigo) não abrem no celular. Abra no Word ou no Google Docs e salve como .docx ou PDF.');
+  if(kind==='heic')return fail('Fotos HEIC do iPhone não abrem aqui. Tire um print da foto ou compartilhe como JPG.');
+  if(!kind)return fail('Formato não suportado. Use PDF, Word (.docx), foto (JPG ou PNG) ou texto (.txt).');
+  render();
+  var p=kind==='pdf'?readPdf(f):kind==='docx'?readDocx(f):kind==='img'?readImg(f):f.text();
+  p.then(function(t){
+    att.text=cleanText(t);att.busy='';
+    if(att.text.replace(/\s/g,'').length<40)att.err='Encontrei pouco ou nenhum texto neste arquivo.'+(att.b64?' O resumo com IA ainda pode ler o arquivo direto.':' Confira se o arquivo tem texto legível.');
+    render();
+  }).catch(function(e){
+    var m=e&&e.message==='lib'?'Não consegui carregar o leitor de arquivos. Na primeira vez, este recurso precisa de internet.':
+          e&&e.message==='img'?'Não consegui abrir esta imagem. Tente salvar como JPG ou PNG.':
+          'Não consegui ler este arquivo. Tente salvar em outro formato (PDF ou .docx).';
+    if(att.b64)m+=' Você ainda pode usar o resumo com IA, que lê o arquivo direto.';
+    fail(m);
+  });
+}
+function readPdf(f){
+  return f.arrayBuffer().then(function(buf){
+    if(buf.byteLength<=20*1024*1024){att.b64=toB64(buf);att.mime='application/pdf'}
+    return loadPdf().then(function(pdfjs){return pdfjs.getDocument({data:new Uint8Array(buf.slice(0))}).promise});
+  }).then(function(doc){
+    var n=doc.numPages,out=[],i=0;
+    function next(){
+      if(i>=n)return Promise.resolve();
+      i++;attStatus('Lendo página '+i+' de '+n+'...');
+      return doc.getPage(i).then(function(pg){return pg.getTextContent()}).then(function(tc){
+        out.push(tc.items.map(function(it){return (it.str||'')+(it.hasEOL?'\n':'')}).join(''));return next();
+      });
+    }
+    return next().then(function(){
+      var t=out.join('\n\n');
+      if(t.replace(/\s/g,'').length>=25*n)return t;
+      return ocrPdf(doc,Math.min(n,15)).then(function(o){return o+(n>15?'\n\n(Foram lidas só as 15 primeiras páginas desta digitalização.)':'')});
+    });
+  });
+}
+function ocrPdf(doc,n){
+  return ocrWorker().then(function(w){
+    var out=[],i=0;
+    function next(){
+      if(i>=n)return Promise.resolve(out.join('\n\n'));
+      i++;attStatus('Página '+i+' de '+n+' é digitalizada. Reconhecendo o texto (pode demorar)...');
+      return doc.getPage(i).then(function(pg){
+        var vp=pg.getViewport({scale:2}),c=document.createElement('canvas');
+        c.width=Math.floor(vp.width);c.height=Math.floor(vp.height);
+        return pg.render({canvas:c,canvasContext:c.getContext('2d'),viewport:vp}).promise.then(function(){return w.recognize(c)});
+      }).then(function(r){out.push(r.data.text||'');return next()});
+    }
+    return next();
+  });
+}
+function readDocx(f){
+  return loadScript('mammoth.browser.min.js','mammoth').then(function(m){
+    return f.arrayBuffer().then(function(buf){return m.extractRawText({arrayBuffer:buf})});
+  }).then(function(r){return r.value||''});
+}
+function imgCanvas(f){
+  return new Promise(function(res,rej){
+    var u=URL.createObjectURL(f),im=new Image();
+    im.onload=function(){
+      var s=Math.min(1,2000/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');
+      c.width=Math.round(im.naturalWidth*s);c.height=Math.round(im.naturalHeight*s);
+      var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+      URL.revokeObjectURL(u);res(c);
+    };
+    im.onerror=function(){URL.revokeObjectURL(u);rej(new Error('img'))};
+    im.src=u;
+  });
+}
+function readImg(f){
+  return imgCanvas(f).then(function(c){
+    att.b64=c.toDataURL('image/jpeg',0.88).split(',')[1];att.mime='image/jpeg';
+    return ocrWorker().then(function(w){attStatus('Reconhecendo o texto da imagem...');return w.recognize(c)}).then(function(r){return r.data.text||''});
+  });
+}
+
+/* ---- resumo grátis (escolhe as frases mais importantes do próprio texto) ---- */
+var STOPW={};('a o e é de da do das dos em no na nos nas um uma uns umas para pra por pelo pela pelos pelas com sem que se ao aos à às ou como mais menos muito muita muitos muitas seu sua seus suas ele ela eles elas isso isto esse essa este esta esses essas estes estas também já não sim entre sobre até quando onde qual quais porque pois são ser foi era há tem têm ter pode podem deve devem num numa cada outro outra outros outras mesmo mesma assim então ainda após antes depois sendo forma através sua lhe nós você vocês the and of to in is for por meio além dessa desse deste desta nesse nessa neste nesta disso dele dela aos seja sejam está estão fazer feito vez tipo tipos parte partes geral exemplo').split(' ').forEach(function(w){STOPW[w]=1});
+function wordsOf(s){return (s.toLowerCase().match(/[a-zà-ü0-9]+/g)||[]).filter(function(w){return w.length>2&&!STOPW[w]&&!/^\d+$/.test(w)})}
+function isHead(l){
+  if(l.length<3||l.length>70||/[.;,:]$/.test(l)||!/[A-Za-zÀ-ú]{3}/.test(l))return false;
+  if(/^(\d+(\.\d+)*[.)]?|[IVX]+[.)])\s+\S/.test(l))return true;
+  var letters=l.replace(/[^A-Za-zÀ-ú]/g,'');
+  if(letters.length>=4&&letters===letters.toUpperCase())return true;
+  var ws=l.split(/\s+/);
+  if(ws.length<=6&&/^[A-ZÁ-Ú]/.test(l)){var cap=ws.filter(function(w){return /^[A-ZÁ-Ú]/.test(w)}).length;return cap/ws.length>=0.5}
+  return false;
+}
+function headTxt(l){l=l.replace(/^(\d+(\.\d+)*[.)]?|[IVX]+[.)])\s+/,'');var L=l.replace(/[^A-Za-zÀ-ú]/g,'');return L&&L===L.toUpperCase()?l.charAt(0)+l.slice(1).toLowerCase():l}
+function splitSents(p){return p.replace(/([.!?])\s+(?=[A-ZÁ-Ú0-9“"(])/g,'$1\u0001').split('\u0001').map(function(s){return s.trim()}).filter(Boolean)}
+var DEFRX=/^(.{3,80}?)\s+(é|são|consiste em|consistem em|caracteriza-se por|caracterizam-se por|corresponde a|correspondem a|refere-se a|referem-se a|define-se como|significa)\s+(.{12,500})$/;
+var attFirstHead='';
+function attSections(text){
+  var secs=[{h:'',items:[]}],buf=[];attFirstHead='';
+  function flush(){if(buf.length){splitSents(buf.join(' ')).forEach(function(s){secs[secs.length-1].items.push({s:s,b:0})});buf=[]}}
+  text.split('\n').forEach(function(raw){
+    var l=raw.trim();
+    if(!l){flush();return}
+    if(/^[•●▪■◦\-–*]\s*/.test(l)){flush();var it=l.replace(/^[•●▪■◦\-–*]\s*/,'');if(it)secs[secs.length-1].items.push({s:it,b:1});return}
+    if(isHead(l)){flush();if(!attFirstHead)attFirstHead=headTxt(l);secs.push({h:headTxt(l),items:[]});return}
+    buf.push(l);
+  });
+  flush();
+  return secs.filter(function(s){return s.items.length});
+}
+function summarizeFree(text,name){
+  var secs=attSections(text),freq={},all=[];
+  secs.forEach(function(sec,si){sec.items.forEach(function(it,ii){it.si=si;it.ii=ii;it.w=wordsOf(it.s);it.w.forEach(function(w){freq[w]=(freq[w]||0)+1});all.push(it)})});
+  if(!all.length)return null;
+  all.forEach(function(it){
+    var n=it.s.split(/\s+/).length,hw=wordsOf(secs[it.si].h);
+    if(n<(it.b?3:6)||n>70||!it.w.length){it.sc=-1;return}
+    var sum=0;it.w.forEach(function(w){sum+=freq[w]});
+    it.sc=sum/it.w.length*Math.log(1+it.w.length);
+    if(DEFRX.test(it.s))it.sc*=1.5;
+    if(hw.some(function(w){return it.w.indexOf(w)>=0}))it.sc*=1.2;
+    if(it.ii===0)it.sc*=1.15;
+  });
+  var ok=all.filter(function(it){return it.sc>0}),K=Math.max(4,Math.min(30,Math.round(ok.length*0.3)));
+  var pick={};ok.slice().sort(function(a,b){return b.sc-a.sc}).slice(0,K).forEach(function(it){pick[it.si+':'+it.ii]=1});
+  var b=[];
+  secs.forEach(function(sec,si){
+    var ch=sec.items.filter(function(it){return pick[si+':'+it.ii]}).map(function(it){return esc(it.s)});
+    if(!ch.length)return;
+    if(sec.h)b.push(['p','<b>'+esc(sec.h)+'</b>']);
+    if(ch.length===1)b.push(['p',ch[0]]);else for(var i=0;i<ch.length;i+=8)b.push(['l',ch.slice(i,i+8)]);
+  });
+  var kw=Object.keys(freq).filter(function(w){return w.length>=5}).sort(function(a,b){return freq[b]-freq[a]}).slice(0,8);
+  if(kw.length>=3)b.push(['bz',' palavras-chave deste material: '+esc(kw.join(', '))+'.']);
+  var cards=[],seen={};
+  all.forEach(function(it){
+    if(cards.length>=15)return;
+    var m=it.s.match(DEFRX),q,a;
+    if(m){
+      var sj=m[1].replace(/^(o|a|os|as)\s+/i,'').trim();
+      if(sj.split(/\s+/).length>8||!/^[A-Za-zÀ-ú]/.test(sj)||/^(isso|isto|ele|ela|eles|elas|que|este|esta|esse|essa)\b/i.test(sj))return;
+      if(/^[A-ZÁ-Ú][a-zà-ú]/.test(sj)&&!/^[A-ZÁ-Ú][a-zà-ú]+\s+[A-ZÁ-Ú]/.test(sj))sj=sj.charAt(0).toLowerCase()+sj.slice(1);
+      q=m[2]==='é'||m[2]==='são'?'O que '+m[2]+' '+sj+'?':'Complete: '+sj+' '+m[2]+' ...';
+      a=m[3].replace(/[.;]+$/,'');a=a.charAt(0).toUpperCase()+a.slice(1)+'.';
+    }else{
+      var c=it.s.match(/^([A-ZÁ-Ú][^:]{2,50}):\s+(.{10,400})$/);
+      if(!c||c[1].split(/\s+/).length>6)return;
+      var tm=c[1].trim();if(/^[A-ZÁ-Ú][a-zà-ú]+$/.test(tm.split(' ')[0]))tm=tm.charAt(0).toLowerCase()+tm.slice(1);q='O que é '+tm+'?';a=c[2].trim();a=a.charAt(0).toUpperCase()+a.slice(1);
+    }
+    var key=q.toLowerCase();if(seen[key])return;seen[key]=1;cards.push({q:q,a:a});
+  });
+  var t=attFirstHead||String(name||'Resumo').replace(/\.[^.]+$/,'').replace(/[_-]+/g,' ');
+  return {t:t.slice(0,90),b:b,cards:cards,qs:[],ia:false};
+}
+
+/* ---- resumo com IA (Claude), opcional, com a chave da própria pessoa ---- */
+var IASCHEMA={type:'object',additionalProperties:false,required:['titulo','blocos','cartoes','questoes'],properties:{
+  titulo:{type:'string'},
+  blocos:{type:'array',items:{type:'object',additionalProperties:false,required:['tipo','texto','itens'],properties:{
+    tipo:{type:'string',enum:['subtitulo','paragrafo','lista','bizu','nao_confunda']},texto:{type:'string'},itens:{type:'array',items:{type:'string'}}}}},
+  cartoes:{type:'array',items:{type:'object',additionalProperties:false,required:['pergunta','resposta'],properties:{pergunta:{type:'string'},resposta:{type:'string'}}}},
+  questoes:{type:'array',items:{type:'object',additionalProperties:false,required:['enunciado','alternativas','correta','explicacao'],properties:{
+    enunciado:{type:'string'},alternativas:{type:'array',items:{type:'string'}},correta:{type:'integer'},explicacao:{type:'string'}}}}
+}};
+var IASYS='Você ajuda estudantes de Enfermagem a estudar. Escreva sempre em português do Brasil, com frases claras e curtas. Use somente o que está no material enviado: não invente dados, doses, valores ou referências que não estejam nele. Se o material estiver incompleto ou ilegível em algum trecho, resuma só o que dá para ler.';
+function iaPrompt(dn){
+  return 'Crie um material de estudo a partir do arquivo acima, para a disciplina "'+dn+'".\n'+
+  '- titulo: um título curto para o assunto.\n'+
+  '- blocos: o resumo, na ordem do material. Organize com subtítulos (tipo "subtitulo", texto curto), parágrafos curtos ("paragrafo") e listas ("lista", com os itens em "itens"). Inclua de 1 a 3 blocos "bizu" com dicas para memorizar e, se houver conceitos fáceis de confundir, blocos "nao_confunda". Em blocos que não são lista, deixe "itens" vazio; em listas, "texto" fica vazio.\n'+
+  '- cartoes: de 8 a 15 cartões com uma pergunta e uma resposta curta sobre os pontos principais.\n'+
+  '- questoes: de 5 a 8 questões de múltipla escolha no estilo de prova, cada uma com 5 alternativas, o índice da alternativa correta em "correta" (a primeira é 0) e uma explicação curta de por que ela é a certa.';
+}
+function iaBlocks(bl){
+  var b=[];
+  (bl||[]).forEach(function(x){
+    var t=String(x.texto||'').trim(),it=(x.itens||[]).map(function(s){return String(s).trim()}).filter(Boolean);
+    if(x.tipo==='lista'){if(t)b.push(['p',esc(t)]);if(it.length)b.push(['l',it.map(esc)]);return}
+    if(!t)return;
+    if(x.tipo==='subtitulo')b.push(['p','<b>'+esc(t)+'</b>']);
+    else if(x.tipo==='bizu')b.push(['bz',' '+esc(t)]);
+    else if(x.tipo==='nao_confunda')b.push(['nc',' '+esc(t)]);
+    else b.push(['p',esc(t)]);
+  });
+  return b;
+}
+function iaErr(m,e){
+  var A=m.Anthropic;
+  if(e instanceof A.AuthenticationError)return 'A chave da IA não foi aceita. Confira se copiou a chave inteira em "Resumo com IA".';
+  if(e instanceof A.PermissionDeniedError)return 'Esta chave não tem permissão para usar a IA. Confira a sua conta na Anthropic.';
+  if(e instanceof A.RateLimitError)return 'Muitos pedidos seguidos. Espere um minuto e tente de novo.';
+  if(e instanceof A.BadRequestError)return 'A IA recusou o pedido: '+String(e.message||'').slice(0,200)+' Se falar em créditos (credit balance), é preciso colocar saldo na sua conta da Anthropic.';
+  if(e instanceof A.APIConnectionError)return 'Sem conexão com a IA. Confira a internet e tente de novo.';
+  if(e instanceof A.APIError)return 'A IA está indisponível agora (erro '+(e.status||'?')+'). Tente de novo em alguns minutos.';
+  return 'Algo deu errado ao gerar o resumo com IA. Tente de novo.';
+}
+function genIA(){
+  var key=iaKey();if(!key){toast('Configure a chave da IA primeiro.');return}
+  var dn=dshort(discOf(attDisc())),content=[];
+  if(att.kind==='pdf'&&att.b64)content.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:att.b64},title:att.name});
+  else if(att.kind==='img'&&att.b64)content.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:att.b64}});
+  else{
+    if(att.text.length>600000){att.err='Este material é longo demais para a IA de uma vez. Divida o arquivo em partes menores.';render();return}
+    content.push({type:'text',text:'Material do arquivo "'+att.name+'":\n\n'+att.text});
+  }
+  content.push({type:'text',text:iaPrompt(dn)});
+  att.busy='A IA está lendo o material e escrevendo o resumo. Pode levar até 2 minutos...';att.err='';render();
+  loadSDK().then(function(m){
+    var client=new m.Anthropic({apiKey:key,dangerouslyAllowBrowser:true});
+    return client.beta.messages.parse({
+      model:IAMODEL,max_tokens:16000,
+      betas:['server-side-fallback-2026-07-01'],fallbacks:'default',
+      output_config:{effort:'medium',format:m.betaJSONSchemaOutputFormat(IASCHEMA)},
+      system:IASYS,messages:[{role:'user',content:content}]
+    }).then(function(r){
+      att.busy='';
+      if(r.stop_reason==='refusal'){att.err='A IA não conseguiu resumir este material. Tente o resumo grátis.';render();return}
+      if(r.stop_reason==='max_tokens'){att.err='O material é grande demais para um resumo só. Divida o arquivo em partes menores.';render();return}
+      var o=r.parsed_output;
+      if(!o){att.err='A IA respondeu num formato inesperado. Tente de novo.';render();return}
+      var qs=(o.questoes||[]).filter(function(q){return q.enunciado&&q.alternativas&&q.alternativas.length>=2&&q.alternativas.length<=6&&q.correta>=0&&q.correta<q.alternativas.length});
+      att.res={t:String(o.titulo||att.name).slice(0,90),b:iaBlocks(o.blocos),
+        cards:(o.cartoes||[]).filter(function(c){return c.pergunta&&c.resposta}).map(function(c){return {q:c.pergunta,a:c.resposta}}),
+        qs:qs.map(function(q){return {q:q.enunciado,o:q.alternativas,c:q.correta,e:q.explicacao||''}}),ia:true};
+      render();window.scrollTo(0,0);
+    },function(e){att.busy='';att.err=iaErr(m,e);render()});
+  },function(){att.busy='';att.err='Não consegui carregar a IA. Na primeira vez, este recurso precisa de internet.';render()});
+}
+
+/* ---- salvar ---- */
+function resOf(d){return (RES[d]||[]).concat((S.mres&&S.mres[d])||[])}
+function attSave(all){
+  var r=att.res,d=attDisc();if(!r||!d)return;
+  if(!r.b.length&&!r.cards.length&&!r.qs.length){toast('Não há nada para salvar.');return}
+  var id='u'+uid(),t=today(),nc=0;
+  S.mres=S.mres||{};(S.mres[d]=S.mres[d]||[]).push({id:id,t:r.t,b:r.b,u:1,src:att.name,dt:t,ia:r.ia?1:0});
+  if(all){
+    r.cards.forEach(function(c){S.cards.push({id:uid(),d:d,s:id,t:'c',q:c.q,a:c.a,box:0,due:t,seen:false,tries:0,ok:0,ex:false});nc++});
+    r.qs.forEach(function(q){S.cards.push({id:uid(),d:d,s:id,t:'q',q:q.q,o:q.o,c:q.c,e:q.e,box:0,due:t,seen:false,tries:0,ok:0,ex:false});nc++});
+  }
+  save();
+  att={name:'',kind:'',busy:'',err:'',text:'',b64:'',mime:'',res:null};
+  rs.d=d;rs.s=id;go('resumos');
+  toast('Resumo salvo'+(nc?' com '+nc+' '+plural(nc,'cartão','cartões'):'')+'.');
+}
+function attAct(a,D){
+  switch(a){
+    case 'att-free':
+      var tx=document.getElementById('attx');if(tx)att.text=tx.value;
+      var r=summarizeFree(att.text,att.name);
+      if(!r||!r.b.length){att.err='Não encontrei frases suficientes para resumir. Confira o texto extraído.';render();return}
+      att.err='';att.res=r;render();window.scrollTo(0,0);break;
+    case 'att-ia':var tx2=document.getElementById('attx');if(tx2)att.text=tx2.value;genIA();break;
+    case 'att-save':attSave(D.all==='1');break;
+    case 'att-back':att.res=null;att.err='';render();break;
+    case 'att-clear':att={name:'',kind:'',busy:'',err:'',text:'',b64:'',mime:'',res:null};render();break;
+    case 'ia-save':
+      var el=document.getElementById('iak'),k=el?el.value.trim():'';
+      if(!/^sk-ant-/.test(k)){toast('A chave começa com sk-ant-. Confira e cole de novo.');return}
+      iaSet(k);render();toast('Chave salva neste aparelho.');break;
+    case 'ia-del':iaSet('');render();toast('Chave removida.');break;
+    case 'delres':
+      if(resDelAsk!==D.id){resDelAsk=D.id;render();return}
+      resDelAsk='';
+      Object.keys(S.mres||{}).forEach(function(k){S.mres[k]=S.mres[k].filter(function(x){return x.id!==D.id})});
+      save();rs.s='';render();toast('Resumo excluído. Os cartões continuam na biblioteca.');break;
+  }
+}
+
+/* ---- tela ---- */
+function viewAnexar(){
+  var k=iaKey(),h='';
+  if(att.res)return attPreview();
+  h+='<div class="card" style="display:flex;flex-direction:column;gap:14px"><div><h3>Anexar arquivo</h3><p class="muted small" style="margin-top:4px">PDF, Word (.docx), foto do caderno ou do slide (JPG, PNG) ou texto (.txt). O Neurinho lê o arquivo e monta um resumo com cartões.</p></div>';
+  h+='<div class="field"><span>Disciplina</span><select data-bind="draft.impd">'+dsel(attDisc())+'</select></div>';
+  if(att.busy){
+    h+='<div class="note info"><b>'+esc(att.name)+'</b><div id="attst" style="margin-top:4px" role="status" aria-live="polite">'+esc(att.busy)+'</div></div>';
+  }else{
+    if(att.err)h+='<div class="note bad">'+esc(att.err)+'</div>';
+    if(att.text||att.b64){
+      var n=att.text.length;
+      h+='<div class="note good"><b>'+esc(att.name)+'</b><div class="small" style="margin-top:2px">'+(n?n.toLocaleString('pt-BR')+' caracteres de texto lidos.':'Arquivo pronto para a IA.')+'</div></div>';
+      if(n)h+='<details class="att-x"><summary class="small"><b>Ver e corrigir o texto lido</b></summary><textarea id="attx" style="min-height:180px;margin-top:8px">'+esc(att.text)+'</textarea></details>';
+      if(n)h+='<button class="btn stk" data-act="att-free">Gerar resumo grátis<small>escolhe as frases principais do texto</small></button>';
+      if(k)h+='<button class="btn stk '+(n?'soft':'')+'" data-act="att-ia">Gerar resumo com IA<small>texto reescrito, cartões e questões</small></button>';
+      else h+='<p class="muted small">Quer um resumo reescrito, com questões de prova? Configure a IA logo abaixo.</p>';
+      h+='<button class="btn ghost sm" data-act="att-clear">Trocar arquivo</button>';
+    }else{
+      h+='<label class="btn" for="attf">Escolher arquivo</label><input type="file" id="attf" class="att-in" accept=".pdf,.docx,.doc,.txt,.md,image/*,application/pdf">';
+    }
+  }
+  h+='</div>';
+  h+='<details class="card att-ia"'+(att.text&&!k?' open':'')+'><summary><b>Resumo com IA (opcional)</b><span class="muted small">'+(k?'Configurado':'Não configurado')+'</span></summary><div style="display:flex;flex-direction:column;gap:10px;margin-top:10px">';
+  h+='<p class="small">O resumo com IA usa a Claude, da Anthropic. Ele lê o arquivo inteiro (inclusive imagens e PDFs digitalizados), reescreve o conteúdo em tópicos e cria cartões e questões de prova.</p>';
+  h+='<div class="note info small">Precisa de uma <b>chave de API</b> criada em console.anthropic.com. O uso é <b>pago</b> e cobrado na sua conta da Anthropic, por resumo gerado. A chave fica salva só neste aparelho e o arquivo vai direto daqui para a Anthropic.</div>';
+  if(k)h+='<div class="row between"><span class="small">Chave: sk-ant-…'+esc(k.slice(-4))+'</span><button class="btn ghost sm" data-act="ia-del">Remover chave</button></div>';
+  else h+='<div class="field"><span>Chave de API</span><input id="iak" type="password" autocomplete="off" placeholder="sk-ant-..."></div><button class="btn soft sm" data-act="ia-save">Salvar chave</button>';
+  h+='</div></details>';
+  h+=viewColar();
+  return h;
+}
+function attPreview(){
+  var r=att.res,d=discOf(attDisc()),nc=r.cards.length+r.qs.length;
+  var h='<div class="row"><button class="btn soft" data-act="att-back">‹ Voltar</button><span class="tag">'+esc(dshort(d))+'</span><span class="tag">'+(r.ia?'Resumo com IA':'Resumo grátis')+'</span></div>';
+  h+='<div class="card"><h2 style="margin-top:0">'+esc(r.t)+'</h2>'+r.b.map(blk).join('')+'</div>';
+  if(r.cards.length)h+='<div class="card"><h3>'+r.cards.length+' '+plural(r.cards.length,'cartão','cartões')+'</h3>'+r.cards.slice(0,30).map(function(c){return '<div class="att-c"><b>'+esc(c.q)+'</b><span class="muted small">'+esc(c.a)+'</span></div>'}).join('')+'</div>';
+  if(r.qs.length)h+='<div class="card"><h3>'+r.qs.length+' '+plural(r.qs.length,'questão','questões')+' de múltipla escolha</h3>'+r.qs.map(function(q){return '<div class="att-c"><b>'+esc(q.q)+'</b><span class="muted small">Resposta: '+esc(q.o[q.c])+'</span></div>'}).join('')+'</div>';
+  if(!r.ia&&!r.cards.length)h+='<p class="muted small">Não encontrei definições claras para virar cartões. Você pode criar cartões na aba Criar.</p>';
+  h+='<div class="note info small">'+(r.ia?'Resumo feito por IA.':'Resumo automático com frases do seu material.')+' Confira com o material da aula antes de estudar.</div>';
+  if(nc)h+='<button class="btn big" data-act="att-save" data-all="1">Salvar resumo e '+nc+' '+plural(nc,'cartão','cartões')+'</button>';
+  h+='<button class="btn '+(nc?'soft':'big')+'" data-act="att-save" data-all="0">Salvar só o resumo</button>';
+  h+='<button class="btn ghost" data-act="att-clear">Descartar</button>';
+  return h;
+}
+document.addEventListener('change',function(e){if(e.target&&e.target.id==='attf'&&e.target.files)attFile(e.target.files[0])});
 
 /* ---------- jogo: A Jornada das Sinapses ---------- */
 var GART={
@@ -1321,25 +1715,25 @@ function blk(b){
 }
 function viewResumos(){
   var h='<div class="row between" style="flex-wrap:nowrap"><div><h1>Resumos</h1><p class="muted">Revise cada assunto antes ou depois de estudar.</p></div>'+mascot(84,stageIdx(S.xp),'think')+'</div>';
-  if(rs.d&&!RES[rs.d])rs.d='';
+  if(rs.d&&!resOf(rs.d).length)rs.d='';
   if(!rs.d){
     h+=perField();
     h+='<div class="rs-list">';
     DP().forEach(function(d){
-      var n=RES[d.id]?RES[d.id].length:0;
+      var n=resOf(d.id).length;
       if(n)h+='<button class="rs-row" data-act="rs-d" data-d="'+esc(d.id)+'"><span class="dot" style="background:'+d.cor+'"></span><div><div class="nm">'+esc(dshort(d))+'</div><div class="muted small">'+n+' '+plural(n,'assunto','assuntos')+'</div></div><span class="muted" aria-hidden="true">›</span></button>';
     });
     h+='</div>';
-    var sem=DP().filter(function(d){return !RES[d.id]}).map(function(d){return esc(dshort(d))});
-    if(sem.length)h+='<p class="muted small">Ainda sem resumo: '+sem.join(', ')+'. Em breve.</p>';
+    var sem=DP().filter(function(d){return !resOf(d.id).length}).map(function(d){return esc(dshort(d))});
+    if(sem.length)h+='<p class="muted small">Ainda sem resumo: '+sem.join(', ')+'. Crie o seu em Cartões, na opção Anexar.</p>';
     return h;
   }
-  var d=discOf(rs.d),lista=RES[rs.d];
+  var d=discOf(rs.d),lista=resOf(rs.d);
   if(!rs.s){
     h+='<div class="row"><button class="btn soft" data-act="rs-back">‹ Disciplinas</button><span class="tag">'+esc(d.nome)+'</span></div><div class="rs-list">';
     lista.forEach(function(a){
       var n=counts(rs.d,a.id).tot;
-      h+='<button class="rs-row" data-act="rs-s" data-s="'+a.id+'"><span class="dot" style="background:'+d.cor+'"></span><div><div class="nm">'+esc(a.t)+'</div><div class="muted small">'+n+' '+plural(n,'cartão','cartões')+' para praticar</div></div><span class="muted" aria-hidden="true">›</span></button>';
+      h+='<button class="rs-row" data-act="rs-s" data-s="'+a.id+'"><span class="dot" style="background:'+d.cor+'"></span><div><div class="nm">'+esc(a.t)+(a.u?' <span class="tag">Meu</span>':'')+'</div><div class="muted small">'+n+' '+plural(n,'cartão','cartões')+' para praticar</div></div><span class="muted" aria-hidden="true">›</span></button>';
     });
     return h+'</div>';
   }
@@ -1348,6 +1742,7 @@ function viewResumos(){
   var k=counts(rs.d,a.id);
   h+='<div class="row"><button class="btn soft" data-act="rs-back">‹ Assuntos</button><span class="tag">'+esc(d.nome)+'</span></div>';
   h+='<div class="card"><h2 style="margin-top:0">'+esc(a.t)+'</h2>'+a.b.map(blk).join('')+'</div>';
+  if(a.u)h+='<div class="row between"><span class="muted small">'+(a.ia?'Resumo com IA':'Resumo grátis')+(a.src?' de '+esc(a.src):'')+'</span><button class="btn ghost sm" data-act="delres" data-id="'+esc(a.id)+'">'+(resDelAsk===a.id?'Toque de novo para excluir':'Excluir resumo')+'</button></div>';
   h+='<button class="btn big" data-act="rs-study" data-disc="'+esc(rs.d)+'" data-sub="'+a.id+'"'+(k.tot?'':' disabled')+'>Praticar este assunto<small>'+k.tot+' '+plural(k.tot,'cartão','cartões')+'</small></button>';
   if(idx<lista.length-1)h+='<button class="btn soft" data-act="rs-s" data-s="'+lista[idx+1].id+'">Próximo: '+esc(lista[idx+1].t)+'</button>';
   return h;
@@ -1435,6 +1830,8 @@ document.addEventListener('click',function(e){
   var a=el.getAttribute('data-act'),D=el.dataset,t=today();
   if(a!=='del'&&a!=='deld'&&a!=='rmex'&&a!=='reset'&&a!=='delev'&&a!=='delh')confirmKey=null;
   if(a.slice(0,2)==='g-'){gameAct(a,D);return}
+  if(a.slice(0,4)==='att-'||a.slice(0,3)==='ia-'||a==='delres'){if(a!=='delres')resDelAsk='';attAct(a,D);return}
+  resDelAsk='';
   switch(a){
     case 'tab':go(D.t);break;
     case 'acc':
@@ -1556,7 +1953,7 @@ function createCard(){
   save();render();toast('Salvo na biblioteca.');
 }
 function importCards(){
-  var list=parseImport(draft.imp),d=draft.impd||(DP()[0]&&DP()[0].id);
+  var list=parseImport(draft.imp),d=attDisc();
   if(!d){toast('Crie uma disciplina primeiro.');return}
   if(!list.length){toast('Nenhuma linha no formato pergunta | resposta.');return}
   list.forEach(function(x){S.cards.push({id:uid(),d:d,t:'c',q:x.q,a:x.a,box:0,due:today(),seen:false,tries:0,ok:0,ex:false})});

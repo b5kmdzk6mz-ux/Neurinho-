@@ -1,5 +1,5 @@
-/* Neurinho: service worker. Versao do conteudo: a24cc9c6ba */
-var VER='neurinho-a24cc9c6ba';
+/* Neurinho: service worker. Versao do conteudo: 578f927342 */
+var VER='neurinho-578f927342';
 var CORE=['./','index.html','OpenDyslexic-Regular.otf','OpenDyslexic-Bold.otf','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VER).then(function(c){return c.addAll(CORE)}).then(function(){return self.skipWaiting()}));
@@ -30,4 +30,18 @@ self.addEventListener('fetch',function(e){
     }).catch(function(){return m});
     return m||net;
   }));
+});
+
+/* Avisos: toque na notificacao abre o app; push fica pronto para um servidor futuro */
+self.addEventListener('notificationclick',function(e){
+  e.notification.close();
+  e.waitUntil(self.clients.matchAll({type:'window',includeUncontrolled:true}).then(function(l){
+    if(l.length&&l[0].focus)return l[0].focus();
+    return self.clients.openWindow('./');
+  }));
+});
+self.addEventListener('push',function(e){
+  var d={};
+  try{d=e.data.json()}catch(x){d={body:e.data?e.data.text():''}}
+  e.waitUntil(self.registration.showNotification(d.title||'Material novo adicionado',{body:d.body||'',icon:'icon-192.png',tag:d.tag||'neurinho'}));
 });

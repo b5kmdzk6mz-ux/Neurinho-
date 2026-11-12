@@ -1,6 +1,6 @@
-/* Neurinho: service worker. Versao do conteudo: 578f927342 */
-var VER='neurinho-578f927342';
-var CORE=['./','index.html','OpenDyslexic-Regular.otf','OpenDyslexic-Bold.otf','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png'];
+/* Neurinho: service worker. Versao do conteudo: 76c6dca383 */
+var VER='neurinho-76c6dca383';
+var CORE=['./','index.html','OpenDyslexic-Regular.otf','OpenDyslexic-Bold.otf','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','afya-logo.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VER).then(function(c){return c.addAll(CORE)}).then(function(){return self.skipWaiting()}));
 });

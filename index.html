@@ -81,6 +81,15 @@ button{cursor:pointer}
 .btn.danger{background:var(--bad-soft); color:var(--bad); border:1.5px solid var(--bad)}
 .btn.sm{padding:8px 12px; font-size:14px; border-radius:12px}
 .btn:disabled{opacity:.5; cursor:not-allowed}
+.fbh{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.fbh img.logo{height:34px; width:auto; max-width:60%}
+.fbq{margin:18px 0 0}
+.fbq>b{display:block; line-height:1.35; margin-bottom:8px}
+.fbs{display:flex; flex-wrap:wrap; gap:6px}
+.fbs .chip{min-width:44px; text-align:center}
+.fbl{display:flex; justify-content:space-between; gap:10px; margin-top:4px; font-size:12px; color:var(--muted)}
+.fbq input[type=text],.fbq textarea{width:100%}
+.fbq textarea{min-height:84px}
 .row{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
 .row.between{justify-content:space-between}
 .grow{flex:1; min-width:0}
@@ -516,6 +525,100 @@ function load(){
 }
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 
+/* ---------- feedback da turma ---------- */
+var FBTOPIC='neurinho-fb-bc451364f0e27481';
+var FBQ=[
+ {k:'consent',n:'Consentimento',t:'Participação voluntária e anônima. Você aceita responder?',ty:'one',o:['Sim, aceito participar','Não quero participar'],r:1},
+ {k:'periodo',n:'Período',t:'Em qual período você está?',ty:'one',o:['1º','2º','3º','4º ou mais','Outro curso'],r:1},
+ {k:'rotina',n:'Trabalho ou filhos',t:'Você trabalha ou tem filhos/dependentes?',ty:'one',o:['Trabalho','Tenho filhos/dependentes','Os dois','Nenhum'],r:1},
+ {k:'dias_uso',n:'Dias de uso',t:'Há quantos dias você usa o Neurinho? Pela aba Progresso, qual sua maior sequência de dias e quantos cartões você já dominou?',ty:'text',r:1},
+ {k:'vezes_sem',n:'Vezes por semana',t:'Quantas vezes por semana você usa?',ty:'sc',a:0,b:7,la:'0',lb:'7',r:1},
+ {k:'tempo_uso',n:'Tempo de cada uso',t:'Quanto tempo dura cada uso?',ty:'one',o:['Até 5 min','5 a 15 min','15 a 30 min','Mais de 30 min'],r:1},
+ {k:'recursos',n:'Recursos usados',t:'O que você já usou?',ty:'multi',o:['Estudar','Resumos','Cartões','Jogo','Cuidar','Acessibilidade','Agenda'],r:1},
+ {h:'O que o app promete',s:'1 = discordo totalmente, 5 = concordo totalmente'},
+ {k:'cabe_rotina',n:'Cabe na rotina',t:'O Neurinho cabe na minha rotina.',ty:'sc',a:1,b:5,la:'Discordo',lb:'Concordo',r:1},
+ {k:'fixa',n:'Fixar conteúdo',t:'Estudar pelo app me ajuda a fixar o conteúdo.',ty:'sc',a:1,b:5,la:'Discordo',lb:'Concordo',r:1},
+ {k:'nao_pesa',n:'Não pesa',t:'O app não pesa no meu dia a dia.',ty:'sc',a:1,b:5,la:'Discordo',lb:'Concordo',r:1},
+ {k:'revisar',n:'Revisar antes das provas',t:'Os cartões e as questões me ajudam a revisar antes das provas.',ty:'sc',a:1,b:5,la:'Discordo',lb:'Concordo',r:1},
+ {k:'incentivo',n:'Incentivo e Cuidar',t:'As frases de incentivo e a aba Cuidar me fazem bem.',ty:'sc',a:1,b:5,la:'Discordo',lb:'Concordo',r:1},
+ {k:'jogo',n:'Jogo',t:'O jogo torna o estudo mais leve e divertido. (se não usou, pule)',ty:'sc',a:1,b:5,la:'Discordo',lb:'Concordo',r:0},
+ {k:'acessib',n:'Acessibilidade',t:'Os recursos de acessibilidade (fonte, tamanho, leitura em voz) são úteis. (se não usou, pule)',ty:'sc',a:1,b:5,la:'Discordo',lb:'Concordo',r:0},
+ {h:'Sua rotina de estudo'},
+ {k:'antes',n:'Dias por semana antes',t:'Antes do Neurinho, em quantos dias por semana você estudava?',ty:'sc',a:0,b:7,la:'0',lb:'7',r:1},
+ {k:'hoje',n:'Dias por semana hoje',t:'Hoje, em quantos dias por semana você estuda?',ty:'sc',a:0,b:7,la:'0',lb:'7',r:1},
+ {k:'rende',n:'Rende mais',t:'Estudar passou a render mais?',ty:'one',o:['Muito mais','Um pouco mais','Igual','Menos'],r:1},
+ {h:'Para finalizar'},
+ {k:'nps',n:'Recomendação',t:'De 0 a 10, o quanto você recomendaria o Neurinho a um colega?',ty:'sc',a:0,b:10,la:'Nada',lb:'Com certeza',r:1},
+ {k:'gostou',n:'Mais gostou',t:'O que você mais gostou?',ty:'para',r:0},
+ {k:'melhorar',n:'Melhorar',t:'O que precisa melhorar ou o que faltou?',ty:'para',r:0},
+ {k:'conteudo',n:'Conteúdo desejado',t:'Qual disciplina ou conteúdo você gostaria de ver no app?',ty:'para',r:0}
+];
+var fb={a:{},busy:false,err:'',sent:false,txt:''};
+function fbMissing(){
+  for(var i=0;i<FBQ.length;i++){var q=FBQ[i];if(!q.k||!q.r)continue;var v=fb.a[q.k];
+    if(q.ty==='multi'?!(v&&v.length):(v===undefined||v===''||v===null))return q}
+  return null;
+}
+function fbText(){
+  var L=['Neurinho feedback v1'];
+  FBQ.forEach(function(q){if(!q.k)return;var v=fb.a[q.k];
+    if(q.ty==='multi')v=(v||[]).join(', ');
+    if(v===undefined||v==='')return;
+    L.push(q.k+': '+String(v).replace(/\s+/g,' ').trim());
+  });
+  return L.join('\n');
+}
+function fbSend(){
+  var m=fbMissing();
+  if(m){fb.err='Falta responder: '+m.n+'.';render();return}
+  fb.err='';fb.busy=true;fb.txt=fbText();render();
+  var done=function(ok){
+    fb.busy=false;
+    if(ok){fb.sent=true;S.fbDone=true;save()}else fb.err='Não consegui enviar agora. Confira a internet e tente de novo.';
+    render();window.scrollTo(0,0);
+  };
+  try{
+    fetch('https://ntfy.sh/'+FBTOPIC,{method:'POST',body:fb.txt}).then(function(r){done(r&&r.ok)},function(){done(false)});
+  }catch(e){done(false)}
+}
+function viewFeedback(){
+  var h='<div class="top"><span class="brand">Neurinho</span><button class="btn ghost sm" data-act="tab" data-t="home">Voltar ao app</button></div>';
+  h+='<div class="card"><div class="fbh"><img class="logo" src="afya-logo.png" alt="Afya Faculdade de Parnaíba">'+mascot(64,stageIdx(S.xp),'happy')+'</div>';
+  if(fb.sent){
+    return h+'<h2 style="margin-top:14px">Obrigada!</h2><p style="margin-top:8px">Sua resposta ajuda o Neurinho a melhorar e a ser apresentado na Semana de Saúde Integral da Afya.</p><button class="btn" style="margin-top:14px" data-act="tab" data-t="home">Voltar ao app</button></div>';
+  }
+  h+='<h2 style="margin-top:14px">Conta pra mim como foi usar</h2><p class="muted small" style="margin-top:6px">Semana de Saúde Integral | Afya Faculdade de Parnaíba. Formulário de cerca de 3 minutos, anônimo: não pede nome nem e-mail. As respostas serão usadas apenas para avaliar o Neurinho.</p></div>';
+  var stop=fb.a.consent==='Não quero participar';
+  var num=0;
+  h+='<div class="card">';
+  for(var i=0;i<FBQ.length;i++){
+    var q=FBQ[i];
+    if(q.h){h+='<h3 style="margin-top:22px">'+esc(q.h)+'</h3>'+(q.s?'<p class="muted small">'+esc(q.s)+'</p>':'');continue}
+    num++;
+    h+='<div class="fbq"><b>'+num+'. '+esc(q.t)+(q.r?'':' <span class="muted small">(opcional)</span>')+'</b>';
+    var v=fb.a[q.k];
+    if(q.ty==='one'){
+      h+='<div class="fbs">'+q.o.map(function(o){return '<button class="chip" aria-pressed="'+(v===o)+'" data-act="fb-set" data-k="'+q.k+'" data-v="'+esc(o)+'">'+esc(o)+'</button>'}).join('')+'</div>';
+    }else if(q.ty==='multi'){
+      h+='<div class="fbs">'+q.o.map(function(o){return '<button class="chip" aria-pressed="'+((v||[]).indexOf(o)>=0)+'" data-act="fb-tog" data-k="'+q.k+'" data-v="'+esc(o)+'">'+esc(o)+'</button>'}).join('')+'</div>';
+    }else if(q.ty==='sc'){
+      var bt='';for(var j=q.a;j<=q.b;j++)bt+='<button class="chip" aria-pressed="'+(v===String(j))+'" data-act="fb-set" data-k="'+q.k+'" data-v="'+j+'">'+j+'</button>';
+      h+='<div class="fbs">'+bt+'</div><div class="fbl"><span>'+esc(q.la)+'</span><span>'+esc(q.lb)+'</span></div>';
+    }else if(q.ty==='text'){
+      h+='<input type="text" data-fb="'+q.k+'" value="'+esc(v||'')+'" aria-label="'+esc(q.n)+'">';
+    }else{
+      h+='<textarea data-fb="'+q.k+'" aria-label="'+esc(q.n)+'">'+esc(v||'')+'</textarea>';
+    }
+    h+='</div>';
+    if(q.k==='consent'&&stop){h+='<div class="note info" style="margin-top:14px">Tudo bem, obrigada por ter aberto! Você pode voltar ao app quando quiser.</div>';break}
+  }
+  h+='</div>';
+  if(!stop){
+    if(fb.err)h+='<div class="note warn">'+esc(fb.err)+'</div>';
+    h+='<button class="btn big" data-act="fb-send"'+(fb.busy?' disabled':'')+'>'+(fb.busy?'Enviando...':'Enviar respostas')+'</button>';
+  }
+  return h;
+}
 /* ---------- avisos de material novo ---------- */
 var NEWS=[
  {id:'2026-11-12-resp',d:'imu',s:'resp',t:'Infecções respiratórias',dt:'2026-11-12'}
@@ -527,7 +630,7 @@ var S=load();
   if(!Array.isArray(S.newsNote))S.newsNote=[];
   try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
 })();
-var tab='home';
+var tab=(location.hash==='#feedback')?'feedback':'home';
 var sess=null;
 var lib={view:'lista',filtro:'todas'};
 var setup={disc:'todas',sub:''};
@@ -560,6 +663,10 @@ function newsNotify(){
       navigator.serviceWorker.ready.then(function(r){return r.showNotification(title,o)}).catch(fallback);
     }else fallback();
   });
+}
+function homeFeedback(){
+  if(S.fbDone)return '';
+  return '<div class="card"><h3>Dê seu feedback</h3><p class="muted small" style="margin:6px 0 10px">Conta como foi usar o Neurinho. São 3 minutos e é anônimo. Sua opinião vai para a apresentação na Semana de Saúde Integral.</p><button class="btn soft sm" data-act="tab" data-t="feedback">Responder agora</button></div>';
 }
 function homeNews(){
   var u=newsUnseen();if(!u.length)return '';
@@ -639,6 +746,7 @@ function viewHome(){
   h+='</div>';
   if(ci.humor&&ci.humor<=2)h+='<div class="note warn"><b>Hoje o dia pesou.</b><div style="margin-top:4px">Que tal começar por uma pausa? A aba Cuidar tem respiração, alongamento e sons para relaxar. Uma microsessão curta já conta.</div><button class="btn soft sm" style="margin-top:8px" data-act="tab" data-t="cuidar">Ir para Cuidar</button></div>';
   h+=homeNews();
+  h+=homeFeedback();
   h+=homeAgenda();
   h+='<div class="card"><h2>Disciplinas do '+S.per+'º período</h2><div class="chips" style="margin-top:10px">'+PERS.map(function(p){return '<button class="chip" aria-pressed="'+(S.per===p)+'" data-act="per" data-p="'+p+'">'+p+'º</button>'}).join('')+'</div><div style="margin-top:6px">';
   if(!DP().length)h+='<p class="muted">Crie uma disciplina na aba Cartões.</p>';
@@ -1019,7 +1127,7 @@ function accCard(){
 function stopBreath(){if(breathTimer){clearTimeout(breathTimer);breathTimer=null}}
 function render(){
   stopBreath();stopStretch();
-  var v={home:viewHome,estudar:viewEstudar,resumos:viewResumos,agenda:viewAgenda,cartoes:viewCartoes,cuidar:viewCuidar,progresso:viewProgresso,jogo:viewJogo}[tab]();
+  var v={home:viewHome,estudar:viewEstudar,resumos:viewResumos,agenda:viewAgenda,cartoes:viewCartoes,cuidar:viewCuidar,progresso:viewProgresso,jogo:viewJogo,feedback:viewFeedback}[tab]();
   document.getElementById('app').innerHTML=v;
   document.getElementById('tabs').innerHTML=TABS.map(function(t){
     return '<button class="tab" data-act="tab" data-t="'+t[0]+'"'+(t[0]===tab?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[t[0]]+'</svg>'+t[1]+'</button>';
@@ -1872,6 +1980,8 @@ function setPath(path,val){
   if(path==='draft.imp'){var el=document.getElementById('impn');if(el){var n=parseImport(val).length;el.textContent=n+' '+plural(n,'cartão pronto','cartões prontos')+' para criar'}}
 }
 document.addEventListener('input',function(e){
+  var fk=e.target&&e.target.getAttribute&&e.target.getAttribute('data-fb');
+  if(fk)fb.a[fk]=e.target.value;
   var b=e.target&&e.target.getAttribute&&e.target.getAttribute('data-bind');
   if(b)setPath(b,e.target.value);
   var k=e.target&&e.target.getAttribute&&e.target.getAttribute('data-ci');
@@ -1892,6 +2002,12 @@ document.addEventListener('click',function(e){
       newsMark(D.id);
       if(nn){rs.d=nn.d;rs.s=nn.s;go('resumos')}else render();
       break;
+    case 'fb-set':fb.a[D.k]=D.v;fb.err='';render();break;
+    case 'fb-tog':
+      var fa=fb.a[D.k]||[],fi=fa.indexOf(D.v);
+      if(fi>=0)fa.splice(fi,1);else fa.push(D.v);
+      fb.a[D.k]=fa;fb.err='';render();break;
+    case 'fb-send':fbSend();break;
     case 'news-ok':
       NEWS.forEach(function(x){newsMark(x.id)});render();break;
     case 'news-perm':

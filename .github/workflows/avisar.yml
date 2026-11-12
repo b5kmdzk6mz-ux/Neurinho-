@@ -1,0 +1,44 @@
+name: Avisar material novo
+
+on:
+  push:
+    branches: [main]
+    paths: ['novidades.json']
+  workflow_dispatch:
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Enviar notificacao para o celular
+        env:
+          TOPICO: neurinho-f6f2889746729c3f
+          EVENTO: ${{ github.event_name }}
+        run: |
+          python3 - <<'PY'
+          import json, os, subprocess, urllib.request
+          topico = os.environ["TOPICO"]
+          atual = json.load(open("novidades.json", encoding="utf-8"))
+          if os.environ["EVENTO"] == "workflow_dispatch":
+              novos = [{"disciplina": "Neurinho", "assunto": "teste de avisos", "frase": "Se você recebeu isto, os avisos estão funcionando."}]
+          else:
+              try:
+                  antigo = json.loads(subprocess.check_output(["git", "show", "HEAD^:novidades.json"], stderr=subprocess.DEVNULL))
+              except Exception:
+                  antigo = []
+              vistos = {x["id"] for x in antigo}
+              novos = [x for x in atual if x["id"] not in vistos]
+          for n in novos:
+              corpo = {
+                  "topic": topico,
+                  "title": "Material novo adicionado",
+                  "message": n["disciplina"] + ": " + n["assunto"] + ". " + n["frase"],
+                  "click": "https://b5kmdzk6mz-ux.github.io/Neurinho-/",
+                  "tags": ["books"],
+              }
+              req = urllib.request.Request("https://ntfy.sh/", data=json.dumps(corpo).encode("utf-8"), headers={"Content-Type": "application/json"})
+              print(urllib.request.urlopen(req, timeout=30).status)
+          PY

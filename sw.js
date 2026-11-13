@@ -13,6 +13,8 @@ self.addEventListener('fetch',function(e){
   var r=e.request;
   if(r.method!=='GET')return;
   var u=new URL(r.url);
+  /* o app Provedor do Autocuidado (pasta autocuidado/) tem service worker proprio: o Neurinho nao mexe nele */
+  if(u.pathname.indexOf('/autocuidado/')!==-1)return;
   var same=u.origin===self.location.origin;
   var font=u.hostname==='fonts.googleapis.com'||u.hostname==='fonts.gstatic.com';
   if(!same&&!font)return;

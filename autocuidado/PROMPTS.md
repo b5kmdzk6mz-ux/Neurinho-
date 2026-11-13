@@ -43,6 +43,8 @@ Meio (fundo branco): à esquerda, o título "No seu celular, de graça:" e uma l
 • Comida, água e caminhada
 • Mito ou verdade? Quebre tabus
 • Onde ser atendido no SUS
+• Hora do Jogo: pênaltis e embaixadinhas para relaxar
+Logo abaixo da lista, um destaque em caixa azul-clara #E9ECF8 com uma bola de futebol e o texto: "Bateu o estresse? Bora bater um pênalti! O app tem um joguinho de futebol para distrair a cabeça."
 À direita, um QUADRADO BRANCO VAZIO grande (cerca de 1/3 da largura), com borda arredondada grossa na cor #473C8F, e embaixo dele o texto "Aponte a câmera aqui". NÃO desenhe QR Code dentro do quadrado: deixe-o totalmente branco.
 
 Abaixo: três caixinhas lado a lado com números grandes: "192 SAMU: emergência" (número em vermelho), "188 CVV: apoio emocional 24 h" (número em #473C8F), "136 Disque Saúde" (número em #1A2458).
@@ -57,7 +59,7 @@ Estilo: design moderno, limpo, flat, muito espaço em branco, texto grande e fá
 ## 3. Post quadrado para Instagram / WhatsApp
 
 ```
-Crie um post quadrado (1080x1080) para Instagram e WhatsApp divulgando o app "Provedor do Autocuidado". Fundo em degradê de #1A2458 para #534FA6. No centro, grande, o avatar flat de homem sorridente de olhos fechados, com bigode grande que abraça um pequeno coração. Acima, o texto em branco, fonte sem serifa bem forte: "Homem que se cuida não é fraco. É provedor." Abaixo do avatar, um QUADRADO BRANCO VAZIO com cantos arredondados (para colar o QR Code depois; NÃO desenhe QR Code) e o texto em #A5C5E2: "Aponte a câmera · funciona sem internet". Estilo flat, moderno, masculino e acolhedor. Somente as cores #1A2458, #473C8F, #534FA6, #4F67B5, #A5C5E2 e branco. Texto em português do Brasil.
+Crie um post quadrado (1080x1080) para Instagram e WhatsApp divulgando o app "Provedor do Autocuidado". Fundo em degradê de #1A2458 para #534FA6. No centro, grande, o avatar flat de homem sorridente de olhos fechados, com bigode grande que abraça um pequeno coração. Acima, o texto em branco, fonte sem serifa bem forte: "Homem que se cuida não é fraco. É provedor." Abaixo do avatar, um QUADRADO BRANCO VAZIO com cantos arredondados (para colar o QR Code depois; NÃO desenhe QR Code) e o texto em #A5C5E2: "Aponte a câmera · funciona sem internet". Acima do nome, um selo arredondado azul-claro #A5C5E2 com uma bola de futebol e o texto em #1A2458 "Tem jogo de pênalti dentro do app!". Estilo flat, moderno, masculino e acolhedor. Somente as cores #1A2458, #473C8F, #534FA6, #4F67B5, #A5C5E2 e branco. Texto em português do Brasil.
 ```
 
 ---

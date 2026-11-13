@@ -10,21 +10,24 @@
 *{box-sizing:border-box}
 body{margin:0;background:#ccd;font-family:"Open Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#16222F}
 .folha{width:210mm;height:297mm;margin:10mm auto;background:#fff;display:flex;flex-direction:column;overflow:hidden}
-.topo{background:#1A2458;color:#fff;padding:16mm 14mm 12mm;display:flex;gap:8mm;align-items:center}
-.topo img{width:40mm;height:40mm;border-radius:9mm}
+.topo{background:#1A2458;color:#fff;padding:11mm 14mm 9mm;display:flex;gap:8mm;align-items:center}
+.topo img{width:34mm;height:34mm;border-radius:8mm}
 .topo h1{font-size:30pt;line-height:1.05;margin:0}
 .topo p{margin:3mm 0 0;font-size:14pt;color:#A5C5E2}
-.meio{flex:1;padding:12mm 14mm;display:flex;gap:10mm}
+.meio{flex:1;padding:9mm 14mm 6mm;display:flex;gap:10mm}
 .lista{flex:1}
-.lista h2{font-size:20pt;margin:0 0 5mm;color:#1A2458}
-.lista li{font-size:14pt;margin:0 0 3.5mm}
-.qrbox{width:80mm;text-align:center}
-.qrbox img{width:80mm;height:80mm;border:3mm solid #473C8F;border-radius:6mm;padding:2mm}
+.lista h2{font-size:18pt;margin:0 0 4mm;color:#1A2458}
+.lista li{font-size:12pt;margin:0 0 2mm}
+.qrbox{width:72mm;text-align:center}
+.qrbox img{width:72mm;height:72mm;border:3mm solid #473C8F;border-radius:6mm;padding:2mm}
 .qrbox b{display:block;font-size:16pt;margin-top:4mm;color:#1A2458}
 .qrbox span{font-size:11pt;color:#4D5B6B}
-.faixa{background:linear-gradient(90deg,#4F67B5,#534FA6);color:#fff;font-weight:800;font-size:17pt;text-align:center;padding:7mm 10mm}
+.jogo{margin:0 14mm 6mm;background:#E9ECF8;border-radius:5mm;padding:4.5mm 6mm;display:flex;gap:5mm;align-items:center;font-size:11.5pt;color:#151B3D}
+.jogo span{font-size:28pt}
+.jogo b{font-size:14pt;color:#1A2458}
+.faixa{background:linear-gradient(90deg,#4F67B5,#534FA6);color:#fff;font-weight:800;font-size:16pt;text-align:center;padding:5mm 10mm}
 .rodape{padding:6mm 14mm;font-size:10pt;color:#4D5B6B;display:flex;justify-content:space-between;gap:6mm}
-.tels{display:flex;gap:5mm;padding:0 14mm 8mm}
+.tels{display:flex;gap:5mm;padding:0 14mm 6mm}
 .tels div{flex:1;border:1px solid #DCE3EC;border-radius:4mm;padding:4mm;text-align:center;font-size:11pt}
 .tels b{display:block;font-size:22pt;color:#C62F2F}
 .tels div:nth-child(2) b{color:#473C8F}
@@ -32,8 +35,9 @@ body{margin:0;background:#ccd;font-family:"Open Sans",system-ui,-apple-system,"S
 .bolso{width:210mm;margin:0 auto 10mm;background:#fff;padding:8mm;display:grid;grid-template-columns:1fr 1fr;gap:6mm}
 .cartao{border:1px dashed #999;border-radius:3mm;height:55mm;display:flex;align-items:center;gap:4mm;padding:4mm;background:#1A2458;color:#fff}
 .cartao img.q{width:42mm;height:42mm;background:#fff;border-radius:2mm;padding:1mm}
-.cartao b{font-size:13pt;display:block}
-.cartao small{font-size:8.5pt;color:#A5C5E2}
+.cartao b{font-size:11.5pt;display:block;line-height:1.15;margin:1mm 0}
+.cartao{overflow:hidden}
+.cartao small{font-size:8.5pt;line-height:1.35;color:#A5C5E2;display:block;margin-top:2mm}
 .dica{max-width:210mm;margin:0 auto;padding:6mm;font-size:12pt}
 @media print{body{background:#fff}.folha{margin:0}.dica{display:none}.bolso{margin:0;page-break-before:always}}
 h1,h2,h3,b,.faixa,.tels b{font-family:"Montserrat","Open Sans",sans-serif}
@@ -50,13 +54,14 @@ h1,h2,h3,b,.faixa,.tels b{font-family:"Montserrat","Open Sans",sans-serif}
     <div class="lista">
       <h2>No seu celular, de graça:</h2>
       <ul>
-        <li>🚦 <b>Sinais de alerta</b>: quando procurar ajuda</li>
+        <li>🚦 <b>Sintomas e cuidados</b>: quando procurar ajuda</li>
         <li>🫀 <b>Conheça seu corpo</b> e o autoexame</li>
         <li>🩺 <b>Exames e consultas</b> com lembretes</li>
-        <li>🧠 <b>Mente e emoções</b>: homem também sente</li>
+        <li>🧠 <b>Saúde mental</b>: homem também sente</li>
         <li>🥗 <b>Comida, água e caminhada</b></li>
         <li>❓ <b>Mito ou verdade?</b> Quebre tabus</li>
-        <li>📍 <b>Onde ser atendido</b> no SUS</li>
+        <li>📍 <b>Onde buscar atendimento</b> no SUS</li>
+        <li>⚽ <b>Hora do Jogo</b>: pênaltis e embaixadinhas para relaxar</li>
       </ul>
       <p style="font-size:13pt"><b>Funciona sem internet</b> e seus dados ficam só no seu celular.</p>
     </div>
@@ -71,13 +76,14 @@ h1,h2,h3,b,.faixa,.tels b{font-family:"Montserrat","Open Sans",sans-serif}
     <div><b>188</b>CVV: apoio emocional 24 h</div>
     <div><b>136</b>Disque Saúde</div>
   </div>
+  <div class="jogo"><span>⚽</span><div><b>Bateu o estresse? Bora bater um pênalti!</b><br>O app tem um joguinho de futebol para distrair a cabeça, com dicas de saúde no fim de cada partida.</div></div>
   <div class="faixa">Novembro Azul: saúde do homem é o ano inteiro 💙</div>
   <div class="rodape"><span>Ação de educação em saúde · Enfermagem · Afya Faculdade de Parnaíba</span><span>Afya Clínica Acadêmica · nov. 2026</span></div>
 </section>
 
 <section class="bolso">
   <script>
-  for(let i=0;i<8;i++)document.write('<div class="cartao"><img class="q" src="qrcode.svg" alt="QR Code"><div><img src="logo.png" alt="" style="width:13mm;height:13mm;border-radius:3mm"><b>Provedor do Autocuidado</b><small>Sinais de alerta, exames, mente e onde ser atendido. Funciona sem internet.<br><br>SAMU 192 · CVV 188</small></div></div>');
+  for(let i=0;i<8;i++)document.write('<div class="cartao"><img class="q" src="qrcode.svg" alt="QR Code"><div><div style="display:flex;align-items:center;gap:2.5mm"><img src="logo.png" alt="" style="width:11mm;height:11mm;border-radius:2.5mm"><b>Provedor do Autocuidado</b></div><small>Saúde do homem no celular + jogo de pênalti para relaxar. Funciona sem internet.<br><b style="display:inline;font-size:9pt;color:#fff">SAMU 192 · CVV 188</b></small></div></div>');
   </script>
 </section>
 </body>

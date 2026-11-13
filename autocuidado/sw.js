@@ -1,5 +1,5 @@
 /* Provedor do Autocuidado: service worker (funciona sem internet). */
-var VER='autocuidado-v1';
+var VER='autocuidado-v2';
 var CORE=['./','index.html','manifest.webmanifest','logo.svg','qrcode.svg','icon-192.png','icon-512.png','maskable-512.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VER).then(function(c){return c.addAll(CORE)}).then(function(){return self.skipWaiting()}));

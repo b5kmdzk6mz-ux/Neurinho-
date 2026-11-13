@@ -5,18 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Provedor do Autocuidado</title>
 <meta name="description" content="Saúde integral do homem: sinais de alerta, exames, mente, hábitos e onde buscar atendimento. Funciona sem internet.">
-<meta name="theme-color" content="#0E2A47">
+<meta name="theme-color" content="#1A2458">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="logo.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
-  --navy:#0E2A47; --azul:#2F6FD6; --azul-claro:#E6EFFC; --ambar:#E8963A; --ambar-claro:#FCEBD6;
-  --creme:#F7F3EC; --bg:#F4F6F9; --card:#FFFFFF; --txt:#16222F; --txt2:#4D5B6B; --linha:#DCE3EC;
+  --navy:#1A2458; --azul:#473C8F; --azul2:#4F67B5; --azul-claro:#E9ECF8; --ambar:#A5C5E2; --ambar-claro:#E3EDF8;
+  --creme:#EEF1FA; --bg:#F3F4FA; --card:#FFFFFF; --txt:#151B3D; --txt2:#4A5070; --linha:#D9DDEE;
   --verde:#1F8A5B; --verde-claro:#DDF3E8; --verm:#C62F2F; --verm-claro:#FBE3E3; --amar:#B7791F; --amar-claro:#FDF1D8;
   --r:18px; --fs:17px;
 }
-:root[data-tema="contraste"]{--bg:#000;--card:#111;--txt:#fff;--txt2:#e6e6e6;--linha:#666;--azul-claro:#0b2547;--ambar-claro:#3a2508;--verde-claro:#06301d;--verm-claro:#3d0b0b;--amar-claro:#3a2a05;--creme:#111}
+:root[data-tema="contraste"]{--bg:#000;--card:#111;--txt:#fff;--txt2:#e6e6e6;--linha:#666;--azul-claro:#1d1a45;--ambar-claro:#16264a;--verde-claro:#06301d;--verm-claro:#3d0b0b;--amar-claro:#3a2a05;--creme:#111}
 *{box-sizing:border-box}
 html{font-size:var(--fs)}
 body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.5;-webkit-tap-highlight-color:transparent;padding-bottom:84px}
@@ -35,7 +35,7 @@ p{margin:.35rem 0 .7rem}
 .voltar{display:none}
 main{max-width:720px;margin:0 auto;padding:16px}
 .card{background:var(--card);border:1px solid var(--linha);border-radius:var(--r);padding:16px;margin:0 0 14px}
-.hero{background:linear-gradient(135deg,var(--navy),#1C4C86);color:#fff;border:0}
+.hero{background:linear-gradient(135deg,var(--navy),#473C8F 70%,#534FA6);color:#fff;border:0}
 .hero p{opacity:.92}
 .hero .frase{font-size:1.3rem;font-weight:800;margin:.1rem 0 .4rem}
 .grade{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -58,7 +58,7 @@ nav.baixo button[aria-current="page"]{color:var(--azul);font-weight:800}
 :root[data-tema="contraste"] .chip{color:#fff}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:14px;padding:12px 16px;min-height:48px;font-weight:700;cursor:pointer;background:var(--azul);color:#fff;text-decoration:none}
 .btn.sec{background:var(--azul-claro);color:var(--navy)}
-.btn.amb{background:var(--ambar);color:#1d1203}
+.btn.amb{background:var(--ambar);color:#1A2458}
 .btn.peq{min-height:38px;padding:6px 12px;font-size:.88rem}
 :root[data-tema="contraste"] .btn.sec{color:#fff}
 .linha{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -70,7 +70,7 @@ details[open] summary::after{content:"–"}
 details .corpo{padding:0 16px 14px}
 .nivel{border-left:6px solid var(--linha);padding:10px 12px;border-radius:10px;margin:8px 0;background:var(--bg)}
 .nivel.verm{border-color:var(--verm);background:var(--verm-claro)}
-.nivel.amar{border-color:var(--ambar);background:var(--amar-claro)}
+.nivel.amar{border-color:var(--amar);background:var(--amar-claro)}
 .nivel.verde{border-color:var(--verde);background:var(--verde-claro)}
 ul{padding-left:1.2rem;margin:.3rem 0 .7rem} li{margin:.2rem 0}
 .passos{counter-reset:p;list-style:none;padding:0}
@@ -82,7 +82,7 @@ ul{padding-left:1.2rem;margin:.3rem 0 .7rem} li{margin:.2rem 0}
 .campo label{font-size:.85rem;font-weight:700;color:var(--txt2)}
 .campo input,.campo select,.campo textarea{border:1px solid var(--linha);background:var(--card);border-radius:12px;padding:11px 12px;min-height:46px;width:100%}
 .barra{height:14px;background:var(--azul-claro);border-radius:99px;overflow:hidden}
-.barra i{display:block;height:100%;background:var(--azul);border-radius:99px;transition:width .4s}
+.barra i{display:block;height:100%;background:linear-gradient(90deg,var(--azul2),var(--azul));border-radius:99px;transition:width .4s}
 .dias{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;font-size:.75rem;color:var(--txt2)}
 .dias div b{display:block;height:64px;background:var(--azul-claro);border-radius:8px;position:relative;overflow:hidden;margin-bottom:3px}
 .dias div b i{position:absolute;bottom:0;left:0;right:0;background:var(--azul)}
@@ -91,7 +91,7 @@ ul{padding-left:1.2rem;margin:.3rem 0 .7rem} li{margin:.2rem 0}
 .humor button small{font-size:.68rem;color:var(--txt2)}
 .humor button[aria-pressed="true"]{border-color:var(--azul);background:var(--azul-claro)}
 .resp{display:grid;place-items:center;padding:12px 0 4px}
-.bola{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#7FA9EE,var(--azul));transform:scale(.6);transition:transform 4s ease-in-out;display:grid;place-items:center;color:#fff;font-weight:800}
+.bola{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#A5C5E2,var(--azul2) 60%,var(--azul));transform:scale(.6);transition:transform 4s ease-in-out;display:grid;place-items:center;color:#fff;font-weight:800}
 .quiz-op{display:flex;gap:10px}
 .quiz-op button{flex:1}
 .res{margin-top:10px;padding:12px;border-radius:12px}
@@ -323,7 +323,7 @@ PAGINAS.inicio = ()=>{
   const sem=semanaMin();
   return `
   <section class="card hero">
-    <div class="mini" style="color:#cfe0ff">${saud}${nome?", "+esc(nome):""}!</div>
+    <div class="mini" style="color:#A5C5E2">${saud}${nome?", "+esc(nome):""}!</div>
     <div class="frase">Cuidar de você também é prover para quem você ama.</div>
     <p>Aqui você reconhece sinais do corpo e da mente, vê quais exames fazer e descobre onde ser atendido. Funciona mesmo sem internet.</p>
     ${nome?"":`<div class="linha"><input id="nomeIn" placeholder="Como quer ser chamado?" style="flex:1;min-width:0;border:0;border-radius:12px;padding:12px" aria-label="Seu nome"><button class="btn amb" id="nomeOk">OK</button></div>`}
@@ -389,11 +389,11 @@ PAGINAS.corpo = ()=>`
       <path d="M40 40 Q180 0 320 40 L300 230 Q180 270 60 230 Z" fill="#F2E3D5" stroke="#d9c3ae"/>
       <g class="org" data-org="reto"><path d="M262 40 C262 120 272 190 250 260 L226 258 C246 190 238 120 238 40 Z" fill="#C98D7A"/><text x="270" y="150">Reto</text></g>
       <g class="org" data-org="bexiga"><ellipse cx="160" cy="120" rx="64" ry="54" fill="#F3C64B"/><text x="132" y="124">Bexiga</text></g>
-      <g class="org" data-org="deferente"><path d="M100 300 C60 250 70 150 120 112" fill="none" stroke="#2F6FD6" stroke-width="7" stroke-linecap="round"/><path d="M196 300 C236 250 232 160 204 116" fill="none" stroke="#2F6FD6" stroke-width="7" stroke-linecap="round"/><text x="6" y="210">Ducto</text><text x="6" y="226">deferente</text></g>
-      <g class="org" data-org="prostata"><ellipse cx="160" cy="194" rx="34" ry="24" fill="#E8963A"/><text x="200" y="198">Próstata</text></g>
+      <g class="org" data-org="deferente"><path d="M100 300 C60 250 70 150 120 112" fill="none" stroke="#4F67B5" stroke-width="7" stroke-linecap="round"/><path d="M196 300 C236 250 232 160 204 116" fill="none" stroke="#4F67B5" stroke-width="7" stroke-linecap="round"/><text x="6" y="210">Ducto</text><text x="6" y="226">deferente</text></g>
+      <g class="org" data-org="prostata"><ellipse cx="160" cy="194" rx="34" ry="24" fill="#534FA6"/><text x="200" y="198">Próstata</text></g>
       <g class="org" data-org="uretra"><path d="M160 172 L160 330" stroke="#B4483B" stroke-width="7"/><text x="168" y="246">Uretra</text></g>
       <g class="org" data-org="penis"><rect x="140" y="226" width="40" height="120" rx="20" fill="#D9A28A" opacity=".85"/><path d="M160 226 L160 340" stroke="#B4483B" stroke-width="6"/><text x="186" y="300">Pênis</text></g>
-      <g class="org" data-org="testiculo"><ellipse cx="104" cy="316" rx="28" ry="36" fill="#7EA6E6"/><ellipse cx="216" cy="316" rx="28" ry="36" fill="#7EA6E6"/><text x="50" y="378">Testículo</text><text x="196" y="378">Testículo</text></g>
+      <g class="org" data-org="testiculo"><ellipse cx="104" cy="316" rx="28" ry="36" fill="#A5C5E2"/><ellipse cx="216" cy="316" rx="28" ry="36" fill="#A5C5E2"/><text x="50" y="378">Testículo</text><text x="196" y="378">Testículo</text></g>
     </svg>
     <div id="orgInfo" class="nivel" style="margin-top:10px"><b>Toque em uma parte do desenho.</b></div>
     <p class="mini">Desenho esquemático, fora de escala, só para entender onde fica cada coisa.</p>

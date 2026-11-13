@@ -14,3 +14,12 @@ Na aba **Cartões > Anexar**, envie um PDF, Word (.docx), foto (JPG/PNG) ou text
 - **Resumo com IA (opcional):** usa a Claude, da Anthropic, com a chave de API da própria pessoa (uso pago, cobrado na conta da Anthropic). Reescreve o conteúdo em tópicos e cria cartões e questões de prova.
 
 Os resumos salvos aparecem na aba Resumos, com a etiqueta "Meu". As bibliotecas usadas estão em `vendor/`.
+
+## Provedor do Autocuidado (saúde do homem)
+
+App separado na pasta [`autocuidado/`](autocuidado/), feito para a ação de educação em saúde do Novembro Azul (Grupo 2: Saúde do Homem). Funciona sem internet e pode ser instalado no celular.
+
+- App: `https://b5kmdzk6mz-ux.github.io/Neurinho-/autocuidado/`
+- Cartaz A4 e cartões com QR Code: `autocuidado/cartaz.html`
+- Guia de identidade visual e ideias de nome: `autocuidado/identidade.html`
+- Para editar os locais de atendimento, mude a lista `LOCAIS` no começo do script de `autocuidado/index.html`.

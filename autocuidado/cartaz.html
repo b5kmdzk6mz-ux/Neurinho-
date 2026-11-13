@@ -4,13 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cartaz Autocuidado</title>
+<link rel="stylesheet" href="fontes/fontes.css">
 <style>
 @page{size:A4;margin:0}
 *{box-sizing:border-box}
-body{margin:0;background:#ccd;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#16222F}
+body{margin:0;background:#ccd;font-family:"Open Sans",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:#16222F}
 .folha{width:210mm;height:297mm;margin:10mm auto;background:#fff;display:flex;flex-direction:column;overflow:hidden}
 .topo{background:#1A2458;color:#fff;padding:16mm 14mm 12mm;display:flex;gap:8mm;align-items:center}
-.topo img{width:34mm;height:34mm}
+.topo img{width:40mm;height:40mm;border-radius:9mm}
 .topo h1{font-size:30pt;line-height:1.05;margin:0}
 .topo p{margin:3mm 0 0;font-size:14pt;color:#A5C5E2}
 .meio{flex:1;padding:12mm 14mm;display:flex;gap:10mm}
@@ -35,14 +36,15 @@ body{margin:0;background:#ccd;font-family:system-ui,-apple-system,"Segoe UI",Rob
 .cartao small{font-size:8.5pt;color:#A5C5E2}
 .dica{max-width:210mm;margin:0 auto;padding:6mm;font-size:12pt}
 @media print{body{background:#fff}.folha{margin:0}.dica{display:none}.bolso{margin:0;page-break-before:always}}
+h1,h2,h3,b,.faixa,.tels b{font-family:"Montserrat","Open Sans",sans-serif}
 </style>
 </head>
 <body>
 <p class="dica">Para imprimir: Ctrl+P (ou Compartilhar → Imprimir no celular), papel A4, sem margens. A página 2 tem 8 cartõezinhos para recortar e entregar.</p>
 <section class="folha">
   <div class="topo">
-    <img src="logo.svg" alt="">
-    <div><h1>Provedor do<br>Autocuidado</h1><p>Cuidar de você também é prover para quem você ama.</p></div>
+    <img src="logo.png" alt="">
+    <div><h1>Provedor <span style="font-weight:500">do</span><br>Autocuidado</h1><p>Cuidar de você também é prover para quem você ama.</p></div>
   </div>
   <div class="meio">
     <div class="lista">
@@ -75,7 +77,7 @@ body{margin:0;background:#ccd;font-family:system-ui,-apple-system,"Segoe UI",Rob
 
 <section class="bolso">
   <script>
-  for(let i=0;i<8;i++)document.write('<div class="cartao"><img class="q" src="qrcode.svg" alt="QR Code"><div><img src="logo.svg" alt="" style="width:12mm;height:12mm"><b>Provedor do Autocuidado</b><small>Sinais de alerta, exames, mente e onde ser atendido. Funciona sem internet.<br><br>SAMU 192 · CVV 188</small></div></div>');
+  for(let i=0;i<8;i++)document.write('<div class="cartao"><img class="q" src="qrcode.svg" alt="QR Code"><div><img src="logo.png" alt="" style="width:13mm;height:13mm;border-radius:3mm"><b>Provedor do Autocuidado</b><small>Sinais de alerta, exames, mente e onde ser atendido. Funciona sem internet.<br><br>SAMU 192 · CVV 188</small></div></div>');
   </script>
 </section>
 </body>

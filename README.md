@@ -22,5 +22,6 @@ App separado na pasta [`autocuidado/`](autocuidado/), feito para a ação de edu
 - App: `https://b5kmdzk6mz-ux.github.io/Neurinho-/autocuidado/`
 - Cartaz A4 e cartões com QR Code: `autocuidado/cartaz.html`
 - Guia de identidade visual e ideias de nome: `autocuidado/identidade.html`
+- Fontes Montserrat e Open Sans em `autocuidado/fontes/` (licença OFL)
 - Prompts para gerar logo, cartaz e post no ChatGPT: [`autocuidado/PROMPTS.md`](autocuidado/PROMPTS.md)
 - Para editar os locais de atendimento, mude a lista `LOCAIS` no começo do script de `autocuidado/index.html`.

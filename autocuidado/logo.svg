@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Provedor do Autocuidado">
-  <rect width="512" height="512" rx="116" fill="#0E2A47"/>
-  <path d="M256 92 L392 140 V252 C392 340 334 400 256 428 C178 400 120 340 120 252 V140 Z" fill="#2F6FD6"/>
-  <path d="M256 352 C214 322 168 288 168 240 C168 212 190 192 214 192 C232 192 246 202 256 216 C266 202 280 192 298 192 C322 192 344 212 344 240 C344 288 298 322 256 352 Z" fill="#F7F3EC"/>
-  <path d="M176 262 H222 L236 234 L256 290 L274 250 L286 262 H336" fill="none" stroke="#E8963A" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>

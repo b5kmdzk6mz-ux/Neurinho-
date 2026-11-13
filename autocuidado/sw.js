@@ -1,6 +1,6 @@
 /* Provedor do Autocuidado: service worker (funciona sem internet). */
-var VER='autocuidado-v1';
-var CORE=['./','index.html','manifest.webmanifest','logo.svg','qrcode.svg','icon-192.png','icon-512.png','maskable-512.png'];
+var VER='autocuidado-v3';
+var CORE=['./','index.html','manifest.webmanifest','logo.png','apple-touch-icon.png','fontes/fontes.css','fontes/montserrat-latin-500-normal.woff2','fontes/montserrat-latin-700-normal.woff2','fontes/montserrat-latin-800-normal.woff2','fontes/open-sans-latin-400-normal.woff2','fontes/open-sans-latin-600-normal.woff2','fontes/open-sans-latin-700-normal.woff2','qrcode.svg','icon-192.png','icon-512.png','maskable-512.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VER).then(function(c){return c.addAll(CORE)}).then(function(){return self.skipWaiting()}));
 });

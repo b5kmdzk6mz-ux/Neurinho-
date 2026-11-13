@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Provedor do Autocuidado</title>
+<meta name="description" content="Saúde integral do homem: sinais de alerta, exames, mente, hábitos e onde buscar atendimento. Funciona sem internet.">
+<meta name="theme-color" content="#0E2A47">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{
+  --navy:#0E2A47; --azul:#2F6FD6; --azul-claro:#E6EFFC; --ambar:#E8963A; --ambar-claro:#FCEBD6;
+  --creme:#F7F3EC; --bg:#F4F6F9; --card:#FFFFFF; --txt:#16222F; --txt2:#4D5B6B; --linha:#DCE3EC;
+  --verde:#1F8A5B; --verde-claro:#DDF3E8; --verm:#C62F2F; --verm-claro:#FBE3E3; --amar:#B7791F; --amar-claro:#FDF1D8;
+  --r:18px; --fs:17px;
+}
+:root[data-tema="contraste"]{--bg:#000;--card:#111;--txt:#fff;--txt2:#e6e6e6;--linha:#666;--azul-claro:#0b2547;--ambar-claro:#3a2508;--verde-claro:#06301d;--verm-claro:#3d0b0b;--amar-claro:#3a2a05;--creme:#111}
+*{box-sizing:border-box}
+html{font-size:var(--fs)}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;line-height:1.5;-webkit-tap-highlight-color:transparent;padding-bottom:84px}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--azul)}
+h1,h2,h3{line-height:1.2;margin:0 0 .5rem}
+h2{font-size:1.35rem}
+h3{font-size:1.08rem}
+p{margin:.35rem 0 .7rem}
+.topo{background:var(--navy);color:#fff;padding:14px 16px 16px;position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px}
+.topo img{width:40px;height:40px;border-radius:11px}
+.topo .nome{font-weight:800;font-size:1.05rem;letter-spacing:.2px}
+.topo .sub{font-size:.78rem;opacity:.8}
+.topo .acoes{margin-left:auto;display:flex;gap:6px}
+.topo button{background:rgba(255,255,255,.12);border:0;color:#fff;border-radius:12px;min-width:44px;height:44px;font-weight:700;cursor:pointer}
+.voltar{display:none}
+main{max-width:720px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--linha);border-radius:var(--r);padding:16px;margin:0 0 14px}
+.hero{background:linear-gradient(135deg,var(--navy),#1C4C86);color:#fff;border:0}
+.hero p{opacity:.92}
+.hero .frase{font-size:1.3rem;font-weight:800;margin:.1rem 0 .4rem}
+.grade{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.tile{background:var(--card);border:1px solid var(--linha);border-radius:var(--r);padding:14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:6px;min-height:112px}
+.tile .ic{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-size:1.3rem}
+.tile b{font-size:1rem}
+.tile span{font-size:.82rem;color:var(--txt2)}
+.ic.a{background:var(--azul-claro)} .ic.b{background:var(--ambar-claro)} .ic.c{background:var(--verde-claro)} .ic.d{background:var(--verm-claro)}
+.sos{display:flex;gap:10px;flex-wrap:wrap}
+.sos a{flex:1 1 140px;text-decoration:none;background:var(--verm);color:#fff;border-radius:14px;padding:12px 14px;font-weight:800;display:flex;flex-direction:column}
+.sos a small{font-weight:500;opacity:.9}
+.sos a.cvv{background:var(--azul)}
+.sos a.ds{background:var(--navy)}
+nav.baixo{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--linha);display:flex;justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom));z-index:6}
+nav.baixo button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.72rem;color:var(--txt2);padding:4px 6px;min-width:58px;cursor:pointer}
+nav.baixo button .e{font-size:1.35rem;line-height:1}
+nav.baixo button[aria-current="page"]{color:var(--azul);font-weight:800}
+.chip{display:inline-block;padding:3px 10px;border-radius:99px;font-size:.78rem;font-weight:700}
+.chip.verm{background:var(--verm-claro);color:var(--verm)} .chip.amar{background:var(--amar-claro);color:var(--amar)} .chip.verde{background:var(--verde-claro);color:var(--verde)} .chip.azul{background:var(--azul-claro);color:var(--azul)}
+:root[data-tema="contraste"] .chip{color:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;border-radius:14px;padding:12px 16px;min-height:48px;font-weight:700;cursor:pointer;background:var(--azul);color:#fff;text-decoration:none}
+.btn.sec{background:var(--azul-claro);color:var(--navy)}
+.btn.amb{background:var(--ambar);color:#1d1203}
+.btn.peq{min-height:38px;padding:6px 12px;font-size:.88rem}
+:root[data-tema="contraste"] .btn.sec{color:#fff}
+.linha{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+details{background:var(--card);border:1px solid var(--linha);border-radius:var(--r);margin:0 0 10px;overflow:hidden}
+details summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;gap:10px;align-items:center;font-weight:700}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";margin-left:auto;font-size:1.3rem;color:var(--txt2)}
+details[open] summary::after{content:"–"}
+details .corpo{padding:0 16px 14px}
+.nivel{border-left:6px solid var(--linha);padding:10px 12px;border-radius:10px;margin:8px 0;background:var(--bg)}
+.nivel.verm{border-color:var(--verm);background:var(--verm-claro)}
+.nivel.amar{border-color:var(--ambar);background:var(--amar-claro)}
+.nivel.verde{border-color:var(--verde);background:var(--verde-claro)}
+ul{padding-left:1.2rem;margin:.3rem 0 .7rem} li{margin:.2rem 0}
+.passos{counter-reset:p;list-style:none;padding:0}
+.passos li{counter-increment:p;position:relative;padding:8px 0 8px 44px;border-bottom:1px dashed var(--linha)}
+.passos li::before{content:counter(p);position:absolute;left:0;top:8px;width:32px;height:32px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;font-weight:800}
+.ouvir{background:none;border:1px solid var(--linha);border-radius:99px;padding:4px 10px;font-size:.8rem;cursor:pointer;color:var(--txt2)}
+.aviso{font-size:.85rem;color:var(--txt2);background:var(--creme);border-radius:12px;padding:10px 12px}
+.campo{display:flex;flex-direction:column;gap:4px;margin:0 0 10px;flex:1 1 140px}
+.campo label{font-size:.85rem;font-weight:700;color:var(--txt2)}
+.campo input,.campo select,.campo textarea{border:1px solid var(--linha);background:var(--card);border-radius:12px;padding:11px 12px;min-height:46px;width:100%}
+.barra{height:14px;background:var(--azul-claro);border-radius:99px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--azul);border-radius:99px;transition:width .4s}
+.dias{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;font-size:.75rem;color:var(--txt2)}
+.dias div b{display:block;height:64px;background:var(--azul-claro);border-radius:8px;position:relative;overflow:hidden;margin-bottom:3px}
+.dias div b i{position:absolute;bottom:0;left:0;right:0;background:var(--azul)}
+.humor{display:flex;justify-content:space-between;gap:6px}
+.humor button{flex:1;border:2px solid var(--linha);background:var(--card);border-radius:14px;padding:8px 2px;font-size:1.7rem;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.humor button small{font-size:.68rem;color:var(--txt2)}
+.humor button[aria-pressed="true"]{border-color:var(--azul);background:var(--azul-claro)}
+.resp{display:grid;place-items:center;padding:12px 0 4px}
+.bola{width:150px;height:150px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#7FA9EE,var(--azul));transform:scale(.6);transition:transform 4s ease-in-out;display:grid;place-items:center;color:#fff;font-weight:800}
+.quiz-op{display:flex;gap:10px}
+.quiz-op button{flex:1}
+.res{margin-top:10px;padding:12px;border-radius:12px}
+.res.ok{background:var(--verde-claro)} .res.nao{background:var(--verm-claro)}
+.local{border-bottom:1px solid var(--linha);padding:12px 0}
+.local:last-child{border-bottom:0}
+.local .tipo{font-size:.78rem;color:var(--txt2);font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+table{width:100%;border-collapse:collapse;font-size:.92rem}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--linha)}
+td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.hbar{height:10px;background:var(--azul);border-radius:99px;margin-top:4px}
+.anat svg{width:100%;height:auto;max-height:420px;display:block;margin:0 auto}
+.anat .org{cursor:pointer;transition:filter .2s}
+.anat .org:hover,.anat .org.sel{filter:brightness(1.12) drop-shadow(0 0 4px rgba(47,111,214,.7))}
+.anat text{font-size:13px;font-weight:700;fill:var(--txt);pointer-events:none}
+.ck{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--linha)}
+.ck:last-child{border-bottom:0}
+.ck .t{flex:1}
+.ck .t small{display:block;color:var(--txt2)}
+.qr{background:#fff;border-radius:16px;padding:14px;display:inline-block}
+.qr img{width:240px;height:240px;display:block}
+.centro{text-align:center}
+.oculto{display:none!important}
+.mini{font-size:.85rem;color:var(--txt2)}
+.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:9;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw}
+.toast.on{opacity:1}
+@media (max-width:400px){.topo .sub{display:none}}
+@media (min-width:640px){.grade{grid-template-columns:repeat(3,1fr)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="topo">
+  <button class="voltar" id="voltar" aria-label="Voltar">←</button>
+  <img src="logo.svg" alt="">
+  <div><div class="nome">Provedor do Autocuidado</div><div class="sub">Cuidar de si também é coisa de homem</div></div>
+  <div class="acoes">
+    <button id="fonte" aria-label="Aumentar letra" title="Tamanho da letra">A+</button>
+    <button id="tema" aria-label="Alto contraste" title="Alto contraste">◐</button>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<nav class="baixo" aria-label="Menu principal">
+  <button data-ir="inicio"><span class="e">🏠</span>Início</button>
+  <button data-ir="sinais"><span class="e">🚦</span>Sinais</button>
+  <button data-ir="cuidar"><span class="e">🩺</span>Exames</button>
+  <button data-ir="mente"><span class="e">🧠</span>Mente</button>
+  <button data-ir="onde"><span class="e">📍</span>Onde ir</button>
+</nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   Provedor do Autocuidado: app de saúde integral do homem.
+   Tudo roda no aparelho. Os dados pessoais ficam só no celular
+   (localStorage) e nada é enviado para servidor nenhum.
+   ============================================================ */
+
+/* ---------- Locais de atendimento: EDITE AQUI ----------
+   Confirme endereço e telefone antes de divulgar.
+   Campo "conf": false mostra o aviso "confirmar antes de ir". */
+const LOCAIS = [
+  {tipo:"Emergência", nome:"SAMU", fone:"192", desc:"Ambulância para urgências: dor no peito, sinais de AVC, falta de ar forte, acidente.", conf:true},
+  {tipo:"Emergência", nome:"Corpo de Bombeiros", fone:"193", desc:"Acidentes, resgate, incêndio.", conf:true},
+  {tipo:"Apoio emocional", nome:"CVV: Centro de Valorização da Vida", fone:"188", desc:"Conversa sigilosa e gratuita, 24 horas, por telefone. Também tem chat em cvv.org.br.", conf:true},
+  {tipo:"Informação", nome:"Disque Saúde (Ministério da Saúde)", fone:"136", desc:"Tira dúvidas sobre saúde, vacinas e serviços do SUS. Também orienta quem quer parar de fumar.", conf:true},
+  {tipo:"Atenção Básica", nome:"Unidade Básica de Saúde (UBS) do seu bairro", desc:"Porta de entrada do SUS: consulta, pressão, glicemia, vacinas, testes rápidos de HIV, sífilis e hepatites, tratamento para parar de fumar, encaminhamentos. Leve RG, Cartão do SUS e comprovante de endereço.", conf:true},
+  {tipo:"Clínica-escola", nome:"Afya Clínica Acadêmica, Parnaíba", desc:"Atendimento pelos cursos da saúde da Afya. Pergunte na recepção quais serviços e horários estão disponíveis.", conf:false},
+  {tipo:"Hospital", nome:"Hospital Estadual Dirceu Arcoverde (HEDA)", end:"Rua Rodrigo Coimbra, 1650, Rodoviária, Parnaíba", fone:"8633231711", foneTxt:"(86) 3323-1711", desc:"Hospital de referência da região.", conf:false},
+  {tipo:"Pronto-socorro", nome:"Pronto Socorro Municipal de Parnaíba", end:"Rua Teresina, 996, Nova Parnaíba", desc:"Urgência e emergência.", conf:false},
+  {tipo:"Saúde mental", nome:"CAPS: Centro de Atenção Psicossocial", desc:"Atendimento gratuito para sofrimento mental, depressão, ansiedade e uso de álcool e outras drogas (CAPS AD). Pode procurar direto, sem encaminhamento. Pergunte na UBS o endereço do CAPS mais perto.", conf:true},
+  {tipo:"ISTs", nome:"CTA: Centro de Testagem e Aconselhamento", desc:"Testes de HIV, sífilis e hepatites, PEP (até 72 h depois de uma exposição de risco) e PrEP. Sigilo garantido. A UBS também faz os testes rápidos.", conf:true},
+  {tipo:"Remédios", nome:"Farmácia Popular", desc:"Remédios de pressão, diabetes e asma de graça nas farmácias credenciadas. Leve receita, documento com foto e CPF.", conf:true}
+];
+
+/* ---------- utilidades ---------- */
+const $ = (s,el=document)=>el.querySelector(s);
+const app = $("#app");
+const LS = {
+  get(k,d){try{const v=localStorage.getItem("pa_"+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem("pa_"+k,JSON.stringify(v))}catch(e){}}
+};
+const hoje = ()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
+const fmtData = s=>{if(!s)return"";const [a,m,d]=s.split("-");return d+"/"+m+"/"+a};
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),2600)}
+function ouvirBtn(){return '<button class="ouvir" data-ouvir>🔊 Ouvir</button>'}
+function falar(txt){
+  if(!("speechSynthesis" in window)){toast("Seu celular não tem leitura em voz alta.");return}
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);u.lang="pt-BR";u.rate=.95;speechSynthesis.speak(u);
+}
+const tel = (n,txt)=>'<a href="tel:'+n+'">'+(txt||n)+'</a>';
+
+/* ---------- conteúdo: sinais de alerta ---------- */
+const SINAIS = [
+ {id:"peito",ic:"❤️",t:"Dor ou aperto no peito",lvl:"verm",
+  o:"Pode ser <b>infarto</b>. O coração está recebendo pouco sangue.",
+  s:["Dor, aperto ou queimação no peito por mais de 20 minutos","A dor vai para o braço esquerdo, pescoço, mandíbula ou costas","Suor frio, falta de ar, enjoo ou tontura"],
+  f:"<b>Ligue 192 (SAMU) agora.</b> Não dirija. Pare o que está fazendo e fique sentado. Cada minuto conta."},
+ {id:"avc",ic:"🧠",t:"Boca torta, braço fraco, fala enrolada",lvl:"verm",
+  o:"Pode ser <b>AVC (derrame)</b>. Lembre da palavra <b>SAMU</b>:",
+  s:["<b>S</b>orriso: um lado do rosto fica caído","<b>A</b>braço: um braço fica fraco ou dormente","<b>M</b>úsica: a fala fica enrolada ou estranha","<b>U</b>rgente: ligue 192 na hora"],
+  f:"<b>Ligue 192.</b> Anote o horário em que começou. O tratamento funciona melhor nas primeiras horas."},
+ {id:"suic",ic:"🫂",t:"Pensamentos de se machucar ou de sumir",lvl:"verm",
+  o:"Isso é <b>sofrimento intenso</b>, não fraqueza. Tem tratamento e tem gente pronta para ouvir.",
+  s:["Pensar que seria melhor não estar vivo","Despedir-se, dar coisas embora, falar que é um peso","Beber muito mais que o normal para aguentar"],
+  f:"<b>Ligue 188 (CVV)</b>, de graça, 24 h. Em risco imediato, <b>ligue 192</b>. Procure o CAPS ou a UBS. Conte para alguém de confiança hoje."},
+ {id:"pressao",ic:"🩸",t:"Dor de cabeça forte, nuca pesada, visão embaçada",lvl:"amar",
+  o:"Pode ser <b>pressão alta</b>. Na maioria das vezes ela não dá sintoma nenhum, por isso é chamada de doença silenciosa.",
+  s:["Dor de cabeça na nuca","Tontura, zumbido no ouvido","Visão embaçada","Sangramento no nariz"],
+  f:"Meça a pressão na UBS ou na farmácia. Se der <b>14 por 9 (140/90) ou mais</b>, marque consulta. Se vier com dor no peito, fala enrolada ou fraqueza, <b>ligue 192</b>."},
+ {id:"diab",ic:"🍬",t:"Muita sede, urina demais, ferida que não sara",lvl:"amar",
+  o:"Pode ser <b>diabetes</b> (açúcar alto no sangue).",
+  s:["Muita sede e boca seca","Urinar muitas vezes, até de madrugada","Fome demais e perda de peso sem motivo","Visão embaçada, formigamento nos pés","Ferida que demora a cicatrizar"],
+  f:"Faça o teste de glicemia (furinho no dedo) na UBS. É rápido e gratuito."},
+ {id:"urina",ic:"🚽",t:"Dificuldade para urinar, jato fraco",lvl:"amar",
+  o:"Pode ser <b>aumento benigno da próstata</b> (muito comum depois dos 50), infecção ou, menos vezes, <b>câncer de próstata</b>.",
+  s:["Jato de urina fraco ou que para e volta","Levantar várias vezes à noite para urinar","Sensação de que a bexiga não esvaziou","Sangue na urina ou no sêmen","Dor ou ardência ao urinar"],
+  f:"Marque consulta na UBS. Esses sinais precisam de avaliação, mas <b>não significam câncer</b> automaticamente. Se não conseguir urinar nada e a barriga doer, vá ao pronto-socorro."},
+ {id:"testic",ic:"🥚",t:"Caroço ou peso no testículo",lvl:"amar",
+  o:"Pode ser <b>câncer de testículo</b>, mais comum entre <b>15 e 35 anos</b>, ou outras alterações benignas.",
+  s:["Caroço duro, geralmente sem dor","Um testículo aumentou ou ficou mais duro","Sensação de peso no saco escrotal"],
+  f:"Procure a UBS. Descoberto cedo, tem cura na grande maioria dos casos. Veja como fazer o autoexame na aba <b>Corpo</b>."},
+ {id:"ist",ic:"🛡️",t:"Corrimento, ferida ou verruga no pênis",lvl:"amar",
+  o:"Pode ser uma <b>IST</b> (infecção sexualmente transmissível): gonorreia, clamídia, sífilis, herpes, HPV.",
+  s:["Corrimento ou pus saindo pela uretra","Ardência ao urinar","Ferida no pênis, mesmo sem dor (pode ser sífilis)","Verrugas ou caroços na região genital","Íngua na virilha"],
+  f:"Vá à UBS ou ao CTA. Teste e tratamento são <b>gratuitos e sigilosos</b>. Avise a parceria e não tenha relação até tratar. Teve relação sem camisinha ou a camisinha rompeu? Procure a <b>PEP em até 72 horas</b>."},
+ {id:"intest",ic:"🩻",t:"Sangue nas fezes, intestino mudou",lvl:"amar",
+  o:"Pode ser hemorroida, mas também <b>câncer de intestino (cólon e reto)</b>, o 2º mais comum nos homens.",
+  s:["Sangue nas fezes ou fezes muito escuras","Intestino que mudou: prisão de ventre ou diarreia que não passa","Dor na barriga frequente","Emagrecer sem motivo, cansaço"],
+  f:"Procure a UBS. Entre <b>50 e 75 anos</b>, pergunte sobre o exame de sangue oculto nas fezes."},
+ {id:"tosse",ic:"🫁",t:"Tosse há mais de 3 semanas",lvl:"amar",
+  o:"Pode ser <b>tuberculose</b>, DPOC (pulmão do fumante) ou câncer de pulmão.",
+  s:["Tosse por 3 semanas ou mais","Febre no fim da tarde, suor à noite","Catarro com sangue","Falta de ar, cansaço, emagrecimento"],
+  f:"Vá à UBS e peça o exame de escarro. A tuberculose tem cura e o tratamento é gratuito. Falta de ar forte: <b>192</b>."},
+ {id:"boca",ic:"👄",t:"Ferida na boca que não sara",lvl:"amar",
+  o:"Pode ser <b>câncer de boca</b>, o 5º mais comum em homens, ligado ao cigarro e ao álcool.",
+  s:["Ferida na boca, língua ou lábio que não sara em 15 dias","Mancha branca ou vermelha","Caroço no pescoço","Dor ou dificuldade para engolir"],
+  f:"Procure o dentista da UBS. Faça o autoexame da boca uma vez por mês, na frente do espelho."},
+ {id:"erecao",ic:"⚡",t:"Dificuldade de ereção",lvl:"verde",
+  o:"É mais comum do que se fala. Pode ter causa emocional (estresse, ansiedade) ou ser um <b>aviso do coração</b>: diabetes, pressão alta e colesterol entopem os vasos do pênis antes dos do coração.",
+  s:["Dificuldade para ter ou manter a ereção na maioria das vezes","Diminuição do desejo"],
+  f:"Converse na UBS sem vergonha. Não tome remédio por conta própria: alguns são perigosos para quem tem problema de coração."},
+ {id:"tristeza",ic:"🌧️",t:"Irritação, cansaço, sem vontade de nada",lvl:"verde",
+  o:"Nos homens, a <b>depressão</b> muitas vezes aparece como irritação, raiva, isolamento ou bebida, e não como choro.",
+  s:["Tristeza ou irritação na maior parte dos dias, por mais de 2 semanas","Perder o gosto pelo que gostava","Dormir demais ou de menos","Beber mais para \"desligar\"","Explosões de raiva, isolamento"],
+  f:"Fale com alguém. Procure a UBS ou o CAPS. Veja a aba <b>Mente</b> para cuidar disso hoje."}
+];
+
+/* ---------- conteúdo: corpo / anatomia ---------- */
+const ORGAOS = {
+ bexiga:{t:"Bexiga",x:"Guarda a urina que vem dos rins. Quando enche, dá vontade de urinar. Segurar urina por muito tempo e beber pouca água favorecem infecção e pedra."},
+ prostata:{t:"Próstata",x:"Glândula do tamanho de uma noz, logo abaixo da bexiga, abraçando a uretra. Produz parte do líquido do sêmen. Com a idade costuma crescer e apertar a uretra, deixando o jato fraco (hiperplasia benigna). Também é onde surge o câncer mais comum no homem."},
+ uretra:{t:"Uretra",x:"Canal que leva a urina e o sêmen para fora pelo pênis. Corrimento ou ardência aqui podem indicar IST ou infecção urinária."},
+ testiculo:{t:"Testículos",x:"Produzem os espermatozoides e a testosterona, o hormônio que influencia músculos, pelos, voz e desejo. Ficam fora do corpo, no saco escrotal, porque precisam de temperatura mais baixa. Faça o autoexame uma vez por mês."},
+ deferente:{t:"Ducto deferente",x:"Canal que leva os espermatozoides do testículo até a uretra. É ele que é cortado na vasectomia, método definitivo e oferecido pelo SUS. A vasectomia não muda a ereção nem o prazer."},
+ penis:{t:"Pênis",x:"A ereção acontece quando o sangue enche os corpos cavernosos. Por isso vasos saudáveis são essenciais: pressão alta, diabetes, cigarro e colesterol atrapalham a ereção. Higiene diária com água e sabão, puxando a pele do prepúcio, previne infecções e câncer de pênis."},
+ reto:{t:"Reto",x:"Final do intestino, logo atrás da próstata. É por isso que o médico consegue sentir a próstata no toque retal, um exame rápido, que dura segundos."}
+};
+
+/* ---------- conteúdo: mitos e verdades ---------- */
+const MITOS = [
+ {q:"Homem que vai ao médico é fraco.",v:false,e:"Cuidar da saúde é força e responsabilidade. Quem se cuida vive mais para a família e para si."},
+ {q:"Se eu não sinto nada, estou saudável.",v:false,e:"Pressão alta, diabetes, colesterol e vários cânceres começam sem sintoma. Só o exame mostra."},
+ {q:"O toque retal afeta a masculinidade.",v:false,e:"É um exame clínico de poucos segundos, feito por um profissional. Não tem nada a ver com masculinidade ou orientação sexual."},
+ {q:"O câncer de próstata sempre dá sintomas.",v:false,e:"No começo, muitas vezes não dá. E sintomas urinários também podem ser só crescimento benigno da próstata."},
+ {q:"Todo homem acima de 50 anos deve fazer PSA todo ano, sem conversa.",v:false,e:"O Ministério da Saúde e o INCA não recomendam rastrear todos os homens sem sintomas. O certo é conversar com o profissional sobre benefícios e riscos e decidir junto (decisão compartilhada). Com sintomas, precisa de avaliação."},
+ {q:"Homem também tem depressão.",v:true,e:"Tem, e muitas vezes ela aparece como irritação, isolamento ou bebida. Os homens morrem mais por suicídio, em parte porque pedem menos ajuda."},
+ {q:"Uma cervejinha todo dia não faz mal nenhum.",v:false,e:"Não existe dose de álcool totalmente segura. O álcool aumenta o risco de câncer de boca, garganta, estômago e fígado, além de pressão alta. Quanto menos, melhor."},
+ {q:"Os testes de HIV, sífilis e hepatites são gratuitos no SUS.",v:true,e:"Sim. O teste rápido fica pronto em cerca de 30 minutos, na UBS ou no CTA, com sigilo."},
+ {q:"Dificuldade de ereção pode ser um aviso do coração.",v:true,e:"Os vasos do pênis são finos e sofrem primeiro. Ereção fraca pode aparecer anos antes de um infarto."},
+ {q:"Caminhar 30 minutos por dia já faz diferença.",v:true,e:"Sim! 150 minutos por semana de atividade moderada reduzem o risco de infarto, diabetes, depressão e alguns cânceres."},
+ {q:"Adulto não precisa tomar vacina.",v:false,e:"Adulto precisa sim: hepatite B, difteria e tétano (reforço a cada 10 anos), febre amarela, tríplice viral, gripe e COVID-19, conforme a idade e a campanha."},
+ {q:"Pedir ajuda para parar de fumar ou beber é coisa de fraco.",v:false,e:"Dependência é doença, não falta de caráter. O SUS oferece tratamento gratuito para parar de fumar na UBS, e o CAPS AD ajuda com álcool e outras drogas."},
+ {q:"Homem pode fazer pré-natal junto com a parceira.",v:true,e:"Existe o Pré-Natal do Parceiro no SUS: o homem faz exames, atualiza vacinas e participa da gestação. Cuidar de si também é cuidar da família."}
+];
+
+/* ---------- conteúdo: checklist de cuidados ---------- */
+const CHECK = [
+ {id:"pa",t:"Medir a pressão",q:"Pelo menos 1 vez por ano (a cada consulta se for alta)",meses:12},
+ {id:"gli",t:"Glicemia (açúcar no sangue)",q:"Se tem mais de 35 a 45 anos, excesso de peso ou pressão alta",meses:12},
+ {id:"col",t:"Colesterol",q:"Conforme orientação, geralmente a cada 1 a 5 anos",meses:24},
+ {id:"ist",t:"Testes rápidos: HIV, sífilis, hepatites B e C",q:"Pelo menos 1 vez na vida; mais vezes se teve relação sem camisinha",meses:12},
+ {id:"dent",t:"Dentista",q:"1 vez por ano, inclusive para olhar a boca toda",meses:12},
+ {id:"vac",t:"Conferir a caderneta de vacinas",q:"dT a cada 10 anos, hepatite B, febre amarela, gripe",meses:12},
+ {id:"peso",t:"Peso e medida da cintura",q:"A cada consulta ou a cada 6 meses",meses:6},
+ {id:"intest",t:"Sangue oculto nas fezes (50 a 75 anos)",q:"Pergunte na UBS sobre esse rastreamento",meses:24},
+ {id:"prost",t:"Conversa sobre próstata (a partir dos 50, ou 45 se pai/irmão teve)",q:"Decisão compartilhada sobre PSA e toque retal",meses:12}
+];
+
+/* ---------- roteamento ---------- */
+const TITULOS = {inicio:1,sinais:1,cuidar:1,mente:1,onde:1};
+function ir(r){location.hash=r}
+function rota(){
+  const r=(location.hash||"#inicio").slice(1).split("/");
+  const pag=r[0]||"inicio";
+  const fn=PAGINAS[pag]||PAGINAS.inicio;
+  app.innerHTML=fn(r[1]);
+  document.querySelectorAll("nav.baixo button").forEach(b=>b.setAttribute("aria-current",b.dataset.ir===pag?"page":"false"));
+  $("#voltar").style.display=TITULOS[pag]?"none":"block";
+  window.scrollTo(0,0);
+  if(DEPOIS[pag])DEPOIS[pag](r[1]);
+  if("speechSynthesis" in window)speechSynthesis.cancel();
+}
+window.addEventListener("hashchange",rota);
+document.querySelectorAll("nav.baixo button").forEach(b=>b.onclick=()=>ir(b.dataset.ir));
+$("#voltar").onclick=()=>history.length>1?history.back():ir("inicio");
+
+/* ouvir: lê o card mais próximo */
+app.addEventListener("click",e=>{
+  const b=e.target.closest("[data-ouvir]");
+  if(b){const c=b.closest(".card,details");falar(c.innerText.replace("🔊 Ouvir",""));return}
+  const t=e.target.closest("[data-ir]");
+  if(t)ir(t.dataset.ir);
+});
+
+/* ---------- páginas ---------- */
+const PAGINAS = {};
+const DEPOIS = {};
+
+PAGINAS.inicio = ()=>{
+  const nome=LS.get("nome","");
+  const h=new Date().getHours();
+  const saud=h<12?"Bom dia":h<18?"Boa tarde":"Boa noite";
+  const prox=(LS.get("agenda",[])).filter(a=>a.data>=hoje()).sort((a,b)=>a.data<b.data?-1:1)[0];
+  const sem=semanaMin();
+  return `
+  <section class="card hero">
+    <div class="mini" style="color:#cfe0ff">${saud}${nome?", "+esc(nome):""}!</div>
+    <div class="frase">Cuidar de você também é prover para quem você ama.</div>
+    <p>Aqui você reconhece sinais do corpo e da mente, vê quais exames fazer e descobre onde ser atendido. Funciona mesmo sem internet.</p>
+    ${nome?"":`<div class="linha"><input id="nomeIn" placeholder="Como quer ser chamado?" style="flex:1;min-width:0;border:0;border-radius:12px;padding:12px" aria-label="Seu nome"><button class="btn amb" id="nomeOk">OK</button></div>`}
+  </section>
+
+  <section class="card">
+    <h3>Precisa de ajuda agora?</h3>
+    <div class="sos">
+      <a href="tel:192">📞 192<small>SAMU: emergência</small></a>
+      <a href="tel:188" class="cvv">💬 188<small>CVV: quer conversar?</small></a>
+      <a href="tel:136" class="ds">ℹ️ 136<small>Disque Saúde</small></a>
+    </div>
+  </section>
+
+  <div class="grade">
+    <button class="tile" data-ir="sinais"><span class="ic d">🚦</span><b>Sinais de alerta</b><span>O que o corpo está avisando</span></button>
+    <button class="tile" data-ir="corpo"><span class="ic a">🫀</span><b>Conheça seu corpo</b><span>Anatomia e autoexame</span></button>
+    <button class="tile" data-ir="cuidar"><span class="ic c">🩺</span><b>Exames e consultas</b><span>Meu check-up e lembretes</span></button>
+    <button class="tile" data-ir="habitos"><span class="ic b">🥗</span><b>Comida e caminhada</b><span>Nutrição, metas e IMC</span></button>
+    <button class="tile" data-ir="mente"><span class="ic a">🧠</span><b>Mente e emoções</b><span>Como você está hoje?</span></button>
+    <button class="tile" data-ir="mitos"><span class="ic b">❓</span><b>Mito ou verdade?</b><span>Quebrando tabus</span></button>
+    <button class="tile" data-ir="dados"><span class="ic d">📊</span><b>Por que se cuidar</b><span>Doenças que mais atingem os homens</span></button>
+    <button class="tile" data-ir="onde"><span class="ic c">📍</span><b>Onde ser atendido</b><span>SUS, telefones e meus locais</span></button>
+    <button class="tile" data-ir="compartilhar"><span class="ic a">🔳</span><b>Compartilhar</b><span>QR Code do app</span></button>
+  </div>
+
+  <section class="card">
+    <h3>Minha semana</h3>
+    <p class="mini">Caminhada/atividade: <b>${sem} de 150 min</b></p>
+    <div class="barra"><i style="width:${Math.min(100,sem/1.5)}%"></i></div>
+    ${prox?`<p style="margin-top:12px">📅 Próximo compromisso: <b>${esc(prox.titulo)}</b> em ${fmtData(prox.data)}${prox.hora?" às "+esc(prox.hora):""}</p>`:`<p class="mini" style="margin-top:12px">Nenhuma consulta marcada. <a href="#cuidar">Anotar uma</a></p>`}
+  </section>
+
+  <p class="aviso">Este app é educativo e <b>não substitui consulta</b>. Na dúvida, procure a UBS. Em emergência, ligue 192. <a href="#sobre">Sobre o app</a></p>`;
+};
+DEPOIS.inicio=()=>{
+  const b=$("#nomeOk");if(b)b.onclick=()=>{const v=$("#nomeIn").value.trim();if(v){LS.set("nome",v.slice(0,30));rota()}};
+};
+
+PAGINAS.sinais = ()=>`
+  <h2>Sinais de alerta</h2>
+  <p>Toque no que você está sentindo. As cores mostram a urgência:</p>
+  <p class="linha"><span class="chip verm">Vermelho: ligue 192 / 188 agora</span><span class="chip amar">Amarelo: procure a UBS logo</span><span class="chip verde">Verde: converse na próxima consulta</span></p>
+  ${SINAIS.map(s=>`
+  <details id="s-${s.id}">
+    <summary><span style="font-size:1.4rem">${s.ic}</span><span>${s.t}<br><span class="chip ${s.lvl}">${s.lvl==="verm"?"Emergência":s.lvl==="amar"?"Procure a UBS":"Converse na consulta"}</span></span></summary>
+    <div class="corpo">
+      <p>${s.o}</p>
+      <ul>${s.s.map(x=>"<li>"+x+"</li>").join("")}</ul>
+      <div class="nivel ${s.lvl}"><b>O que fazer:</b> ${s.f}</div>
+      ${ouvirBtn()}
+    </div>
+  </details>`).join("")}
+  <p class="aviso">Os sinais servem para você saber <b>quando procurar ajuda</b>, não para dar diagnóstico. Só o profissional de saúde pode avaliar.</p>`;
+
+PAGINAS.corpo = ()=>`
+  <h2>Conheça seu corpo</h2>
+  <p>Autoconhecimento é o primeiro passo do autocuidado. Quem conhece o próprio corpo percebe cedo quando algo muda.</p>
+  <section class="card anat">
+    <h3>Sistema urinário e reprodutor masculino</h3>
+    <p class="mini">Toque em cada parte para entender o que ela faz.</p>
+    <svg viewBox="0 0 360 400" role="img" aria-label="Desenho esquemático da bexiga, próstata, uretra, testículos, pênis e reto">
+      <path d="M40 40 Q180 0 320 40 L300 230 Q180 270 60 230 Z" fill="#F2E3D5" stroke="#d9c3ae"/>
+      <g class="org" data-org="reto"><path d="M262 40 C262 120 272 190 250 260 L226 258 C246 190 238 120 238 40 Z" fill="#C98D7A"/><text x="270" y="150">Reto</text></g>
+      <g class="org" data-org="bexiga"><ellipse cx="160" cy="120" rx="64" ry="54" fill="#F3C64B"/><text x="132" y="124">Bexiga</text></g>
+      <g class="org" data-org="deferente"><path d="M100 300 C60 250 70 150 120 112" fill="none" stroke="#2F6FD6" stroke-width="7" stroke-linecap="round"/><path d="M196 300 C236 250 232 160 204 116" fill="none" stroke="#2F6FD6" stroke-width="7" stroke-linecap="round"/><text x="6" y="210">Ducto</text><text x="6" y="226">deferente</text></g>
+      <g class="org" data-org="prostata"><ellipse cx="160" cy="194" rx="34" ry="24" fill="#E8963A"/><text x="200" y="198">Próstata</text></g>
+      <g class="org" data-org="uretra"><path d="M160 172 L160 330" stroke="#B4483B" stroke-width="7"/><text x="168" y="246">Uretra</text></g>
+      <g class="org" data-org="penis"><rect x="140" y="226" width="40" height="120" rx="20" fill="#D9A28A" opacity=".85"/><path d="M160 226 L160 340" stroke="#B4483B" stroke-width="6"/><text x="186" y="300">Pênis</text></g>
+      <g class="org" data-org="testiculo"><ellipse cx="104" cy="316" rx="28" ry="36" fill="#7EA6E6"/><ellipse cx="216" cy="316" rx="28" ry="36" fill="#7EA6E6"/><text x="50" y="378">Testículo</text><text x="196" y="378">Testículo</text></g>
+    </svg>
+    <div id="orgInfo" class="nivel" style="margin-top:10px"><b>Toque em uma parte do desenho.</b></div>
+    <p class="mini">Desenho esquemático, fora de escala, só para entender onde fica cada coisa.</p>
+  </section>
+
+  <details open>
+    <summary>🥚 Autoexame dos testículos (1 vez por mês)</summary>
+    <div class="corpo">
+      <ol class="passos">
+        <li>Faça depois do banho quente, quando a pele do saco está relaxada.</li>
+        <li>Segure um testículo de cada vez entre o polegar e os outros dedos.</li>
+        <li>Role devagar, sentindo a superfície. Ele deve ser liso e firme, como um ovo cozido sem casca.</li>
+        <li>Atrás de cada testículo existe um "cordãozinho" macio (epidídimo). Isso é normal.</li>
+        <li>É normal um testículo ser um pouco maior ou ficar mais baixo que o outro.</li>
+        <li>Achou caroço, endurecimento, aumento de tamanho ou sensação de peso? <b>Procure a UBS.</b></li>
+      </ol>${ouvirBtn()}
+    </div>
+  </details>
+  <details>
+    <summary>👄 Autoexame da boca</summary>
+    <div class="corpo">
+      <ol class="passos">
+        <li>Na frente do espelho, com boa luz, tire a prótese se usar.</li>
+        <li>Olhe lábios, gengivas, bochechas por dentro, céu da boca.</li>
+        <li>Ponha a língua para fora e para os lados; olhe embaixo dela.</li>
+        <li>Apalpe o pescoço procurando caroços.</li>
+        <li>Ferida que não sara em 15 dias, mancha branca ou vermelha: <b>dentista da UBS</b>.</li>
+      </ol>${ouvirBtn()}
+    </div>
+  </details>
+  <details>
+    <summary>🧼 Higiene íntima</summary>
+    <div class="corpo"><p>Lave o pênis todo dia com água e sabão, puxando a pele do prepúcio para trás e limpando a glande. Seque bem. Isso previne infecções e o <b>câncer de pênis</b>, que é mais comum onde falta higiene. Se a pele não volta ou não desce (fimose), converse na UBS: tem tratamento.</p>${ouvirBtn()}</div>
+  </details>
+  <details>
+    <summary>💪 Autoestima: seu corpo não é só desempenho</summary>
+    <div class="corpo">
+      <p>Muitos homens aprenderam que o corpo serve para trabalhar, aguentar e "dar conta". Mas o corpo também cansa, adoece e pede cuidado, e isso não diminui ninguém.</p>
+      <ul><li>Você não precisa ter o corpo da propaganda para ser saudável.</li><li>Pedir ajuda é uma atitude de quem sabe o que quer.</li><li>Dor não é para ser aguentada calado: dor é um aviso.</li><li>Cuidar da aparência, da pele, do sono e dos sentimentos também é cuidar da saúde.</li></ul>${ouvirBtn()}
+    </div>
+  </details>`;
+DEPOIS.corpo=()=>{
+  document.querySelectorAll(".org").forEach(g=>g.addEventListener("click",()=>{
+    document.querySelectorAll(".org").forEach(x=>x.classList.remove("sel"));g.classList.add("sel");
+    const o=ORGAOS[g.dataset.org];$("#orgInfo").innerHTML="<b>"+o.t+":</b> "+o.x;$("#orgInfo").className="nivel verde";
+  }));
+};
+
+PAGINAS.mitos = ()=>{
+  const i=LS.get("mitoI",0)%MITOS.length;
+  const m=MITOS[i];
+  return `
+  <h2>Mito ou verdade?</h2>
+  <p>Vamos derrubar alguns tabus? Responda e veja a explicação.</p>
+  <section class="card">
+    <p class="mini">Pergunta ${i+1} de ${MITOS.length} · Acertos: ${LS.get("mitoAc",0)}</p>
+    <p style="font-size:1.25rem;font-weight:800">"${m.q}"</p>
+    <div class="quiz-op"><button class="btn sec" data-r="1">✅ Verdade</button><button class="btn sec" data-r="0">❌ Mito</button></div>
+    <div id="mres"></div>
+  </section>`;
+};
+DEPOIS.mitos=()=>{
+  const i=LS.get("mitoI",0)%MITOS.length,m=MITOS[i];let resp=false;
+  document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{
+    if(resp)return;resp=true;
+    const ok=(b.dataset.r==="1")===m.v;
+    if(ok)LS.set("mitoAc",LS.get("mitoAc",0)+1);
+    $("#mres").innerHTML=`<div class="res ${ok?"ok":"nao"}"><b>${ok?"Acertou!":"Não foi dessa vez."}</b> É <b>${m.v?"VERDADE":"MITO"}</b>. ${m.e}</div>
+      <div class="linha" style="margin-top:10px"><button class="btn" id="mprox">Próxima →</button>${ouvirBtn()}</div>`;
+    $("#mprox").onclick=()=>{LS.set("mitoI",i+1);if(i+1>=MITOS.length){toast("Você terminou! Acertos: "+LS.get("mitoAc",0)+" de "+MITOS.length);LS.set("mitoAc",0);LS.set("mitoI",0)}rota()};
+  });
+};
+
+PAGINAS.cuidar = ()=>{
+  const feitos=LS.get("check",{});
+  const ag=LS.get("agenda",[]).sort((a,b)=>a.data<b.data?-1:1);
+  return `
+  <h2>Exames e consultas</h2>
+  <section class="card">
+    <h3>Meu check-up</h3>
+    <p class="mini">Marque a data em que fez cada cuidado. O app avisa o que está em dia e o que já passou da hora. As idades e intervalos são uma referência: o profissional da UBS ajusta para você.</p>
+    ${CHECK.map(c=>{
+      const d=feitos[c.id];let st='<span class="chip azul">Não informado</span>';
+      if(d){const lim=new Date(d);lim.setMonth(lim.getMonth()+c.meses);st=lim>new Date()?'<span class="chip verde">Em dia</span>':'<span class="chip amar">Hora de refazer</span>'}
+      return `<div class="ck"><div class="t"><b>${c.t}</b><small>${c.q}</small>${st}${d?' <small style="display:inline">· feito em '+fmtData(d)+'</small>':''}</div>
+      <input type="date" data-ck="${c.id}" value="${d||""}" max="${hoje()}" aria-label="Data: ${c.t}" style="max-width:150px;border:1px solid var(--linha);border-radius:10px;padding:8px;background:var(--card)"></div>`}).join("")}
+  </section>
+
+  <section class="card">
+    <h3>Minha agenda de saúde</h3>
+    <div class="linha">
+      <div class="campo" style="flex-basis:100%"><label for="agT">O quê</label><input id="agT" placeholder="Ex.: Consulta na UBS, buscar exame"></div>
+      <div class="campo"><label for="agD">Data</label><input id="agD" type="date" min="${hoje()}"></div>
+      <div class="campo"><label for="agH">Hora</label><input id="agH" type="time"></div>
+      <div class="campo" style="flex-basis:100%"><label for="agL">Onde</label><input id="agL" placeholder="Ex.: UBS do bairro"></div>
+    </div>
+    <button class="btn" id="agOk">Salvar compromisso</button>
+    <div style="margin-top:12px">${ag.length?ag.map((a,i)=>`<div class="ck"><div class="t"><b>${esc(a.titulo)}</b><small>${fmtData(a.data)}${a.hora?" às "+esc(a.hora):""}${a.local?" · "+esc(a.local):""}${a.data<hoje()?" · já passou":""}</small></div>
+      <button class="btn sec peq" data-ics="${i}" title="Adicionar ao calendário do celular">📅</button><button class="btn sec peq" data-del="${i}" aria-label="Apagar">🗑️</button></div>`).join(""):'<p class="mini">Nenhum compromisso ainda.</p>'}</div>
+    <p class="mini">O botão 📅 coloca o compromisso no calendário do celular, que avisa na hora certa.</p>
+  </section>
+
+  <details>
+    <summary>🔬 PSA e toque retal: o que saber</summary>
+    <div class="corpo">
+      <p><b>PSA</b> é um exame de sangue que mede uma proteína da próstata. Ele pode subir por câncer, mas também por crescimento benigno, inflamação ou até depois de andar de bicicleta. <b>PSA alterado não confirma câncer.</b></p>
+      <p><b>Toque retal</b> é um exame rápido em que o profissional sente o tamanho e a consistência da próstata.</p>
+      <p>O Ministério da Saúde e o INCA <b>não recomendam fazer esses exames em todos os homens sem sintomas</b> (rastreamento), porque podem levar a biópsias e tratamentos desnecessários. O caminho é a <b>decisão compartilhada</b>: conversar com o profissional sobre benefícios, riscos e limites e decidir junto.</p>
+      <div class="nivel amar"><b>Com sintomas</b> (jato fraco, sangue na urina ou no sêmen, dor)? Aí precisa, sim, de avaliação.</div>${ouvirBtn()}
+    </div>
+  </details>
+  <details>
+    <summary>💉 Vacinas do homem adulto (SUS)</summary>
+    <div class="corpo"><ul>
+      <li><b>Hepatite B:</b> 3 doses, se não tomou.</li>
+      <li><b>Difteria e tétano (dT):</b> reforço a cada 10 anos (ou 5 anos em caso de ferimento grave).</li>
+      <li><b>Febre amarela:</b> conforme a situação vacinal.</li>
+      <li><b>Tríplice viral</b> (sarampo, caxumba, rubéola): até 59 anos, conforme a caderneta.</li>
+      <li><b>Gripe e COVID-19:</b> nas campanhas e grupos indicados.</li>
+      <li><b>HPV:</b> meninos de 9 a 14 anos e grupos especiais.</li></ul>
+      <p>Leve a caderneta à UBS. Perdeu? Eles ajudam a refazer.</p>${ouvirBtn()}</div>
+  </details>
+  <details>
+    <summary>👶 Pré-natal do parceiro</summary>
+    <div class="corpo"><p>Vai ser pai? No SUS, o parceiro pode (e deve) fazer o <b>Pré-Natal do Parceiro</b>: consulta, testes rápidos de HIV, sífilis e hepatites, pressão, glicemia e vacinas. É cuidar de si, da parceira e do bebê, e muitas vezes é a porta de entrada do homem na UBS.</p>${ouvirBtn()}</div>
+  </details>
+  <details>
+    <summary>🗣️ Como aproveitar a consulta</summary>
+    <div class="corpo"><ul>
+      <li>Anote antes o que quer perguntar (dá para usar o campo "O quê" da agenda).</li>
+      <li>Conte tudo, inclusive sobre sexo, bebida e humor. O atendimento é sigiloso.</li>
+      <li>Leve a lista de remédios que usa e exames antigos.</li>
+      <li>Não entendeu? Peça para explicar de novo. É seu direito.</li></ul>${ouvirBtn()}</div>
+  </details>`;
+};
+DEPOIS.cuidar=()=>{
+  document.querySelectorAll("[data-ck]").forEach(inp=>inp.onchange=()=>{const f=LS.get("check",{});if(inp.value)f[inp.dataset.ck]=inp.value;else delete f[inp.dataset.ck];LS.set("check",f);rota();toast("Salvo no seu celular")});
+  $("#agOk").onclick=()=>{
+    const t=$("#agT").value.trim(),d=$("#agD").value;
+    if(!t||!d){toast("Preencha o quê e a data");return}
+    const ag=LS.get("agenda",[]);ag.push({titulo:t.slice(0,80),data:d,hora:$("#agH").value,local:$("#agL").value.trim().slice(0,80)});LS.set("agenda",ag);rota();toast("Compromisso salvo");
+  };
+  const ag=LS.get("agenda",[]).sort((a,b)=>a.data<b.data?-1:1);
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ag.splice(+b.dataset.del,1);LS.set("agenda",ag);rota()});
+  document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>baixarIcs(ag[+b.dataset.ics]));
+};
+function baixarIcs(a){
+  const d=a.data.replace(/-/g,"");const h=(a.hora||"08:00").replace(":","")+"00";
+  const fim=String(Math.min(23,+h.slice(0,2)+1)).padStart(2,"0")+h.slice(2);
+  const limpa=s=>String(s||"").replace(/[,;\\]/g," ").replace(/\n/g," ");
+  const ics=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Provedor do Autocuidado//PT-BR","BEGIN:VEVENT","UID:"+Date.now()+"@autocuidado","DTSTAMP:"+new Date().toISOString().replace(/[-:]/g,"").slice(0,15)+"Z","DTSTART:"+d+"T"+h,"DTEND:"+d+"T"+fim,"SUMMARY:"+limpa(a.titulo),"LOCATION:"+limpa(a.local),"BEGIN:VALARM","TRIGGER:-PT2H","ACTION:DISPLAY","DESCRIPTION:"+limpa(a.titulo),"END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const url=URL.createObjectURL(new Blob([ics],{type:"text/calendar"}));
+  const l=document.createElement("a");l.href=url;l.download="compromisso-saude.ics";document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+
+function semanaMin(){
+  const c=LS.get("cam",{});let t=0;
+  for(let i=0;i<7;i++){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");t+=c[k]||0}
+  return t;
+}
+PAGINAS.habitos = ()=>{
+  const c=LS.get("cam",{});const dias=[];
+  for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");dias.push({k,n:"DSTQQSS"[d.getDay()],v:c[k]||0})}
+  const sem=semanaMin();const agua=(LS.get("agua",{}))[hoje()]||0;
+  return `
+  <h2>Comida, água e movimento</h2>
+  <section class="card">
+    <h3>🚶 Minhas caminhadas</h3>
+    <p class="mini">Meta da semana: <b>150 minutos</b> de atividade moderada (dá 30 min, 5 dias). Vale caminhada, bicicleta, futebol, capina, subir escada.</p>
+    <div class="barra" aria-label="Progresso"><i style="width:${Math.min(100,sem/1.5)}%"></i></div>
+    <p><b>${sem} min</b> nos últimos 7 dias ${sem>=150?"🎉 Meta batida!":""}</p>
+    <div class="dias">${dias.map(d=>`<div><b><i style="height:${Math.min(100,d.v/60*100)}%"></i></b>${d.n}<br>${d.v||""}</div>`).join("")}</div>
+    <p style="margin-top:12px">Hoje eu me mexi por:</p>
+    <div class="linha">${[10,20,30,45,60].map(m=>`<button class="btn sec peq" data-min="${m}">+${m} min</button>`).join("")}<button class="btn sec peq" data-min="0">Zerar hoje</button></div>
+  </section>
+
+  <section class="card">
+    <h3>💧 Água hoje</h3>
+    <p style="font-size:1.6rem;margin:.2rem 0">${"🥤".repeat(Math.min(agua,10))}${agua?"":"<span class='mini'>Nenhum copo ainda</span>"}</p>
+    <p class="mini">${agua} de 8 copos (cerca de 2 litros; mais se trabalha no sol).</p>
+    <div class="linha"><button class="btn" id="aguaMais">+1 copo</button><button class="btn sec" id="aguaMenos">−1</button></div>
+  </section>
+
+  <section class="card">
+    <h3>⚖️ Peso e cintura</h3>
+    <div class="linha">
+      <div class="campo"><label for="pP">Peso (kg)</label><input id="pP" type="number" inputmode="decimal" min="30" max="300"></div>
+      <div class="campo"><label for="pA">Altura (cm)</label><input id="pA" type="number" inputmode="decimal" min="120" max="230"></div>
+      <div class="campo"><label for="pC">Cintura (cm)</label><input id="pC" type="number" inputmode="decimal" min="40" max="250"></div>
+    </div>
+    <button class="btn" id="imcOk">Calcular</button>
+    <div id="imcRes"></div>
+    <p class="mini">Meça a cintura na altura do umbigo, sem encolher a barriga. No homem, a partir de <b>94 cm</b> o risco para coração e diabetes aumenta, e a partir de <b>102 cm</b> é alto.</p>
+  </section>
+
+  <details open>
+    <summary>🍽️ Prato saudável do dia a dia</summary>
+    <div class="corpo">
+      <p>Baseado no <b>Guia Alimentar para a População Brasileira</b>:</p>
+      <ul>
+        <li><b>Metade do prato:</b> verduras e legumes (alface, tomate, cenoura, abóbora, maxixe, quiabo).</li>
+        <li><b>Um quarto:</b> arroz, macaxeira, batata, cuscuz.</li>
+        <li><b>Um quarto:</b> feijão + carne, frango, peixe ou ovo. O feijão com arroz é uma ótima dupla!</li>
+        <li>Fruta de sobremesa (caju, acerola, manga, banana).</li>
+      </ul>
+      <div class="nivel amar"><b>Diminua:</b> salgadinho, embutido (salsicha, mortadela, linguiça), refrigerante, macarrão instantâneo, temperos prontos em cubo e o sal do saleiro. Quanto mais natural a comida, melhor.</div>
+      ${ouvirBtn()}
+    </div>
+  </details>
+  <details>
+    <summary>🍺 Álcool</summary>
+    <div class="corpo"><p>Não existe quantidade totalmente segura. Quanto menos, melhor. O álcool está ligado a pressão alta, problemas no fígado e câncer de boca, garganta, estômago e intestino, além de acidentes e violência.</p>
+    <p><b>Sinais de alerta:</b> sentiu que devia beber menos? Ficou irritado com críticas sobre a bebida? Sentiu culpa? Precisou beber logo ao acordar? Duas respostas "sim" pedem uma conversa na UBS ou no CAPS AD.</p>${ouvirBtn()}</div>
+  </details>
+  <details>
+    <summary>🚬 Parar de fumar</summary>
+    <div class="corpo"><p>O SUS oferece <b>tratamento gratuito</b> com acompanhamento e, se precisar, adesivo e remédio. Pergunte na UBS ou ligue 136.</p>
+    <p>Em 20 minutos sem cigarro a pressão já começa a baixar; em 1 ano o risco de infarto cai pela metade.</p>${ouvirBtn()}</div>
+  </details>
+  <details>
+    <summary>😴 Sono</summary>
+    <div class="corpo"><p>Adultos precisam de <b>7 a 9 horas</b> por noite. Ronco alto com pausas na respiração e sono durante o dia podem ser apneia, que aumenta a pressão e o risco de acidentes. Converse na UBS.</p>${ouvirBtn()}</div>
+  </details>`;
+};
+DEPOIS.habitos=()=>{
+  document.querySelectorAll("[data-min]").forEach(b=>b.onclick=()=>{const c=LS.get("cam",{});const m=+b.dataset.min;c[hoje()]=m?Math.min(600,(c[hoje()]||0)+m):0;LS.set("cam",c);rota();if(m)toast("Boa! Cada passo conta.")});
+  const ag=d=>{const a=LS.get("agua",{});a[hoje()]=Math.max(0,(a[hoje()]||0)+d);LS.set("agua",a);rota()};
+  $("#aguaMais").onclick=()=>ag(1);$("#aguaMenos").onclick=()=>ag(-1);
+  const sv=LS.get("medidas",{});["pP","pA","pC"].forEach(k=>{if(sv[k])$("#"+k).value=sv[k]});
+  $("#imcOk").onclick=()=>{
+    const p=+$("#pP").value,a=+$("#pA").value/100,c=+$("#pC").value;
+    LS.set("medidas",{pP:$("#pP").value,pA:$("#pA").value,pC:$("#pC").value});
+    let h="";
+    if(p&&a){const imc=p/(a*a);let cl,cor;
+      if(imc<18.5){cl="abaixo do peso";cor="amar"}else if(imc<25){cl="peso adequado";cor="verde"}else if(imc<30){cl="sobrepeso";cor="amar"}else{cl="obesidade";cor="verm"}
+      h+=`<div class="nivel ${cor}">IMC <b>${imc.toFixed(1).replace(".",",")}</b>: ${cl}.</div>`}
+    if(c){h+=c>=102?`<div class="nivel verm">Cintura ${c} cm: risco <b>alto</b> para coração e diabetes. Converse na UBS.</div>`:c>=94?`<div class="nivel amar">Cintura ${c} cm: risco <b>aumentado</b>. Movimento e comida natural ajudam.</div>`:`<div class="nivel verde">Cintura ${c} cm: dentro do recomendado.</div>`}
+    $("#imcRes").innerHTML=h||'<p class="mini">Preencha peso e altura.</p>';
+  };
+};
+
+PAGINAS.mente = ()=>{
+  const hum=LS.get("humor",{});const h=hum[hoje()];
+  const ops=[["😄","Ótimo"],["🙂","Bem"],["😐","Mais ou menos"],["😟","Mal"],["😞","Muito mal"]];
+  const ult=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");ult.push(hum[k]!=null?ops[hum[k]][0]:"·")}
+  const ruins=Object.keys(hum).sort().slice(-14).filter(k=>hum[k]>=3).length;
+  return `
+  <h2>Mente e emoções</h2>
+  <section class="card">
+    <h3>Como você está hoje?</h3>
+    <div class="humor">${ops.map((o,i)=>`<button data-h="${i}" aria-pressed="${h===i}">${o[0]}<small>${o[1]}</small></button>`).join("")}</div>
+    <p class="mini" style="margin-top:10px">Últimos 7 dias: <span style="font-size:1.2rem;letter-spacing:4px">${ult.join(" ")}</span></p>
+    <div id="humorMsg">${h!=null?msgHumor(h,ruins):""}</div>
+  </section>
+
+  <section class="card">
+    <h3>Respiração para acalmar (1 minuto)</h3>
+    <p class="mini">Puxe o ar quando a bola crescer, segure, e solte devagar quando ela diminuir.</p>
+    <div class="resp"><div class="bola" id="bola">Pronto?</div></div>
+    <div class="centro"><button class="btn" id="respBtn">Começar</button></div>
+  </section>
+
+  <details open>
+    <summary>🧔 Homem também sente</summary>
+    <div class="corpo">
+      <p>Muitos homens cresceram ouvindo "homem não chora", "aguenta firme". Guardar tudo não faz o problema sumir: ele sai como raiva, bebida, insônia, dor no corpo ou isolamento.</p>
+      <ul><li>Falar sobre o que sente é <b>coragem</b>, não fraqueza.</li><li>Ansiedade e depressão são doenças comuns e <b>têm tratamento</b>.</li><li>Escolha uma pessoa de confiança e conte como está de verdade.</li><li>O <b>CAPS</b> e a <b>UBS</b> atendem saúde mental de graça.</li></ul>${ouvirBtn()}
+    </div>
+  </details>
+  <details>
+    <summary>🧰 Pequenas atitudes que ajudam</summary>
+    <div class="corpo"><ul>
+      <li>Caminhe 20 minutos, de preferência no sol da manhã.</li>
+      <li>Durma e acorde em horários parecidos.</li>
+      <li>Diminua a bebida: o álcool piora a ansiedade e a tristeza no dia seguinte.</li>
+      <li>Ligue para um amigo, sem motivo.</li>
+      <li>Faça algo com as mãos: consertar, cozinhar, plantar.</li>
+      <li>Desligue o celular 1 hora antes de dormir.</li></ul>${ouvirBtn()}</div>
+  </details>
+  <section class="card">
+    <h3>Precisa conversar agora?</h3>
+    <div class="sos"><a href="tel:188" class="cvv">💬 188<small>CVV, 24 h, grátis e sigiloso</small></a><a href="tel:192">📞 192<small>Risco imediato</small></a></div>
+  </section>`;
+};
+function msgHumor(h,ruins){
+  if(h>=3&&ruins>=5)return '<div class="nivel verm">Você tem marcado muitos dias difíceis. Isso merece cuidado: procure a UBS ou o CAPS e converse com alguém de confiança. Se pensar em se machucar, <a href="tel:188">ligue 188</a>.</div>';
+  if(h===4)return '<div class="nivel amar">Sinto muito que hoje esteja pesado. Que tal a respiração abaixo e uma conversa com alguém? Se a dor apertar, <a href="tel:188">o CVV (188)</a> atende agora.</div>';
+  if(h===3)return '<div class="nivel amar">Dias ruins acontecem. Tente uma caminhada curta, água e falar com alguém. Se isso se repetir por 2 semanas, procure a UBS.</div>';
+  if(h===2)return '<div class="nivel">Dia mais ou menos. Uma pausa para respirar pode ajudar.</div>';
+  return '<div class="nivel verde">Que bom! Aproveite para fazer algo que te faz bem.</div>';
+}
+DEPOIS.mente=()=>{
+  document.querySelectorAll("[data-h]").forEach(b=>b.onclick=()=>{const hm=LS.get("humor",{});hm[hoje()]=+b.dataset.h;LS.set("humor",hm);rota()});
+  let rodando=false;
+  $("#respBtn").onclick=()=>{
+    if(rodando)return;rodando=true;const bola=$("#bola");let ciclo=0;
+    const passo=()=>{
+      if(ciclo>=5){bola.textContent="Muito bem";bola.style.transform="scale(.6)";rodando=false;return}
+      bola.textContent="Puxe o ar";bola.style.transitionDuration="4s";bola.style.transform="scale(1)";
+      setTimeout(()=>{bola.textContent="Segure";
+        setTimeout(()=>{bola.textContent="Solte devagar";bola.style.transitionDuration="6s";bola.style.transform="scale(.6)";
+          setTimeout(()=>{ciclo++;passo()},6000)},2000)},4000);
+    };passo();
+  };
+};
+
+PAGINAS.onde = ()=>{
+  const meus=LS.get("locais",[]);
+  return `
+  <h2>Onde ser atendido</h2>
+  <p>A <b>UBS do seu bairro</b> é a porta de entrada: lá você faz consulta, exames, vacinas e é encaminhado quando precisar. Os telefones funcionam mesmo sem internet.</p>
+  <section class="card">
+    ${LOCAIS.map(l=>`<div class="local"><div class="tipo">${esc(l.tipo)}</div><b>${esc(l.nome)}</b>
+      <p class="mini" style="margin:.2rem 0">${esc(l.desc)}</p>
+      ${l.end?`<p class="mini" style="margin:.2rem 0">📍 ${esc(l.end)}</p>`:""}
+      <div class="linha">${l.fone?`<a class="btn peq" href="tel:${l.fone}">📞 ${esc(l.foneTxt||l.fone)}</a>`:""}${l.end?`<a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(l.end)}" target="_blank" rel="noopener">Ver no mapa</a>`:""}</div>
+      ${l.conf?"":'<p class="mini" style="margin:.3rem 0 0">⚠️ Confirme endereço e horário antes de ir.</p>'}</div>`).join("")}
+  </section>
+
+  <section class="card">
+    <h3>Meus locais</h3>
+    <p class="mini">Anote sua UBS, o nome do seu agente de saúde, o telefone da clínica. Fica salvo só no seu celular.</p>
+    ${meus.map((l,i)=>`<div class="ck"><div class="t"><b>${esc(l.nome)}</b><small>${esc(l.info)}</small></div>${l.fone?`<a class="btn peq" href="tel:${esc(l.fone.replace(/[^0-9+]/g,""))}">📞</a>`:""}<button class="btn sec peq" data-dl="${i}" aria-label="Apagar">🗑️</button></div>`).join("")}
+    <div class="campo"><label for="lN">Nome do local</label><input id="lN" placeholder="Ex.: UBS do meu bairro"></div>
+    <div class="campo"><label for="lI">Endereço, horário, nome do agente</label><input id="lI"></div>
+    <div class="campo"><label for="lF">Telefone</label><input id="lF" type="tel" inputmode="tel"></div>
+    <button class="btn" id="lOk">Salvar local</button>
+  </section>
+  <details>
+    <summary>🧾 O que levar</summary>
+    <div class="corpo"><ul><li>Documento com foto e CPF</li><li>Cartão do SUS (se não tiver, a UBS faz)</li><li>Comprovante de endereço</li><li>Caderneta de vacinas</li><li>Receitas, remédios em uso e exames antigos</li></ul></div>
+  </details>`;
+};
+DEPOIS.onde=()=>{
+  $("#lOk").onclick=()=>{const n=$("#lN").value.trim();if(!n){toast("Escreva o nome do local");return}
+    const m=LS.get("locais",[]);m.push({nome:n.slice(0,60),info:$("#lI").value.trim().slice(0,120),fone:$("#lF").value.trim().slice(0,20)});LS.set("locais",m);rota();toast("Local salvo")};
+  document.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>{const m=LS.get("locais",[]);m.splice(+b.dataset.dl,1);LS.set("locais",m);rota()});
+};
+
+PAGINAS.dados = ()=>{
+  const c=[["Próstata",77920],["Cólon e reto",26270],["Pulmão",18730],["Estômago",13830],["Cavidade oral",12260]];
+  return `
+  <h2>Por que se cuidar?</h2>
+  <section class="card">
+    <h3>Doenças que mais atingem os homens no Brasil</h3>
+    <ul>
+      <li><b>Doenças do coração e dos vasos:</b> pressão alta, infarto, AVC.</li>
+      <li><b>Diabetes</b>, principalmente o tipo 2.</li>
+      <li><b>Câncer:</b> principalmente de próstata, pulmão e intestino.</li>
+      <li><b>Doenças respiratórias:</b> pneumonia, DPOC.</li>
+      <li><b>Obesidade</b> e alterações metabólicas.</li>
+      <li><b>Saúde mental:</b> depressão, ansiedade, álcool e outras drogas.</li>
+      <li><b>ISTs:</b> sífilis, HIV, hepatites.</li>
+    </ul>
+    <div class="nivel amar">Existem as doenças <b>mais frequentes</b> e as que <b>mais matam</b>: as do coração, o câncer e as respiratórias. Quase todas podem ser prevenidas ou descobertas cedo.</div>
+  </section>
+  <section class="card">
+    <h3>Câncer em homens: casos novos estimados para 2026</h3>
+    <p class="mini">Os cinco mais frequentes, sem contar o câncer de pele não melanoma.</p>
+    <table><thead><tr><th>Tipo</th><th style="text-align:right">Casos</th></tr></thead><tbody>
+      ${c.map(x=>`<tr><td>${x[0]}<div class="hbar" style="width:${x[1]/779.2}%"></div></td><td class="n">${x[1].toLocaleString("pt-BR")}</td></tr>`).join("")}
+    </tbody></table>
+    <p class="mini" style="margin-top:10px">Fonte: Instituto Nacional de Câncer (INCA). Estimativa 2026–2028: incidência de câncer no Brasil.</p>
+  </section>`;
+};
+
+PAGINAS.compartilhar = ()=>`
+  <h2>Compartilhe com outro homem</h2>
+  <section class="card centro">
+    <p>Aponte a câmera do celular para o código:</p>
+    <div class="qr"><img src="qrcode.svg" alt="QR Code para abrir o app Provedor do Autocuidado"></div>
+    <p class="mini" style="word-break:break-all">${esc(location.href.split("#")[0])}</p>
+    <div class="linha" style="justify-content:center"><button class="btn" id="shBtn">Enviar link</button><a class="btn sec" href="https://wa.me/?text=${encodeURIComponent("Provedor do Autocuidado: app de saúde do homem. Funciona sem internet. "+location.href.split("#")[0])}" target="_blank" rel="noopener">WhatsApp</a></div>
+  </section>
+  <section class="card" id="instalar">
+    <h3>📲 Instale no celular (funciona sem internet)</h3>
+    <button class="btn amb oculto" id="instBtn">Instalar o app</button>
+    <p><b>Android (Chrome):</b> menu ⋮ → "Adicionar à tela inicial" ou "Instalar app".</p>
+    <p><b>iPhone (Safari):</b> botão compartilhar □↑ → "Adicionar à Tela de Início".</p>
+    <p class="mini">Depois de abrir uma vez com internet, o app fica guardado no celular e abre mesmo offline.</p>
+  </section>`;
+DEPOIS.compartilhar=()=>{
+  $("#shBtn").onclick=async()=>{const u=location.href.split("#")[0];
+    if(navigator.share){try{await navigator.share({title:"Provedor do Autocuidado",text:"App de saúde do homem",url:u})}catch(e){}}
+    else{try{await navigator.clipboard.writeText(u);toast("Link copiado")}catch(e){toast(u)}}};
+  if(window._instalar){const b=$("#instBtn");b.classList.remove("oculto");b.onclick=()=>{window._instalar.prompt();window._instalar=null;b.classList.add("oculto")}}
+};
+
+PAGINAS.sobre = ()=>`
+  <h2>Sobre o app</h2>
+  <section class="card">
+    <p><b>Provedor do Autocuidado</b> nasceu de uma ação de educação em saúde do Novembro Azul, feita por estudantes de Enfermagem da Afya Faculdade de Parnaíba na Afya Clínica Acadêmica.</p>
+    <p>O nome inverte uma ideia que muitos homens carregam: o homem que "provê" para a família também precisa prover cuidado para si mesmo.</p>
+    <p><b>Princípios:</b> linguagem simples, sem julgamento, respeito à privacidade e incentivo à procura da Atenção Básica.</p>
+  </section>
+  <section class="card">
+    <h3>Privacidade</h3>
+    <p>Tudo o que você anota (nome, humor, caminhadas, consultas) fica <b>somente neste celular</b>. Nada é enviado para a internet.</p>
+    <button class="btn sec" id="apagar">Apagar todos os meus dados</button>
+  </section>
+  <section class="card">
+    <h3>Fontes</h3>
+    <ul class="mini">
+      <li>Ministério da Saúde. Política Nacional de Atenção Integral à Saúde do Homem (PNAISH).</li>
+      <li>INCA. Estimativa 2026–2028: incidência de câncer no Brasil.</li>
+      <li>INCA / Ministério da Saúde. Detecção precoce do câncer de próstata (decisão compartilhada).</li>
+      <li>Ministério da Saúde. Guia Alimentar para a População Brasileira.</li>
+      <li>Ministério da Saúde. Guia de Atividade Física para a População Brasileira.</li>
+      <li>Ministério da Saúde. Calendário Nacional de Vacinação; Guia do Pré-Natal do Parceiro.</li>
+      <li>Secretaria de Estado da Saúde do Piauí. Campanha de prevenção à saúde do homem, nov. 2026.</li>
+    </ul>
+    <p class="aviso">Conteúdo educativo. Não substitui avaliação de profissional de saúde.</p>
+  </section>`;
+DEPOIS.sobre=()=>{$("#apagar").onclick=()=>{if(confirm("Apagar tudo o que você salvou neste app?")){Object.keys(localStorage).filter(k=>k.indexOf("pa_")===0).forEach(k=>localStorage.removeItem(k));toast("Dados apagados");ir("inicio")}}};
+
+/* ---------- acessibilidade ---------- */
+const FS=[17,19,21,15];
+function aplicaPref(){document.documentElement.style.setProperty("--fs",FS[LS.get("fs",0)]+"px");document.documentElement.dataset.tema=LS.get("tema","")}
+$("#fonte").onclick=()=>{LS.set("fs",(LS.get("fs",0)+1)%FS.length);aplicaPref()};
+$("#tema").onclick=()=>{LS.set("tema",LS.get("tema","")?"":"contraste");aplicaPref()};
+aplicaPref();
+
+/* ---------- offline / instalar ---------- */
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();window._instalar=e});
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+
+rota();
+</script>
+</body>
+</html>

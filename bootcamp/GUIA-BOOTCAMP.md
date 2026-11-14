@@ -1,6 +1,6 @@
 # Neurinho no Bootcamp Maratona de Ideias (Ignite Afya × Wadhwani)
 
-Guia para terminar o bootcamp e disputar o prêmio. Os textos abaixo podem ser colados nos campos da plataforma Ignite. Troque o que está entre colchetes, como `[__]`, pelos seus dados reais.
+Guia para terminar o bootcamp e disputar o prêmio. Os textos abaixo seguem os formatos ensinados nos Labs 01 a 05 e podem ser colados nos campos da plataforma Ignite. Troque o que está entre colchetes, como `[__]`, pelos seus dados reais.
 
 ---
 
@@ -10,14 +10,14 @@ Guia para terminar o bootcamp e disputar o prêmio. Os textos abaixo podem ser c
 |---|---|
 | **Até 15/11, 23h59** | Concluir as atividades na plataforma Ignite e entregar o projeto. Sem isso, não tem certificado (18 h) nem concorre. |
 | Até 17/11 | Divulgação dos 10 melhores pela curadoria Wadhwani. |
-| 19/11 | Grande final: pitch para diretores da Afya. 1º e 2º lugar: Alexa. 3º lugar: fone JBL. |
+| 19/11 | Grande final: pitch de 3 minutos para diretores da Afya. 1º e 2º lugar: Alexa. 3º lugar: fone JBL. |
 
-> **Atenção:** na sua gravação de tela a plataforma mostrava **2% de progresso geral**. Esse é o ponto mais urgente. As aulas gravadas dão para ver em velocidade 1,5× ou 2×.
+> **Atenção:** na sua gravação de tela a plataforma mostrava **2% de progresso geral**. Esse é o ponto mais urgente. Dúvidas com a plataforma: Tauan, (11) 96497-2671 (contato passado nas aulas).
 
 ### Checklist da plataforma (eneur.wadhwanifoundation.org)
 
 - [ ] Cadastro feito, com o código da turma **IFFA-2609-14BB**
-- [ ] Negócio criado ("Criar negócio") com o nome **Neurinho**
+- [ ] Negócio criado ("Criar negócio") com o nome **Neurinho**, você como representante do negócio
 - [ ] Equipe adicionada (se tiver)
 - [ ] Módulo 0: Orientação
 - [ ] Módulo 1: Identificação do Problema
@@ -38,11 +38,10 @@ Cada lição tem atividades marcadas como **OBRIGATÓRIO** (Introdução ao Conc
 
 ## 1. Problema (Módulo 1)
 
-**Problema em uma frase**
-Estudantes de Enfermagem estudam de forma passiva e de véspera, esquecem rápido e deixam o autocuidado para depois, o que gera ansiedade, sono ruim, notas baixas e desistência do curso.
+Regras do Lab 02: o problema não pode ser generalista nem duplo, não pode atingir um grupo pequeno demais, não pode ser "vitamina C" (sem urgência) e **precisa ser orientado a quem vai pagar**. Por isso o problema é um só (falta de constância nos estudos), e as consequências incluem a perda de receita da faculdade.
 
-**Descrição do problema**
-Estudantes de Enfermagem têm muito conteúdo, pouco tempo e pouca energia. Muitos trabalham, estudam no ônibus e à noite. Aprendem a estudar relendo slides e grifando, que é o que menos fixa, e revisam só na véspera. Esquecem rápido, acumulam matéria e entram num ciclo de ansiedade e noites mal dormidas. Cuidar de si é visto como perda de tempo. As ferramentas que existem fazem só uma parte: ou ajudam a estudar, ou ajudam a relaxar.
+**Apresentação do problema (qual é, quem passa, consequências)**
+Estudantes de Enfermagem de faculdades privadas não conseguem manter uma rotina de estudo constante. Sem tempo e sem método, estudam de forma passiva e só na véspera, esquecem rápido e acumulam matéria. Isso gera ansiedade, sono ruim e reprovação e, no limite, a desistência do curso, que é perda direta de receita para as faculdades.
 
 **Causas raiz**
 1. Estudo passivo (reler, grifar) em vez de prática ativa (testar-se).
@@ -52,70 +51,110 @@ Estudantes de Enfermagem têm muito conteúdo, pouco tempo e pouca energia. Muit
 5. Autocuidado visto como algo que atrapalha o estudo.
 
 **Quem é afetado (stakeholders)**
-Estudantes de Enfermagem e de outros cursos da saúde; professores e coordenação; faculdades (perdem alunos e receita); famílias; e os futuros pacientes, que recebem profissionais menos preparados.
+Estudantes de Enfermagem; faculdades (perdem alunos e receita); professores e coordenação; famílias; e os futuros pacientes.
 
 **Impacto**
-Ansiedade, sono ruim, reprovação e evasão. Na rede privada, a desistência acumulada chega a 61% (INEP, Censo da Educação Superior 2023). Estudos brasileiros com universitários de Enfermagem encontram sintomas de ansiedade em mais da metade dos alunos (Rev. Bras. Enferm., SciELO).
+Na rede privada, a desistência acumulada chega a 61% (INEP, Censo da Educação Superior 2023). Estudos brasileiros com universitários de Enfermagem encontram sintomas de ansiedade em mais da metade dos alunos (Rev. Bras. Enferm., SciELO).
 
 **Por que eu (time conectado ao problema)**
 Sou estudante de Enfermagem da Afya e vivo esse problema. Criei o Neurinho primeiro para mim e para a minha turma, e as colegas já usam o app.
 
-**Área / Indústria / Domínio**
-Saúde e Educação / EdTech e bem-estar estudantil / Ensino superior em saúde, começando pela Enfermagem.
+**Área / Indústria (segmento) / Domínio (nicho)**
+Educação / Ensino superior em saúde / Estudantes de Enfermagem de faculdades privadas.
+
+**Categoria do modelo de negócio**
+B2B2C: vendemos para a faculdade (B2B) e o aluno usa (B2C). Um plano opcional é vendido direto ao aluno (B2C).
 
 ---
 
 ## 2. Cliente (Módulo 2)
 
-**Segmento primário (quem usa)**
-Estudantes de Enfermagem e de outros cursos da saúde, de 18 a 30 anos, em faculdades privadas. Muitos trabalham e estudam, e usam o celular como principal tela de estudo.
+**Público beneficiário (B2C)**
+Estudantes de Enfermagem de 18 a 30 anos, em faculdades privadas, com renda familiar de até R$ 5.000. Muitos trabalham e estudam, e usam o celular como principal tela de estudo.
 
-**Segmento secundário (quem paga)**
-Faculdades privadas de saúde, principalmente grupos com várias unidades, que precisam reduzir evasão, melhorar o desempenho e cuidar da saúde mental dos alunos.
+**Público pagante primário (B2B)**
+Faculdades privadas com curso de Enfermagem e a partir de 300 alunos no curso. Grupos com várias unidades, como a Afya, são o alvo principal.
 
-**Persona**
+**Público pagante secundário (B2C)**
+O próprio estudante que quer recursos extras (plano Neurinho Plus).
+
+A renda familiar e o porte mínimo da faculdade são hipóteses a validar no piloto.
+
+**Persona B2C (quem usa)**
 Camila, 21 anos, 2º período de Enfermagem em Parnaíba (PI), faculdade privada. Trabalha meio período, estuda no ônibus e à noite. Diz: "Leio o slide três vezes e, na prova, esqueço" e "Em semana de prova eu durmo quatro horas". Quer passar sem virar a noite, chegar segura no estágio e sentir que está dando conta.
 
-**Jobs to be done**
+**Persona B2B (quem decide a compra)**
+Renata, 45 anos, coordenadora do curso de Enfermagem de uma faculdade privada com 600 alunos no curso. Responde por notas, permanência e bem-estar dos alunos. Diz: "Perco alunos no 2º e 3º períodos e só descubro quando eles já trancaram." Dores: evasão e reprovação nas disciplinas básicas, pouca verba, nenhum dado sobre como os alunos estão. Quer: reter alunos, melhorar notas, mostrar ação concreta em saúde mental e ter números para a direção. (Persona hipotética, a validar em conversas com coordenações.)
+
+**Jobs to be done** (funcional, emocional e social, como no Lab 03)
 - **Funcionais:** revisar a matéria certa no dia certo, em sessões de 5 minutos; transformar o PDF da aula em resumo e questões; organizar o horário de aulas e provas.
 - **Emocionais:** sentir que está dando conta; chegar menos ansiosa na véspera; pausar e dormir sem culpa.
 - **Sociais:** chegar preparada no estágio; estudar junto com a turma; ser vista como alguém que cuida bem do paciente e de si.
 
-**Como validei**
-O app tem um questionário anônimo dentro dele (aba Início > "Dê seu feedback"). Resultado: `[__]` respostas, `[__]` colegas usando, `[__]%` disseram que `[__]`.
+**Como validei** (formas de validação do Lab 03)
+- **MVP funcional:** o app está no ar e é usado por colegas.
+- **Entrevistas** com potenciais clientes (roteiro abaixo).
+- **Questionário** anônimo dentro do app (aba Início > "Dê seu feedback").
 
-**Roteiro de entrevista (para mais 5 colegas antes da final)**
+Resultado: `[__]` respostas, `[__]` colegas usando, `[__]%` disseram que `[__]`.
+
+**Roteiro de entrevista com alunas (faça com mais 5 colegas antes da final)**
 1. Me conta como foi sua última semana de prova. O que você fez para estudar?
 2. Quanto tempo seguido você consegue estudar num dia normal? Onde?
 3. O que você já tentou (Anki, resumos, YouTube, cursinho)? O que deu errado?
 4. Como você fica antes da prova (sono, ansiedade)? Faz alguma coisa para se cuidar?
 5. Depois de usar o Neurinho por uma semana: o que você mais usou? O que faria você parar de usar?
 
-Anote frases literais. Uma frase real de uma colega vale muito no pitch.
+**Roteiro com a coordenação (se conseguir 10 minutos com alguém do curso)**
+1. Em que períodos o curso mais perde alunos?
+2. Como vocês ficam sabendo que um aluno está em risco de desistir?
+3. O que a faculdade já faz pela saúde mental dos alunos? Funciona?
+4. Se uma ferramenta mostrasse, de forma anônima, o engajamento da turma, ela ajudaria? Quem decide comprar?
+
+Anote frases literais. Uma frase real vale muito no pitch.
 
 ---
 
 ## 3. Geração de ideias (Módulo 3)
 
+Usamos as etapas do Design Thinking do Lab 03: imersão (vivo o problema), definição (o problema da seção 1), ideação e prototipação.
+
 **Ideias consideradas**
 1. Grupo de estudos com cronograma no WhatsApp. Barato, mas não personaliza e não ajuda na ansiedade.
 2. Banco de questões de Enfermagem. Ajuda a estudar, mas ignora o autocuidado.
 3. App de bem-estar para estudantes. Ajuda na ansiedade, mas não resolve a matéria acumulada.
-4. **App que junta estudo ativo, autocuidado e jogo (escolhida).** Ataca as duas causas ao mesmo tempo e cabe em 5 minutos por dia.
+4. **App que junta estudo ativo, autocuidado e jogo (escolhida).** Ataca as causas ao mesmo tempo e cabe em 5 minutos por dia.
 
 **Por que a ideia 4**
-Estudar bem e cuidar de si dependem um do outro: quem dorme mal esquece, quem está ansioso não estuda. Juntar os dois no mesmo app, e fazer o autocuidado dar vantagem no jogo, transforma pausa em parte do plano de estudo.
+Quem dorme mal esquece, quem está ansioso não estuda. Juntar estudo e autocuidado no mesmo app, e fazer o autocuidado dar vantagem no jogo, transforma pausa em parte do plano de estudo.
 
 ---
 
 ## 4. Oportunidade e concorrência (Módulo 4)
 
-**Concorrentes diretos (Brasil):** cursinhos e bancos de questões da saúde (Sanar, Estratégia, Medway). Bons, mas pagos e com foco em Medicina.
-**Concorrentes diretos (global):** Anki, Quizlet. Ótimos para revisão, mas você precisa montar tudo sozinha.
-**Indiretos:** apps de bem-estar (Lojong, Headspace), YouTube, grupos de WhatsApp e resumos compartilhados.
+**Tamanho do mercado (TAM, SAM, SOM)**
+| | Cálculo | Valor por ano |
+|---|---|---|
+| TAM (mercado total) | 274 mil alunos presenciais de Enfermagem × R$ 48 por ano | R$ 13,2 milhões |
+| SAM (mercado endereçável) | cerca de 80% na rede privada, que compra a licença (estimativa) | R$ 10,5 milhões |
+| SOM (meta em 2 anos) | 9.500 alunos licenciados, cerca de 4% do SAM | R$ 456 mil |
+
+Suposições: preço de R$ 4 por aluno por mês; contamos só alunos presenciais de Enfermagem, sem os outros cursos da saúde. Os 80% vêm da participação da rede privada no total de matrículas do ensino superior, não só de Enfermagem.
+
+**Estratégia de entrada**
+Fase 1: piloto na Afya Parnaíba. Fase 2: outras unidades Afya no Nordeste. Fase 3: faculdades privadas de saúde no Brasil e outros cursos.
+
+**Concorrentes: forças e fraquezas**
+| Concorrente | Tipo | Preço | Forças | Fraquezas |
+|---|---|---|---|---|
+| Anki | Indireto | Grátis; pago no iPhone | Revisão espaçada muito eficaz | Você monta todos os cartões; visual difícil |
+| Quizlet | Indireto | Freemium | Fácil de usar, muitos baralhos prontos | Pouco conteúdo de Enfermagem revisado |
+| Sanar, Estratégia | Direto | Assinatura paga | Marca forte, banco de questões grande | Foco em Medicina e concursos; caro |
+| Lojong, Headspace | Indireto | Freemium | Ótimo conteúdo de meditação | Não fala de prova nem de rotina de estudo |
+| **Neurinho** | — | Grátis; faculdade paga | Enfermagem pronta, estudo e autocuidado juntos, jogo, offline | Marca nova; conteúdo só até o 4º período |
 
 **Nosso diferencial**
-O único que junta, para Enfermagem: conteúdo pronto da grade, estudo ativo com revisão espaçada, autocuidado, jogo, e é grátis e funciona sem internet.
+O único que junta, para Enfermagem: conteúdo pronto da grade, estudo ativo com revisão espaçada, autocuidado e jogo, e é grátis e funciona sem internet.
 
 **Tendências a favor**
 - Social: saúde mental universitária entrou na pauta das faculdades (ex.: Semana de Saúde Integral).
@@ -129,7 +168,9 @@ O único que junta, para Enfermagem: conteúdo pronto da grade, estudo ativo com
 
 ---
 
-## 5. Protótipo / MVP (Módulo 5)
+## 5. Protótipo e MVP (Módulo 5)
+
+Pelo Lab 03, protótipo responde "isso faz sentido?" e MVP responde "alguém realmente quer usar isso?". O Neurinho já é um **MVP funcional**: entrega valor real e é usado por colegas.
 
 **Formato:** app web instalável no celular (PWA), que funciona sem internet.
 **Link:** https://b5kmdzk6mz-ux.github.io/Neurinho-/
@@ -146,30 +187,41 @@ Login com sincronização na nuvem, painel anônimo para a faculdade, conteúdo 
 
 ---
 
-## 6. Modelo de negócio (Módulo 6): Lean Canvas
+## 6. Modelo de negócio (Módulo 6)
 
+**Proposta de valor** (formato do Lab 04: o problema, para quem e o benefício)
+Com o Neurinho, estudantes de Enfermagem estudam 5 minutos por dia e cuidam da saúde mental no mesmo app, sem virar a noite antes da prova. E as faculdades retêm mais alunos.
+
+**Lean Canvas**
 | Campo | Resposta |
 |---|---|
 | Problema | Estudo passivo e de véspera; ansiedade e sono ruim; evasão. |
-| Segmento de clientes | Estudantes de Enfermagem e saúde (usam); faculdades privadas (pagam). |
-| Proposta de valor | Estudo que cabe no seu dia e cuidado que cabe na sua rotina: passar sem se destruir no caminho. |
+| Segmento de clientes | Estudantes de Enfermagem (usam); faculdades privadas com curso de Enfermagem (pagam). |
+| Proposta de valor | Estudantes de Enfermagem estudam 5 min por dia e cuidam da saúde mental no mesmo app, sem virar a noite; faculdades retêm mais alunos. |
 | Solução | Estudo ativo com revisão espaçada, autocuidado e jogo no mesmo app. |
 | Canais | Turmas e ligas acadêmicas, Instagram, coordenação dos cursos, eventos como a Semana de Saúde Integral. |
-| Fontes de receita | Licença institucional R$ 4 por aluno/mês; plano Plus R$ 9,90/mês. |
-| Estrutura de custos | Desenvolvimento, revisão de conteúdo, servidor e IA, marketing, contabilidade e impostos. |
-| Métricas-chave | Alunos ativos por semana, sessões por aluno, sequência de dias, check-ins, retenção. |
+| Fontes de receita | Licenciamento SaaS para faculdades (R$ 4 por aluno/mês); freemium para o aluno (Plus, R$ 9,90/mês). |
+| Estrutura de custos | Desenvolvimento, revisão de conteúdo, servidor e IA, marketing, contador e impostos. |
+| Métricas-chave | Alunos ativos por semana, sessões por aluno, sequência de dias, check-ins, retenção dos alunos no curso. |
 | Vantagem injusta | Feito por estudante de Enfermagem, com 1.707 itens prontos da grade e turma já usando. |
 
 ---
 
 ## 7. Finanças (Módulo 7)
 
-**Modelo de receita**
-- Primário: licença institucional, **R$ 4 por aluno por mês**, paga pela faculdade. Inclui conteúdo da grade, painel anônimo de engajamento e bem-estar, e suporte.
-- Secundário: **Neurinho Plus, R$ 9,90 por mês**, pago pelo estudante (resumos com IA sem limite, todos os períodos, estatísticas).
-- O básico é sempre grátis para o estudante.
+Segue o roteiro do Lab 05: metas, custos iniciais, custos diretos, despesas operacionais, preço, projeção, margem de contribuição, ponto de equilíbrio e payback.
+
+**Modelos de receita** (nomes da lista do Lab 04)
+- Primário: **licenciamento SaaS**, R$ 4 por aluno por mês, pago pela faculdade. Inclui conteúdo da grade, painel anônimo de engajamento e bem-estar, e suporte.
+- Secundário: **freemium**. O básico é sempre grátis; o Neurinho Plus custa R$ 9,90 por mês (resumos com IA sem limite, todos os períodos, estatísticas).
 
 **Por que a faculdade paga:** 500 alunos × R$ 4 × 12 meses = R$ 24.000 por ano. Com mensalidade de cerca de R$ 1.000, manter 2 alunos no curso por ano já paga isso.
+
+**Metas financeiras**
+- 3 faculdades piloto e 2.300 alunos licenciados até o mês 10.
+- Equilíbrio operacional no mês 10.
+- R$ 327 mil de receita no ano 2.
+- Recuperar o investimento (payback) até o mês 21.
 
 **Custos iniciais (R$ 7.290)**
 | Item | Valor |
@@ -180,95 +232,117 @@ Login com sincronização na nuvem, painel anônimo para a faculdade, conteúdo 
 | Design e identidade | R$ 2.000 |
 | Jurídico (termos de uso, LGPD) | R$ 3.000 |
 
-**Custos mensais, ano 1 (R$ 8.650/mês)**
-| Item | Valor |
-|---|---|
-| Desenvolvimento (meio período) | R$ 2.500 |
-| Revisão de conteúdo (2 monitores) | R$ 2.000 |
-| Pró-labore | R$ 1.500 |
-| Marketing | R$ 1.000 |
-| Servidor, IA e domínio | R$ 750 |
-| Contabilidade e impostos | R$ 900 |
+**Custos diretos (crescem com cada venda)**
+| Unidade | Item | Valor |
+|---|---|---|
+| Aluno licenciado | Servidor e IA | R$ 0,40 |
+| Aluno licenciado | Imposto (6% de R$ 4) | R$ 0,24 |
+| Assinante Plus | IA | R$ 2,00 |
+| Assinante Plus | Taxa de pagamento (4%) e imposto (6%) | R$ 0,99 |
 
-No ano 2 o custo mensal sobe para R$ 14.000 (dev em tempo integral, R$ 5.000; conteúdo, R$ 3.000; marketing e vendas, R$ 2.000; infraestrutura e IA, R$ 1.200; pró-labore, R$ 1.500; contabilidade e impostos, R$ 1.300).
+**Despesas operacionais (fixas por mês)**
+| Item | Ano 1 | Ano 2 |
+|---|---|---|
+| Desenvolvimento | R$ 2.500 (meio período) | R$ 5.000 (tempo integral) |
+| Revisão de conteúdo (monitores) | R$ 2.000 | R$ 3.000 |
+| Pró-labore | R$ 1.500 | R$ 1.500 |
+| Marketing e vendas | R$ 1.000 | R$ 2.000 |
+| Contador | R$ 400 | R$ 600 |
+| Servidor base e ferramentas | R$ 350 | R$ 900 |
+| **Total** | **R$ 7.750** | **R$ 13.000** |
+
+**Margem de contribuição**
+- Por aluno licenciado: R$ 4,00 − R$ 0,64 = **R$ 3,36**.
+- Por assinante Plus: R$ 9,90 − R$ 2,99 = **R$ 6,91**.
+
+**Ponto de equilíbrio**
+- Ano 1: R$ 7.750 ÷ R$ 3,36 = **2.307 alunos licenciados** por mês. Acontece no **mês 10**, com 2.300 alunos e 106 assinantes Plus.
+- Ano 2: R$ 13.000 ÷ R$ 3,36 = 3.870 alunos. Acontece no mês 15.
+
+**Payback:** o caixa recupera os custos iniciais e os prejuízos dos primeiros meses no **mês 21**. O pior momento do caixa é −R$ 55.420, no mês 9, por isso pedimos **R$ 60 mil** de investimento.
 
 **Premissas de venda**
 - Faculdades piloto entram nos meses 4 (500 alunos), 7 (+800) e 10 (+1.000): 2.300 alunos no fim do ano 1.
 - No ano 2, +600 alunos licenciados por mês.
 - Plus: 30 assinantes no mês 1, crescendo 15% ao mês no ano 1 e 8% no ano 2.
 
-**Resultado**
+**Resultado por ano**
 | | Ano 1 | Ano 2 |
 |---|---|---|
 | Receita | R$ 57.813 | R$ 327.754 |
-| Custos (com iniciais no ano 1) | R$ 111.090 | R$ 168.000 |
-| Resultado | −R$ 53.277 | +R$ 159.754 |
-
-- **Ponto de equilíbrio operacional:** mês 10 (receita passa o custo do mês).
-- **Caixa volta ao positivo:** mês 20.
-- **Investimento necessário:** cerca de R$ 60 mil (o caixa chega a −R$ 58.560 no mês 9).
+| Custos diretos | R$ 10.474 | R$ 56.723 |
+| **Lucro bruto** | R$ 47.339 | R$ 271.031 |
+| Despesas operacionais | R$ 93.000 | R$ 156.000 |
+| Custos iniciais | R$ 7.290 | — |
+| **Lucro líquido** | **−R$ 52.951** | **+R$ 115.031** |
 
 **Fluxo mês a mês (R$)**
-| Mês | Plus | Alunos licenciados | Receita | Custo | Resultado | Caixa acumulado |
-|---|---|---|---|---|---|---|
-| 1 | 30 | 0 | 297 | 8.650 | −8.353 | −15.643 |
-| 2 | 34 | 0 | 337 | 8.650 | −8.313 | −23.956 |
-| 3 | 40 | 0 | 396 | 8.650 | −8.254 | −32.210 |
-| 4 | 46 | 500 | 2.455 | 8.650 | −6.195 | −38.405 |
-| 5 | 52 | 500 | 2.515 | 8.650 | −6.135 | −44.540 |
-| 6 | 60 | 500 | 2.594 | 8.650 | −6.056 | −50.596 |
-| 7 | 69 | 1.300 | 5.883 | 8.650 | −2.767 | −53.363 |
-| 8 | 80 | 1.300 | 5.992 | 8.650 | −2.658 | −56.021 |
-| 9 | 92 | 1.300 | 6.111 | 8.650 | −2.539 | −58.560 |
-| 10 | 106 | 2.300 | 10.249 | 8.650 | +1.599 | −56.961 |
-| 11 | 121 | 2.300 | 10.398 | 8.650 | +1.748 | −55.213 |
-| 12 | 140 | 2.300 | 10.586 | 8.650 | +1.936 | −53.277 |
-| 13 | 161 | 2.900 | 13.194 | 14.000 | −806 | −54.083 |
-| 14 | 173 | 3.500 | 15.713 | 14.000 | +1.713 | −52.370 |
-| 15 | 187 | 4.100 | 18.251 | 14.000 | +4.251 | −48.119 |
-| 16 | 202 | 4.700 | 20.800 | 14.000 | +6.800 | −41.319 |
-| 17 | 218 | 5.300 | 23.358 | 14.000 | +9.358 | −31.961 |
-| 18 | 236 | 5.900 | 25.936 | 14.000 | +11.936 | −20.025 |
-| 19 | 255 | 6.500 | 28.524 | 14.000 | +14.524 | −5.500 |
-| 20 | 275 | 7.100 | 31.122 | 14.000 | +17.122 | +11.622 |
-| 21 | 297 | 7.700 | 33.740 | 14.000 | +19.740 | +31.363 |
-| 22 | 321 | 8.300 | 36.378 | 14.000 | +22.378 | +53.741 |
-| 23 | 347 | 8.900 | 39.035 | 14.000 | +25.035 | +78.776 |
-| 24 | 374 | 9.500 | 41.703 | 14.000 | +27.703 | +106.478 |
+| Mês | Plus | Alunos | Receita | Custos diretos | Lucro bruto | Despesas | Resultado | Caixa acumulado |
+|---|---|---|---|---|---|---|---|---|
+| 1 | 30 | 0 | 297 | 90 | 207 | 7.750 | −7.543 | −14.833 |
+| 2 | 34 | 0 | 337 | 102 | 235 | 7.750 | −7.515 | −22.348 |
+| 3 | 40 | 0 | 396 | 120 | 276 | 7.750 | −7.474 | −29.821 |
+| 4 | 46 | 500 | 2.455 | 458 | 1.998 | 7.750 | −5.752 | −35.574 |
+| 5 | 52 | 500 | 2.515 | 475 | 2.039 | 7.750 | −5.711 | −41.284 |
+| 6 | 60 | 500 | 2.594 | 499 | 2.095 | 7.750 | −5.655 | −46.940 |
+| 7 | 69 | 1.300 | 5.883 | 1.038 | 4.845 | 7.750 | −2.905 | −49.845 |
+| 8 | 80 | 1.300 | 5.992 | 1.071 | 4.921 | 7.750 | −2.829 | −52.674 |
+| 9 | 92 | 1.300 | 6.111 | 1.107 | 5.004 | 7.750 | −2.746 | −55.420 |
+| 10 | 106 | 2.300 | 10.249 | 1.789 | 8.460 | 7.750 | +710 | −54.710 |
+| 11 | 121 | 2.300 | 10.398 | 1.834 | 8.564 | 7.750 | +814 | −53.896 |
+| 12 | 140 | 2.300 | 10.586 | 1.891 | 8.695 | 7.750 | +945 | −52.950 |
+| 13 | 161 | 2.900 | 13.194 | 2.337 | 10.857 | 13.000 | −2.143 | −55.094 |
+| 14 | 173 | 3.500 | 15.713 | 2.757 | 12.955 | 13.000 | −45 | −55.138 |
+| 15 | 187 | 4.100 | 18.251 | 3.183 | 15.068 | 13.000 | +2.068 | −53.070 |
+| 16 | 202 | 4.700 | 20.800 | 3.612 | 17.188 | 13.000 | +4.188 | −48.882 |
+| 17 | 218 | 5.300 | 23.358 | 4.044 | 19.314 | 13.000 | +6.314 | −42.568 |
+| 18 | 236 | 5.900 | 25.936 | 4.482 | 21.455 | 13.000 | +8.455 | −34.113 |
+| 19 | 255 | 6.500 | 28.524 | 4.922 | 23.602 | 13.000 | +10.602 | −23.511 |
+| 20 | 275 | 7.100 | 31.122 | 5.366 | 25.756 | 13.000 | +12.756 | −10.755 |
+| 21 | 297 | 7.700 | 33.740 | 5.816 | 27.924 | 13.000 | +14.924 | +4.169 |
+| 22 | 321 | 8.300 | 36.378 | 6.272 | 30.106 | 13.000 | +17.106 | +21.275 |
+| 23 | 347 | 8.900 | 39.035 | 6.734 | 32.302 | 13.000 | +19.302 | +40.577 |
+| 24 | 374 | 9.500 | 41.703 | 7.198 | 34.504 | 13.000 | +21.504 | +62.082 |
 
-O caixa do mês 1 já desconta os R$ 7.290 de custos iniciais.
+O caixa do mês 1 já desconta os R$ 7.290 de custos iniciais. Pequenas diferenças de R$ 1 vêm de arredondamento.
 
 ---
 
-## 8. Pitch da grande final (Módulo 8) — roteiro de 3 minutos
+## 8. Pitch da grande final (Módulo 8): roteiro de 3 minutos
 
-Confirme com a organização quanto tempo cada equipe terá. Este roteiro tem cerca de 3 minutos em ritmo calmo.
+O Lab 05 pede, em 3 minutos: problema, solução, diferencial, público-alvo, mercado (TAM, SAM, SOM), modelo de negócio, concorrentes, time, momento atual, plano de ação e chamada para ação. E lembra: **a banca compra a sua história**. Os números entre colchetes indicam o slide do deck.
 
-**[0:00] Abertura (slide 1)**
-"Quem aqui já leu o mesmo slide três vezes na véspera da prova e, na hora, esqueceu tudo? Eu sou [nome], estudante de Enfermagem da Afya Parnaíba, e esse é o Neurinho."
+**[0:00] Abertura e história (slide 1)**
+"Quem aqui já leu o mesmo slide três vezes na véspera da prova e, na hora, esqueceu tudo? Eu sou [nome], estudante de Enfermagem da Afya Parnaíba, e isso acontecia comigo toda semana. Foi por isso que eu criei o Neurinho."
 
-**[0:15] Problema (slides 2 e 3)**
-"Mais da metade dos estudantes de Enfermagem tem sintomas de ansiedade. Na rede privada, 61% de quem entra desiste do curso. A gente aprende a estudar relendo e grifando, estuda na véspera, dorme mal e esquece. E o autocuidado sempre fica para depois da prova."
+**[0:20] Problema (slides 2 e 3)**
+"Estudantes de Enfermagem não conseguem manter uma rotina de estudo constante. Estudam na véspera, esquecem e acumulam matéria. Mais da metade tem sintomas de ansiedade, e na rede privada 61% de quem entra acaba desistindo. Para a faculdade, cada desistência é mensalidade perdida."
 
-**[0:45] Cliente (slide 7)**
-"Essa é a Camila: 21 anos, trabalha meio período e estuda no ônibus. Ela não tem duas horas para estudar. Tem dez minutos."
+**[0:45] Público-alvo (slides 7 e 8)**
+"Quem usa é a Camila: trabalha meio período e estuda no ônibus. Ela tem dez minutos, não duas horas. Quem paga é a Renata, coordenadora do curso, que precisa segurar esses alunos."
 
-**[1:00] Solução e demonstração (slides 10 e 11)**
-"O Neurinho junta estudo e autocuidado no mesmo app. Em 5 minutos ela faz as questões do dia, com revisão espaçada, que é a técnica com mais evidência científica. Na aba Cuidar ela respira, alonga e registra como dormiu. E no jogo ela enfrenta vilões como o Procrastino e o Ansiax respondendo questões: jogar é estudar. Ele já funciona hoje, sem internet, com 1.707 cartões e questões da nossa grade."
+**[1:00] Solução (slides 11 e 12)**
+"Com o Neurinho, a Camila estuda 5 minutos por dia, com revisão espaçada, e cuida da saúde mental no mesmo app: respira, alonga e registra o sono. No jogo, ela enfrenta vilões como o Procrastino e o Ansiax respondendo questões. [Mostrar o app no celular por 15 segundos.] Já é um MVP funcional, no ar, com 1.707 cartões e questões da nossa grade."
 
-**[1:45] Mercado e diferencial (slide 13)**
-"Anki exige montar tudo. Cursinhos são caros e focados em Medicina. Apps de meditação não sabem que você tem prova amanhã. O Neurinho é o único que junta tudo isso para Enfermagem."
+**[1:40] Diferencial e concorrentes (slides 14 e 15)**
+"Anki exige montar tudo. Cursinhos são caros e focados em Medicina. Apps de meditação não sabem que você tem prova amanhã. O Neurinho é o único que junta tudo isso para Enfermagem, grátis e offline."
 
-**[2:05] Modelo de negócio (slides 15 e 18)**
-"O aluno usa grátis. Quem paga é a faculdade: 4 reais por aluno por mês. Se a mensalidade é perto de mil reais, manter só dois alunos no curso já paga a licença de 500. Com três faculdades piloto, chegamos ao equilíbrio no mês 10."
+**[1:55] Mercado (slide 16)**
+"Só com alunos presenciais de Enfermagem, o mercado é de 13 milhões de reais por ano. Nossa meta em dois anos é 9.500 alunos, começando pela Afya Parnaíba."
 
-**[2:30] Validação e pedido (slide 19)**
-"Hoje [__] colegas usam o Neurinho. Uma delas disse: '[frase real]'. Queremos começar um piloto em uma unidade Afya e precisamos de 60 mil reais para os primeiros 12 meses."
+**[2:10] Modelo de negócio (slides 18 e 21)**
+"O aluno usa grátis. A faculdade paga 4 reais por aluno por mês. Manter só dois alunos no curso já paga a licença de 500. Com 2.300 alunos licenciados, o negócio se paga, o que acontece no mês 10."
 
-**[2:50] Fechamento (slide 20)**
-"Cuidar de si é parte da jornada. O Neurinho faz isso caber no dia. Obrigada/o!"
+**[2:30] Time, momento atual e plano de ação (slides 23 e 24)**
+"Hoje [__] colegas já usam o Neurinho. Uma delas disse: '[frase real]'. Nos próximos 90 dias, queremos um piloto com uma turma, medindo uso, notas e bem-estar."
 
-**Dica para a final:** mostre o app de verdade no celular, por 15 segundos, na parte da solução. Ver funcionando convence mais que qualquer slide.
+**[2:50] Chamada para ação (slides 24 e 25)**
+"Pedimos um piloto em uma unidade Afya, mentoria e 60 mil reais para os primeiros 12 meses. Cuidar de si é parte da jornada, e o Neurinho faz isso caber no dia. Obrigada/o!"
+
+**Dicas do Lab 05 aplicadas**
+- O que é claro para você não é claro para a banca: fale devagar e sem siglas.
+- Use imagens: mostre o app de verdade, não só slides.
+- Ensaie com cronômetro até caber em 3 minutos.
 
 ---
 
@@ -280,6 +354,9 @@ Revisão espaçada e prática de recuperação são das técnicas de estudo com 
 **"Por que a faculdade pagaria?"**
 Porque evasão custa caro. Um aluno que desiste leva a mensalidade de todos os semestres que faltam. A licença de 500 alunos custa o mesmo que manter 2 alunos por ano.
 
+**"Qual é a sua margem e quando dá lucro?"**
+Cada aluno licenciado deixa R$ 3,36 de margem de contribuição. Com 2.307 alunos o negócio empata, no mês 10. O investimento volta no mês 21.
+
 **"E a privacidade dos dados de humor e sono?"**
 Hoje esses dados ficam só no celular do aluno. O painel da faculdade será anônimo e agregado, seguindo a LGPD.
 
@@ -287,7 +364,7 @@ Hoje esses dados ficam só no celular do aluno. O painel da faculdade será anô
 Monitores e professores, com revisão. O app também deixa o aluno anexar o PDF da aula e gerar cartões, então o conteúdo cresce com a turma.
 
 **"O que impede uma empresa grande de copiar?"**
-A gente já tem o conteúdo da grade, a turma usando e o jeito de falar com o estudante de Enfermagem. E começar dentro da Afya, com um piloto, é a vantagem que uma empresa de fora não tem.
+A gente já tem o conteúdo da grade, a turma usando e o jeito de falar com o estudante de Enfermagem. E começar dentro da Afya, com um piloto, é uma vantagem que uma empresa de fora não tem.
 
 **"Por que um jogo? Não distrai?"**
 O jogo usa as mesmas questões do estudo. Cada vilão representa um inimigo real de quem estuda, e fazer uma pausa de respiração dá vantagem na batalha. A distração vira estudo.
@@ -298,6 +375,7 @@ O jogo usa as mesmas questões do estudo. Cada vilão representa um inimigo real
 
 - INEP, Censo da Educação Superior 2023: desistência acumulada de 61% na rede privada ([CartaCapital](https://www.cartacapital.com.br/politica/estudantes-cotistas-tiveram-melhor-desempenho-no-ensino-superior-em-2023-aponta-censo/)).
 - INEP, Censo da Educação Superior 2024: 274.281 matrículas presenciais em Enfermagem ([Agência Brasil](https://agenciabrasil.ebc.com.br/educacao/noticia/2025-09/brasil-tem-mais-alunos-em-cursos-distancia-que-em-presenciais)).
+- Participação da rede privada nas matrículas do ensino superior, perto de 80% ([Extra Classe](https://www.extraclasse.org.br/?p=108950)).
 - Ansiedade em estudantes de Enfermagem: estudos transversais brasileiros, com prevalências acima de 60% ([Rev. Bras. Enferm., SciELO](https://scielo.br/j/reben/a/JwkL4F3S5DQGkmvx5ZP7cYQ)).
 - Dunlosky, J. et al. (2013). Improving Students' Learning With Effective Learning Techniques. *Psychological Science in the Public Interest*, 14(1).
 

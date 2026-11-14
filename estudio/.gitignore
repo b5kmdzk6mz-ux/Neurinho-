@@ -1,0 +1,6 @@
+modelos/
+projetos/*/entrada/*
+projetos/*/midia/*
+projetos/*/saida/*
+projetos/*/analise/quadros/
+!projetos/*/*/.gitkeep

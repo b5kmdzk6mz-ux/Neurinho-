@@ -9,6 +9,7 @@ import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { TTFLoader } from 'three/addons/loaders/TTFLoader.js';
 import { Font } from 'three/addons/loaders/FontLoader.js';
 import { TextGeometry } from 'three/addons/geometries/TextGeometry.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 
 const Q = new URLSearchParams(location.search);
 const W = +(Q.get('w') || 1920), H = +(Q.get('h') || 1080);
@@ -281,12 +282,19 @@ const aguaSup = new THREE.Mesh(new THREE.CircleGeometry(60, 96), new THREE.MeshP
 aguaSup.rotation.x = -Math.PI / 2; cena1.add(aguaSup);
 
 // geometria de gota (perfil em torno do eixo Y)
-function geoGota({ sx = 1.45, sy = 1.15, m = 1.0, dobra = .26, seg = 72, lat = 64 } = {}) {
-  const pts = [];
+function geoGota({ sx = 1.45, sy = 1.15, m = 1.0, dobra = .26, seg = 72, lat = 64, pescoco = null } = {}) {
+  let pts = [];
   for (let i = 0; i <= lat; i++) {
     const phi = Math.PI * (1 - i / lat);
     const x = Math.sin(phi) * Math.pow(Math.sin(phi / 2), m) * sx;
     pts.push(new THREE.Vector2(Math.max(x, 1e-4), Math.cos(phi) * sy));
+  }
+  if (pescoco) { // cabeca de fantoche: a base da gota afina suavemente ate a manga
+    const { yc, r, desce, fundo } = pescoco;
+    const topo = pts.filter(p => p.y >= yc);
+    const rc = topo[0].x, base = [];
+    for (let k = 0; k <= 20; k++) { const u = k / 20, y = fundo + u * (yc - fundo); const w = sstep(yc - desce, yc, y); base.push(new THREE.Vector2(lerp(r, rc, w * w * (3 - 2 * w) ** .0 * w ** .2), y)); }
+    pts = [...base.slice(0, -1), ...topo];
   }
   const g = new THREE.LatheGeometry(pts, seg);
   const p = g.attributes.position;
@@ -379,28 +387,79 @@ function atualizaFontes(t) {
   }));
 }
 
-// ------------------------------------------------------------------ PERSONAGENS
-const geoCorpo = geoGota();
+// ------------------------------------------------------------------ PERSONAGENS (fieis a foto de referencia: fantoches de pelucia)
+const geoCorpo = geoGota({ sx: 1.42, sy: 1.15, m: 1.05, dobra: .2, pescoco: { yc: -.62, r: .6, desce: .6, fundo: -2.05 } });
 const RAIO = geoCorpo.userData.raio, SY = geoCorpo.userData.sy;
-const ESCALA = .78;
+const ESCALA = .64;
+const MANGA_H = .7, CABECA_Y = 2.05;
+
+// textura de plastico-bolha (gotinha transparente)
+const texBolhas = canvasTex(256, (g, s) => {
+  g.fillStyle = '#000'; g.fillRect(0, 0, s, s);
+  const n = 4, d = s / n;
+  for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+    const x = (i + .5 + (j % 2) * .5) * d, y = (j + .5) * d;
+    for (const dx of [-s, 0, s]) {
+      const gr = g.createRadialGradient(x + dx, y, 0, x + dx, y, d * .42);
+      gr.addColorStop(0, '#fff'); gr.addColorStop(.75, '#bbb'); gr.addColorStop(1, '#000');
+      g.fillStyle = gr; g.beginPath(); g.arc(x + dx, y, d * .42, 0, 6.283); g.fill();
+    }
+  }
+}, [5, 3]);
+// textura canelada da manga (meia)
+const texCanelado = canvasTex(256, (g, s) => {
+  for (let x = 0; x < s; x++) { const v = 128 + 60 * Math.sin(x / s * Math.PI * 2 * 12); g.fillStyle = `rgb(${v},${v},${v})`; g.fillRect(x, 0, 1, s); }
+  g.globalAlpha = .35; g.drawImage(texPelo.image, 0, 0, s, s);
+}, [2, 1]);
+
+// bocas desenhadas (decal projetado na superficie da cabeca)
+function texBoca(tipo) {
+  return canvasTex(512, (g, s) => {
+    g.clearRect(0, 0, s, s);
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    if (tipo === 'aberta') {
+      g.beginPath();
+      g.moveTo(20, 40); g.quadraticCurveTo(s / 2, 90, s - 20, 40);
+      g.bezierCurveTo(s - 10, 330, s * .72, s - 20, s / 2, s - 20);
+      g.bezierCurveTo(s * .28, s - 20, 10, 330, 20, 40); g.closePath();
+      const gr = g.createLinearGradient(0, 40, 0, s);
+      gr.addColorStop(0, '#5a0612'); gr.addColorStop(.5, '#9c1022'); gr.addColorStop(1, '#c0182a');
+      g.fillStyle = gr; g.fill();
+      g.save(); g.clip();
+      g.fillStyle = '#ff5468'; g.beginPath(); g.ellipse(s / 2, s - 40, s * .3, s * .2, 0, 0, 6.283); g.fill();
+      g.fillStyle = 'rgba(255,255,255,.25)'; g.beginPath(); g.ellipse(s / 2 - 40, s - 90, 40, 16, -.3, 0, 6.283); g.fill();
+      g.strokeStyle = '#d9384c'; g.lineWidth = 6; g.beginPath(); g.moveTo(s / 2, s - 150); g.lineTo(s / 2, s - 60); g.stroke();
+      g.restore();
+      g.strokeStyle = '#3d040c'; g.lineWidth = 14;
+      g.beginPath(); g.moveTo(20, 40); g.quadraticCurveTo(s / 2, 90, s - 20, 40);
+      g.bezierCurveTo(s - 10, 330, s * .72, s - 20, s / 2, s - 20); g.bezierCurveTo(s * .28, s - 20, 10, 330, 20, 40); g.stroke();
+    } else {
+      g.strokeStyle = '#3d040c'; g.lineWidth = 34;
+      g.beginPath();
+      if (tipo === 'sorriso') { g.moveTo(60, 140); g.quadraticCurveTo(s / 2, 420, s - 60, 140); }
+      else { g.moveTo(110, 360); g.quadraticCurveTo(s / 2, 170, s - 110, 360); }
+      g.stroke();
+    }
+  });
+}
+const BOCAS = { aberta: texBoca('aberta'), sorriso: texBoca('sorriso'), bico: texBoca('bico') };
 
 const CONFIG = [
-  { nome: 'transparente', cor: '#dff4ff', sheen: '#ffffff', iris: '#2f7fd6', bochecha: '#ff9fb3', vidro: true, sobr: [.18, .18], incl: [.12, -.12] },
-  { nome: 'amarelo-claro', cor: '#fff0a0', sheen: '#fffbe0', iris: '#6a4320', bochecha: '#ff9a8a', sobr: [.2, .2], incl: [-.28, .28] },
-  { nome: 'amarela', cor: '#ffc81a', sheen: '#fff2a0', iris: '#5a3410', bochecha: '#ff8a5c', sobr: [.24, .24], incl: [.1, -.1] },
-  { nome: 'laranja', cor: '#ff8417', sheen: '#ffd0a0', iris: '#4a2a10', bochecha: '#ff5f4a', sobr: [.26, .14], incl: [.18, .02] },
-  { nome: 'castanha', cor: '#8c4a22', sheen: '#e0a070', iris: '#2a1608', bochecha: '#d0604a', sobr: [.12, .12], incl: [-.05, .05], palpebra: .78 },
-  { nome: 'esverdeada', cor: '#a2c64a', sheen: '#eaffb0', iris: '#2f3a10', bochecha: '#ff8f70', sobr: [.24, .12], incl: [.25, .18] },
-  { nome: 'vermelha', cor: '#de2b2b', sheen: '#ffb0a0', iris: '#3a0c0c', bochecha: '#ff6a6a', sobr: [.12, .12], incl: [-.3, .3] },
+  { nome: 'transparente', cor: '#eef5fa', manga: '#d8dde3', sheen: '#ffffff', bolhas: true, sobr: { alt: [.05, .05], ang: [.15, .15] }, fechada: 'sorriso', acessorio: 'oculos' },
+  { nome: 'amarelo-claro', cor: '#fff09a', manga: '#f7e98e', sheen: '#fffbe0', cilios: true, bochecha: '#ff8fa6', sobr: { alt: [.06, .06], ang: [.2, .2] }, fechada: 'sorriso', acessorio: 'laco' },
+  { nome: 'amarela', cor: '#ffd21a', manga: '#f5c814', sheen: '#fff2a0', sobr: { alt: [.04, .08], ang: [.12, .25] }, fechada: 'sorriso', piscadinha: 1 },
+  { nome: 'laranja', cor: '#ff7a14', manga: '#f26f10', sheen: '#ffd0a0', sobr: { alt: [.12, -.04], ang: [.25, -.35] }, palp: [.38, .3], fechada: 'bico' },
+  { nome: 'castanha', cor: '#7f4421', manga: '#74401f', sheen: '#d89a6a', sobr: { alt: [-.05, .1], ang: [-.3, .2] }, palp: [.45, 0], fechada: 'sorriso', acessorio: 'chapeu', segura: 'lupa', maoProp: 0 },
+  { nome: 'esverdeada', cor: '#8fd13a', manga: '#84c234', sheen: '#e4ffb0', sobr: { alt: [.04, .04], ang: [-.45, -.45] }, palp: [.35, .35], fechada: 'bico', segura: 'termometro', maoProp: 1 },
+  { nome: 'vermelha', cor: '#e0221f', manga: '#cc1d1b', sheen: '#ffb0a0', sobr: { alt: [-.02, -.02], ang: [.5, .5] }, fechada: 'bico', segura: 'placa', maoProp: 1 },
 ];
 
-const matBranco = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .85, sheen: 1, sheenRoughness: .4, sheenColor: 0xffffff, bumpMap: texPelo, bumpScale: 1.4 });
+const pelucia = (cor, extra = {}) => new THREE.MeshPhysicalMaterial({ color: cor, roughness: .9, sheen: 1, sheenRoughness: .38, sheenColor: new THREE.Color(cor).lerp(new THREE.Color('#ffffff'), .5), bumpMap: texPelo, bumpScale: 1.6, envMapIntensity: .9, ...extra });
+const matBranco = pelucia('#ffffff', { bumpScale: 1.2, sheenColor: new THREE.Color('#ffffff') });
 const matOlho = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .25, clearcoat: 1, clearcoatRoughness: .05 });
-const matPupila = new THREE.MeshPhysicalMaterial({ color: 0x050608, roughness: .2, clearcoat: 1 });
+const matPupila = new THREE.MeshPhysicalMaterial({ color: 0x060606, roughness: .15, clearcoat: 1 });
 const matReflexo = new THREE.MeshBasicMaterial({ color: 0xffffff });
-const matBoca = new THREE.MeshStandardMaterial({ color: 0x4a0f1e, roughness: .6 });
-const matLingua = new THREE.MeshStandardMaterial({ color: 0xff6a7a, roughness: .5 });
-const matDente = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .4 });
+const matPreto = new THREE.MeshPhysicalMaterial({ color: 0x0c0c0c, roughness: .5, clearcoat: .4 });
 
 function pontoSuperficie(x, y, recuo = 0) {
   const r = RAIO(y);
@@ -409,78 +468,152 @@ function pontoSuperficie(x, y, recuo = 0) {
   return { p: V(x, y, z - recuo), n };
 }
 
+// ---- acessorios
+function oculos() {
+  const g = new THREE.Group(), m = new THREE.MeshPhysicalMaterial({ color: 0x050505, roughness: .12, clearcoat: 1, clearcoatRoughness: .05 });
+  for (const s of [-1, 1]) { const l = new THREE.Mesh(new RoundedBoxGeometry(.46, .32, .07, 4, .09), m); l.position.set(s * .28, 0, 0); g.add(l); }
+  const ponte = new THREE.Mesh(new THREE.BoxGeometry(.16, .06, .05), m); ponte.position.y = .07; g.add(ponte);
+  for (const s of [-1, 1]) { const h = new THREE.Mesh(new THREE.BoxGeometry(.05, .05, .7), m); h.position.set(s * .5, .06, -.33); g.add(h); }
+  return g;
+}
+function laco() {
+  const g = new THREE.Group(), m = pelucia('#ff4f9a', { bumpScale: .8 });
+  for (const s of [-1, 1]) { const a = new THREE.Mesh(new THREE.SphereGeometry(.22, 24, 16), m); a.scale.set(1.15, .75, .45); a.position.x = s * .2; a.rotation.z = s * .35; g.add(a); }
+  const n = new THREE.Mesh(new THREE.SphereGeometry(.09, 16, 12), m); n.position.z = .05; g.add(n);
+  return g;
+}
+function chapeu() {
+  const g = new THREE.Group(), m = pelucia('#6b3f22', { roughness: .8, bumpScale: .6 }), mf = pelucia('#2e1a0e', { bumpScale: .4 });
+  const aba = new THREE.Mesh(new THREE.CylinderGeometry(.92, .92, .06, 48), m); aba.scale.z = .88; g.add(aba);
+  const copa = new THREE.Mesh(new THREE.CylinderGeometry(.42, .55, .5, 40), m); copa.position.y = .27; g.add(copa);
+  const topo = new THREE.Mesh(new THREE.SphereGeometry(.42, 32, 12, 0, 6.283, 0, Math.PI / 2), m); topo.scale.y = .25; topo.position.y = .52; g.add(topo);
+  const faixa = new THREE.Mesh(new THREE.CylinderGeometry(.53, .56, .11, 40), mf); faixa.position.y = .1; g.add(faixa);
+  return g;
+}
+function lupa() {
+  const g = new THREE.Group();
+  const aro = new THREE.Mesh(new THREE.TorusGeometry(.22, .04, 12, 36), new THREE.MeshPhysicalMaterial({ color: 0x2a2f38, roughness: .3, metalness: .6 }));
+  aro.position.y = .52; g.add(aro);
+  const vidro = new THREE.Mesh(new THREE.CircleGeometry(.22, 32), new THREE.MeshPhysicalMaterial({ color: 0x9fd8ff, roughness: 0, transparent: true, opacity: .45, clearcoat: 1, side: THREE.DoubleSide, envMapIntensity: 2 }));
+  vidro.position.y = .52; g.add(vidro);
+  const cabo = new THREE.Mesh(new THREE.CylinderGeometry(.04, .05, .36, 16), matPreto); cabo.position.y = .14; g.add(cabo);
+  return g;
+}
+function termometro() {
+  const g = new THREE.Group();
+  const corpo = new THREE.Mesh(new THREE.CapsuleGeometry(.045, .5, 8, 16), new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: .1, clearcoat: 1, transparent: true, opacity: .85 }));
+  corpo.position.y = .38; g.add(corpo);
+  const linha = new THREE.Mesh(new THREE.CylinderGeometry(.018, .018, .38, 8), new THREE.MeshBasicMaterial({ color: 0xff2020 })); linha.position.y = .36; g.add(linha);
+  const bulbo = new THREE.Mesh(new THREE.SphereGeometry(.065, 16, 12), new THREE.MeshPhysicalMaterial({ color: 0xff1a1a, emissive: 0xaa0000, emissiveIntensity: .3, clearcoat: 1 }));
+  bulbo.position.y = .12; g.add(bulbo);
+  return g;
+}
+function placa() {
+  const g = new THREE.Group();
+  const tri = (r) => { const sh = new THREE.Shape(); for (let k = 0; k < 3; k++) { const a = Math.PI / 2 + k * 2 * Math.PI / 3; k ? sh.lineTo(Math.cos(a) * r, Math.sin(a) * r) : sh.moveTo(Math.cos(a) * r, Math.sin(a) * r); } sh.closePath(); return sh; };
+  const ext = new THREE.Mesh(new THREE.ExtrudeGeometry(tri(.46), { depth: .06, bevelEnabled: true, bevelThickness: .03, bevelSize: .05, bevelSegments: 4 }), new THREE.MeshPhysicalMaterial({ color: 0xe8141a, roughness: .35, clearcoat: .8 }));
+  const inn = new THREE.Mesh(new THREE.ShapeGeometry(tri(.3)), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: .5 }));
+  inn.position.z = .1;
+  const ex1 = new THREE.Mesh(new THREE.CapsuleGeometry(.035, .14, 6, 12), matPreto); ex1.position.set(0, .02, .12);
+  const ex2 = new THREE.Mesh(new THREE.SphereGeometry(.04, 12, 8), matPreto); ex2.position.set(0, -.15, .12);
+  const sinal = new THREE.Group(); sinal.add(ext, inn, ex1, ex2); sinal.position.set(0, .62, .08);
+  const cabo = new THREE.Mesh(new THREE.CylinderGeometry(.03, .03, .45, 10), new THREE.MeshStandardMaterial({ color: 0xdddddd, roughness: .4, metalness: .5 })); cabo.position.y = .2;
+  g.add(sinal, cabo);
+  return g;
+}
+const PROPS = { lupa, termometro, placa };
+
+// ---- luva branca de 4 dedos
+function luva(lado) {
+  const g = new THREE.Group();
+  const palma = new THREE.Mesh(new THREE.SphereGeometry(.19, 24, 18), matBranco); palma.scale.set(1.05, .95, .62); g.add(palma);
+  const punho = new THREE.Mesh(new THREE.TorusGeometry(.15, .055, 10, 24), matBranco); punho.rotation.x = Math.PI / 2; punho.position.y = -.17; g.add(punho);
+  const dedos = [-.13, -.045, .045, .13].map((x, k) => {
+    const piv = new THREE.Group(); piv.position.set(x, .12, 0); g.add(piv);
+    const d = new THREE.Mesh(new THREE.CapsuleGeometry(.056, k === 0 || k === 3 ? .1 : .13, 6, 12), matBranco); d.position.y = .1; piv.add(d);
+    piv.userData.abre = x * 1.4;
+    return piv;
+  });
+  const pol = new THREE.Group(); pol.position.set(-lado * .15, .0, .04); g.add(pol);
+  const pm = new THREE.Mesh(new THREE.CapsuleGeometry(.06, .12, 6, 12), matBranco); pm.position.y = .1; pol.add(pm);
+  return { g, dedos, pol, lado };
+}
+function poseLuva(l, pose) {
+  const fecha = pose === 'aberta' ? 0 : 1;
+  l.dedos.forEach(d => { d.rotation.set(fecha * 2.3, 0, -d.userData.abre * (1 - fecha) * 1.2); d.scale.setScalar(1 - .15 * fecha); });
+  if (pose === 'joinha') { l.pol.rotation.set(0, 0, l.lado * Math.PI / 2); l.pol.scale.set(1, 1.35, 1); }
+  else { l.pol.rotation.set(fecha * .9, 0, l.lado * (fecha ? .5 : 1.0)); l.pol.scale.set(1, 1, 1); }
+}
+
 class Gotinha {
   constructor(cfg, i) {
     this.cfg = cfg; this.i = i;
     this.raiz = new THREE.Group();
     this.corpo = new THREE.Group();   // pivo na base (squash)
     this.raiz.add(this.corpo);
-    const cor = new THREE.Color(cfg.cor);
-    const mat = new THREE.MeshPhysicalMaterial({
-      color: cor, roughness: .9, sheen: 1, sheenRoughness: .38, sheenColor: new THREE.Color(cfg.sheen),
-      bumpMap: texPelo, bumpScale: 1.6, envMapIntensity: .9,
-    });
-    if (cfg.vidro) Object.assign(mat, { transparent: true, opacity: .8, roughness: .45, clearcoat: .8, iridescence: .7, iridescenceIOR: 1.4, emissive: new THREE.Color('#9fe6ff'), emissiveIntensity: .12 });
+    const mat = cfg.bolhas
+      ? new THREE.MeshPhysicalMaterial({ color: '#eef6fb', roughness: .22, clearcoat: 1, clearcoatRoughness: .1, bumpMap: texBolhas, bumpScale: -2.4, transparent: true, opacity: .78, iridescence: .45, iridescenceIOR: 1.3, sheen: .6, sheenColor: new THREE.Color('#ffffff'), envMapIntensity: 1.4 })
+      : pelucia(cfg.cor);
     this.mat = mat;
+    // manga (meia)
+    const manga = new THREE.Mesh(new THREE.CylinderGeometry(.615, .64, MANGA_H, 48, 1, true), new THREE.MeshPhysicalMaterial({ color: cfg.manga, roughness: .95, sheen: .8, sheenColor: new THREE.Color(cfg.manga).lerp(new THREE.Color('#fff'), .4), bumpMap: texCanelado, bumpScale: 1.1 }));
+    manga.position.y = MANGA_H / 2; this.corpo.add(manga);
+    // cabeca
     const malha = new THREE.Mesh(geoCorpo, mat);
-    malha.position.y = SY;
+    malha.position.y = CABECA_Y;
     this.corpo.add(malha);
     this.malha = malha;
-    if (cfg.vidro) { // brilhinhos internos
-      const brilho = new THREE.Mesh(new THREE.SphereGeometry(.45, 24, 16), new THREE.MeshBasicMaterial({ color: 0xcff6ff, transparent: true, opacity: .25, blending: THREE.AdditiveBlending, depthWrite: false }));
-      brilho.position.set(-.25, -.2, .1); malha.add(brilho);
-    }
 
     // olhos
     this.olhos = [];
     for (const lado of [-1, 1]) {
-      const { p, n } = pontoSuperficie(lado * .34, .16, .06);
-      const g = new THREE.Group(); g.position.copy(p); g.lookAt(p.clone().add(n.clone().add(V(0, .05, .9)).normalize()));
-      const esc = new THREE.Mesh(new THREE.SphereGeometry(.27, 32, 24), matOlho); esc.scale.set(1, 1.18, .55); g.add(esc);
+      const { p, n } = pontoSuperficie(lado * .3, .3, .07);
+      const g = new THREE.Group(); g.position.copy(p); g.lookAt(p.clone().add(n.clone().add(V(0, .05, 1.1)).normalize()));
+      const esc = new THREE.Mesh(new THREE.SphereGeometry(.25, 32, 24), matOlho); esc.scale.set(1, 1.22, .55); g.add(esc);
       const irisG = new THREE.Group(); irisG.position.z = .1; g.add(irisG);
-      const iris = new THREE.Mesh(new THREE.SphereGeometry(.17, 28, 20), new THREE.MeshPhysicalMaterial({ color: cfg.iris, roughness: .25, clearcoat: 1 }));
-      iris.scale.set(1, 1.12, .42); irisG.add(iris);
-      const pup = new THREE.Mesh(new THREE.SphereGeometry(.105, 24, 16), matPupila); pup.scale.set(1, 1.1, .4); pup.position.z = .055; irisG.add(pup);
-      const r1 = new THREE.Mesh(new THREE.SphereGeometry(.046, 12, 8), matReflexo); r1.position.set(-.06, .08, .08); irisG.add(r1);
-      const r2 = new THREE.Mesh(new THREE.SphereGeometry(.026, 10, 6), matReflexo); r2.position.set(.065, -.05, .075); irisG.add(r2);
-      // palpebra (cor do corpo) que desce para piscar
-      const palp = new THREE.Mesh(new THREE.SphereGeometry(.285, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), mat);
-      palp.scale.set(1.04, 1.21, .85); g.add(palp);
-      // sobrancelha
-      const sob = new THREE.Mesh(new THREE.CapsuleGeometry(.035, .17, 6, 12), new THREE.MeshStandardMaterial({ color: cor.clone().multiplyScalar(cfg.vidro ? .55 : .45), roughness: .8 }));
-      sob.rotation.z = Math.PI / 2; g.add(sob);
-      this.corpo.children[0].add(g);
+      const pup = new THREE.Mesh(new THREE.SphereGeometry(.15, 28, 20), matPupila); pup.scale.set(.92, 1.08, .42); pup.position.y = -.02; irisG.add(pup);
+      const r1 = new THREE.Mesh(new THREE.SphereGeometry(.05, 12, 8), matReflexo); r1.position.set(-.055, .05, .07); irisG.add(r1);
+      const r2 = new THREE.Mesh(new THREE.SphereGeometry(.024, 10, 6), matReflexo); r2.position.set(.05, -.07, .065); irisG.add(r2);
+      const palp = new THREE.Mesh(new THREE.SphereGeometry(.265, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), mat);
+      palp.scale.set(1.04, 1.24, .9); g.add(palp);
+      // sobrancelha preta em arco
+      const sob = new THREE.Mesh(new THREE.TorusGeometry(.2, .036, 10, 24, 1.5), matPreto);
+      sob.rotation.z = Math.PI / 2 - .75; g.add(sob);
+      if (cfg.cilios) for (let k = 0; k < 3; k++) {
+        const c = new THREE.Mesh(new THREE.CapsuleGeometry(.018, .09, 4, 8), matPreto);
+        const a = (lado > 0 ? .25 : Math.PI - .25) + (lado > 0 ? 1 : -1) * k * .32;
+        c.position.set(Math.cos(a) * .26, Math.sin(a) * .31 + .02, .04); c.rotation.z = a - Math.PI / 2; g.add(c);
+      }
+      malha.add(g);
       this.olhos.push({ g, irisG, palp, sob, lado });
     }
     // bochechas
-    for (const lado of [-1, 1]) {
-      const { p, n } = pontoSuperficie(lado * .6, -.18, .03);
-      const b = new THREE.Mesh(new THREE.CircleGeometry(.13, 24), new THREE.MeshBasicMaterial({ color: cfg.bochecha, transparent: true, opacity: .55, depthWrite: false }));
-      b.position.copy(p); b.lookAt(p.clone().add(n)); b.scale.set(1.3, .8, 1); b.position.addScaledVector(n, .035);
-      malha.add(b);
+    if (cfg.bochecha) for (const lado of [-1, 1]) {
+      const { p, n } = pontoSuperficie(lado * .58, -.02, .02);
+      const b = new THREE.Mesh(new THREE.CircleGeometry(.09, 24), new THREE.MeshBasicMaterial({ color: cfg.bochecha, transparent: true, opacity: .85, depthWrite: false }));
+      b.position.copy(p).addScaledVector(n, .04); b.lookAt(p.clone().add(n)); malha.add(b);
     }
-    // boca
-    const { p: pb, n: nb } = pontoSuperficie(0, -.3, .02);
-    this.boca = new THREE.Group(); this.boca.position.copy(pb); this.boca.lookAt(pb.clone().add(nb.add(V(0, -.15, 0)))); malha.add(this.boca);
-    const sorriso = new THREE.Mesh(new THREE.TorusGeometry(.16, .034, 12, 32, Math.PI), matBoca); sorriso.rotation.z = Math.PI; sorriso.position.y = .06; sorriso.scale.set(1.05, .62, 1); this.boca.add(sorriso);
-    this.sorriso = sorriso;
-    const aberta = new THREE.Group(); this.boca.add(aberta); this.aberta = aberta;
-    const cav = new THREE.Mesh(new THREE.SphereGeometry(.17, 28, 18, 0, Math.PI * 2, Math.PI / 2 - .2, Math.PI / 2 + .2), matBoca); cav.scale.set(1, 1, .35); cav.rotation.x = 0; aberta.add(cav);
-    const tampa = new THREE.Mesh(new THREE.CylinderGeometry(.17, .17, .01, 28, 1, false, 0, Math.PI), matBoca); tampa.rotation.set(Math.PI / 2, 0, Math.PI / 2); tampa.scale.z = .35; // borda reta superior
-    const lingua = new THREE.Mesh(new THREE.SphereGeometry(.09, 16, 12), matLingua); lingua.scale.set(1.2, .6, .5); lingua.position.set(0, -.11, .03); aberta.add(lingua);
-    const dentes = new THREE.Mesh(new THREE.BoxGeometry(.16, .035, .03), matDente); dentes.position.set(0, -.015, .045); aberta.add(dentes);
-    this.cav = cav;
+    // boca: grade projetada na superficie (decal) que abre como boca de fantoche
+    this.bocaGeo = new THREE.PlaneGeometry(1, 1, 28, 14);
+    this.bocaBase = this.bocaGeo.attributes.position.array.slice();
+    this.bocaMat = new THREE.MeshStandardMaterial({ map: BOCAS.aberta, transparent: true, alphaTest: .4, roughness: .55, polygonOffset: true, polygonOffsetFactor: -4, depthWrite: true });
+    this.boca = new THREE.Mesh(this.bocaGeo, this.bocaMat); this.boca.frustumCulled = false; malha.add(this.boca);
 
-    // bracos (cor do corpo) + maos brancas
+    // bracos + luvas
     this.bracos = [];
     for (const lado of [-1, 1]) {
-      const piv = new THREE.Group(); piv.position.set(lado * .97, -.16, .05); malha.add(piv);
-      const br = new THREE.Mesh(new THREE.CapsuleGeometry(.1, .32, 8, 16), mat); br.position.y = -.22; piv.add(br);
-      const mao = new THREE.Group(); mao.position.y = -.5; piv.add(mao);
-      const palma = new THREE.Mesh(new THREE.SphereGeometry(.17, 24, 18), matBranco); palma.scale.set(1, 1.05, .8); mao.add(palma);
-      const polegar = new THREE.Mesh(new THREE.SphereGeometry(.075, 16, 12), matBranco); polegar.position.set(-lado * .13, .06, .08); mao.add(polegar);
-      const punho = new THREE.Mesh(new THREE.TorusGeometry(.13, .045, 10, 24), matBranco); punho.rotation.x = Math.PI / 2; punho.position.y = .13; mao.add(punho);
-      this.bracos.push({ piv, lado });
+      const piv = new THREE.Group(); piv.position.set(lado * .82, -.55, .12); malha.add(piv);
+      const br = new THREE.Mesh(new THREE.CapsuleGeometry(.1, .34, 8, 16), cfg.bolhas ? mat : pelucia(cfg.manga)); br.position.y = -.24; piv.add(br);
+      const l = luva(lado); l.g.position.y = -.56; l.g.rotation.z = Math.PI; piv.add(l.g);
+      this.bracos.push({ piv, lado, luva: l });
+    }
+    // acessorios
+    if (cfg.acessorio === 'oculos') { const o = oculos(); o.position.set(0, .72, .42); o.rotation.x = -.55; malha.add(o); }
+    if (cfg.acessorio === 'laco') { const o = laco(); o.position.set(-.38, .62, .42); o.rotation.set(-.3, -.35, .35); malha.add(o); }
+    if (cfg.acessorio === 'chapeu') { const o = chapeu(); o.position.set(.05, .62, -.02); o.rotation.set(-.12, 0, -.14); malha.add(o); }
+    if (cfg.segura) {
+      const pr = PROPS[cfg.segura](); const l = this.bracos[cfg.maoProp].luva;
+      pr.position.set(0, .05, .14); pr.scale.setScalar(cfg.segura === 'placa' ? 1.7 : 1.45); l.g.add(pr); this.prop = pr;
     }
     // sombra de contato
     this.sombra = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), new THREE.MeshBasicMaterial({ map: texSombra, transparent: true, depthWrite: false }));
@@ -488,6 +621,21 @@ class Gotinha {
     palco.add(this.sombra);
     this.raiz.scale.setScalar(ESCALA);
     palco.add(this.raiz);
+  }
+
+  atualizaBoca(ab) {
+    let tipo = ab >= .14 ? 'aberta' : (this.cfg.fechada || 'sorriso');
+    const largura = tipo === 'aberta' ? 1.12 + .08 * ab : .8, topo = -.04;
+    const alt = tipo === 'aberta' ? .2 + .62 * clamp(ab, 0, 1.3) : .3;
+    if (this.bocaMat.map !== BOCAS[tipo]) { this.bocaMat.map = BOCAS[tipo]; this.bocaMat.needsUpdate = true; }
+    const pos = this.bocaGeo.attributes.position, b = this.bocaBase;
+    for (let k = 0; k < pos.count; k++) {
+      const u = b[k * 3], v = b[k * 3 + 1];   // -0.5..0.5
+      const x = u * largura, y = tipo === 'aberta' ? topo - (.5 - v) * alt : -.2 + v * alt;
+      const r = RAIO(y), z = Math.sqrt(Math.max(r * r - x * x, .0001)) + .012;
+      pos.setXYZ(k, x, y, z);
+    }
+    pos.needsUpdate = true; this.bocaGeo.computeVertexNormals(); this.bocaGeo.computeBoundingSphere();
   }
 
   aplica(e) {
@@ -498,41 +646,46 @@ class Gotinha {
     this.raiz.scale.setScalar(ESCALA * e.escala);
     this.corpo.scale.set(e.sx, e.sy, e.sx);
     this.corpo.rotation.z = e.incl; this.corpo.rotation.x = e.inclX || 0;
+    this.malha.rotation.z = e.cabeca || 0;
     const alt = Math.max(e.y, 0);
     this.sombra.position.set(e.x, .012, e.z);
-    const ss = ESCALA * e.escala * (1.15 - Math.min(alt * .12, .5)) * e.sx;
+    const ss = ESCALA * e.escala * (1.25 - Math.min(alt * .12, .5)) * e.sx;
     this.sombra.scale.set(ss, ss, ss);
     this.sombra.material.opacity = clamp(1 - alt * .25, .25, 1);
-    // olhos
-    const pal = this.cfg.palpebra || 1;
+    // olhos e sobrancelhas
+    const cfg = this.cfg;
     this.olhos.forEach((o, k) => {
-      const pisc = k === 0 ? e.piscaE : e.piscaD;
-      const fech = clamp(Math.max(pisc, 1 - pal * (1 + .25 * e.alegria)));
-      o.palp.rotation.x = lerp(-1.57, 1.57, fech); // palpebra fecha de cima para baixo
+      let fech = k === 0 ? e.piscaE : e.piscaD;
+      const base = (cfg.palp ? cfg.palp[k] : 0) * (1 - .6 * e.alegria);
+      fech = clamp(Math.max(fech, base));
+      o.palp.rotation.x = lerp(-1.57, 1.57, fech);
       o.palp.visible = fech > .02;
-      o.irisG.position.x = e.olharX * .065; o.irisG.position.y = e.olharY * .07;
-      const [sy, ] = this.cfg.sobr, incl = this.cfg.incl[k];
-      o.sob.position.set(0, .34 + (k === 0 ? this.cfg.sobr[0] : this.cfg.sobr[1]) * .25 + e.sobeSobr * .08, .11);
-      o.sob.rotation.z = Math.PI / 2 + (o.lado < 0 ? incl : -incl) * (1 - .5 * e.sobeSobr);
+      o.irisG.position.x = e.olharX * .06; o.irisG.position.y = e.olharY * .07;
+      const ang = cfg.sobr.ang[k] * (1 - .4 * e.alegria), altura = cfg.sobr.alt[k] + e.sobeSobr * .07;
+      o.sob.position.set(0, .3 + altura, .1);
+      o.sob.rotation.z = Math.PI / 2 - .75 + (o.lado < 0 ? -ang : ang);
     });
-    // boca
-    const ab = clamp(e.boca, 0, 1.3);
-    this.sorriso.visible = ab < .2;
-    this.aberta.visible = ab >= .2;
-    this.aberta.scale.set(1.05 + ab * .15, .3 + ab * .8, 1);
-    // bracos
+    this.atualizaBoca(clamp(e.boca, 0, 1.3));
+    // bracos e maos
     this.bracos.forEach((b, k) => {
       const a = k === 0 ? e.bracoE : e.bracoD;
       b.piv.rotation.set(a.x || 0, 0, b.lado * a.z);
+      poseLuva(b.luva, (k === 0 ? e.maoE : e.maoD) || 'aberta');
     });
+    if (this.prop) { // acessorio segurado fica sempre em pe, de frente
+      this.raiz.updateMatrixWorld(true);
+      const qp = new THREE.Quaternion(); this.prop.parent.getWorldQuaternion(qp);
+      const qd = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, e.yaw + (this.cfg.segura === 'placa' ? -.25 : .2), .12 * Math.sin(e.t * 3 + this.i)));
+      this.prop.quaternion.copy(qp.invert().multiply(qd));
+    }
   }
 }
 const gotinhas = CONFIG.map((c, i) => new Gotinha(c, i));
 
 // posicoes por fase
 const SLOT2 = [[-5.2, .2], [-3.45, -.5], [-1.7, .35], [0, -.45], [1.7, .35], [3.45, -.5], [5.2, .2]];
-const SLOT3 = [-3, -2, -1, 0, 1, 2, 3].map(k => [k * 1.62, .7 - .09 * k * k]);
-const SLOT4 = [[-5.0, 1.3], [-3.6, .5], [-2.05, 1.6], [0, 2.3], [2.05, 1.6], [3.6, .5], [5.0, 1.3]];
+const SLOT3 = [-3, -2, -1, 0, 1, 2, 3].map(k => [k * 1.55, .7 - .09 * k * k]);
+const SLOT4 = [[-4.75, 1.2], [-3.4, .5], [-1.95, 1.5], [0, 2.2], [1.95, 1.5], [3.4, .5], [4.75, 1.2]];
 
 function salto(u, h) { return 4 * h * u * (1 - u); }
 function squash(dt) { if (dt < 0 || dt > 1.2) return 0; return Math.exp(-dt * 6) * Math.cos(dt * 19) * .2; }
@@ -631,40 +784,48 @@ function estado(i, t, cam) {
   e.incl = incl + .055 * Math.sin(t * 2.1 + i * 1.7);
   e.piscaE = piscada(t, i); e.piscaD = e.piscaE;
   // ---- gestos e fala por fase
-  let bE = { ...REPOUSO }, bD = { ...REPOUSO }, boca = 0, alegria = 0;
+  const cfg = CONFIG[i], hp = cfg.segura ? cfg.maoProp : -1;
+  const SEG = { z: 1.75, x: -.8 };
+  let bE = hp === 0 ? { ...SEG } : { ...REPOUSO }, bD = hp === 1 ? { ...SEG } : { ...REPOUSO }, boca = 0, alegria = 0;
+  let mE = hp === 0 ? 'segura' : 'aberta', mD = hp === 1 ? 'segura' : 'aberta';
+  const ajusta = (k, v) => { if (k === 0) bE = v; else bD = v; };
   if (t < 14) {
     boca = fala(t, i * 1.7, .8) * (u > .5 ? 1 : 0);
     const G = [
-      () => { bD = gesto(t, te + .55, te + 2.4, tt => acenar(tt)); boca = Math.max(boca, u > .7 && u < 2 ? fala(t, 3.1) + .2 : 0); },
-      () => { bE = gesto(t, te + .55, te + 1.5, timido); bD = gesto(t, te + .55, te + 1.5, timido); bE = gesto(t, te + 1.5, te + 2.6, tt => acenar(tt, 2.2), bE); alegria = .3; },
-      () => { bE = gesto(t, te + .7, te + 1.9, tt => bracoCima(tt)); bD = gesto(t, te + .7, te + 1.9, tt => bracoCima(tt, 1)); boca = u > .7 && u < 1.9 ? .55 + .35 * Math.abs(Math.sin(t * 8)) : boca; },
-      () => { bD = gesto(t, te + .75, te + 1.9, apontar); if (u > .9 && u < 1.4) e.piscaE = 1; boca = u > .8 && u < 1.9 ? fala(t, 5.5) + .15 : boca; },
-      () => { bE = gesto(t, te + .5, te + 1.9, tt => acenar(tt, 2.4, 1)); boca = u > .6 && u < 1.9 ? fala(t, 7.7) + .15 : boca; },
-      () => { bE = gesto(t, te + 1.05, te + 2.1, bater); bD = gesto(t, te + 1.05, te + 2.1, bater); boca = u > 1.0 && u < 2.1 ? fala(t, 9.9) + .2 : boca; },
-      () => { bE = gesto(t, te + .55, te + 1.5, tt => bracoCima(tt)); bD = gesto(t, te + .55, te + 1.5, tt => bracoCima(tt, 2)); bD = gesto(t, te + 1.5, te + 2.4, tt => acenar(tt), bD); boca = u > .55 && u < 1.6 ? .7 + .3 * Math.abs(Math.sin(t * 7)) : boca; },
+      () => { bD = gesto(t, te + .55, te + 2.4, tt => acenar(tt)); boca = Math.max(boca, u > .7 && u < 2 ? fala(t, 3.1) + .3 : 0); },
+      () => { bE = gesto(t, te + .5, te + 2.2, tt => acenar(tt, 2.4)); bD = gesto(t, te + .5, te + 2.2, tt => acenar(tt, 2.4, 2)); alegria = .5; boca = u > .5 && u < 2.2 ? .6 + .4 * Math.abs(Math.sin(t * 7)) : boca; },
+      () => { bD = gesto(t, te + .7, te + 2.3, { z: 1.85, x: -.45 }); if (u > .7 && u < 2.3) mD = 'joinha'; if (u > .85 && u < 2.0) e.piscaD = 1; boca = u > .7 && u < 2.3 ? .55 + .3 * Math.abs(Math.sin(t * 6)) : boca; },
+      () => { bE = gesto(t, te + .8, te + 2.4, { z: .15, x: -2.35 }); if (u > .8 && u < 2.4) { mE = 'segura'; boca = .05; e.cabeca = -.12; } else boca = u > 2.4 ? boca : boca; },
+      () => { bE = gesto(t, te + .5, te + 2.2, { z: .55, x: -2.05 }, SEG); if (u > .6 && u < 2.2) e.piscaD = Math.max(e.piscaD, .5); boca = u > .7 && u < 2.2 ? fala(t, 7.7) + .2 : boca; },
+      () => { bD = gesto(t, te + 1.0, te + 2.4, { z: 2.1, x: -.6 }, SEG); bE = gesto(t, te + 1.0, te + 2.4, { z: 1.2, x: -1.2 }); boca = u > 1.0 && u < 2.4 ? fala(t, 9.9) + .2 : boca; },
+      () => { bD = gesto(t, te + .5, te + 2.4, tt => ({ z: 2.5 + .1 * Math.sin(tt * 7), x: -.2 }), SEG); bE = gesto(t, te + 1.2, te + 2.4, tt => acenar(tt, 2.6)); boca = u > .5 && u < 2.0 ? .8 + .35 * Math.abs(Math.sin(t * 8)) : boca; },
     ];
     G[i]();
-    // quem ja esta no palco acena de leve para os novos
-    if (u > 2.6) { const w = bump(t, ENTRADAS.find(tt => tt > t - .9 && tt < t + .3) ?? -9, .5); if (w > .05 && i % 2 === 0) bE = mix(bE, acenar(t, 2.4, i), w); }
+    if (u > 2.6) { const w = bump(t, ENTRADAS.find(tt => tt > t - .9 && tt < t + .3) ?? -9, .5); if (w > .05 && i % 2 === 0 && hp !== 0) bE = mix(bE, acenar(t, 2.4, i), w); }
+    if (i === 2 && u > 2.6 && Math.sin(t * 1.3) > .6) e.piscaD = 1;
   } else if (t < T_EXPLOSAO) {
     const cima = sstep(15.3, 15.7, t);
-    bE = mix(REPOUSO, bracoCima(t, i), cima); bD = mix(REPOUSO, bracoCima(t, i + 1), cima);
+    bE = mix(bE, bracoCima(t, i), cima); bD = mix(bD, bracoCima(t, i + 1), cima);
     if (t < 15.3) boca = fala(t, i * 2.3, .7);
-    else boca = .25;
-    for (const g of GRITOS) for (const s of SILABAS) boca = Math.max(boca, 1.15 * bump(t, g + s + .05, .085));
-    if (t > 19.4) boca = .3;
-    alegria = .4; e.incl += .1 * Math.sin((t - 15) * Math.PI * 2);
+    else boca = .3;
+    for (const g of GRITOS) for (const s of SILABAS) boca = Math.max(boca, 1.2 * bump(t, g + s + .05, .085));
+    if (t > 19.4) boca = .45;
+    alegria = .6; e.incl += .1 * Math.sin((t - 15) * Math.PI * 2);
   } else {
     const k = t - T_EXPLOSAO;
-    boca = k < 1.2 ? .9 : (.18 + fala(t, i * 3.3, .7));
+    boca = k < 1.2 ? 1.0 : (.25 + fala(t, i * 3.3, .7));
     const m = i % 3;
-    if (m === 0) { bD = gesto(t, T_EXPLOSAO + .9, 99, tt => acenar(tt, 2.2, i)); bE = gesto(t, T_EXPLOSAO + .9, 99, tt => bracoCima(tt, i)); }
-    else if (m === 1) { bE = gesto(t, T_EXPLOSAO + .9, 99, tt => acenar(tt, 2.5, i)); }
-    else { bE = gesto(t, T_EXPLOSAO + .9, 99, tt => acenar(tt, 2.0, i)); bD = gesto(t, T_EXPLOSAO + .9, 99, tt => acenar(tt, 2.0, i + 2)); }
+    if (m === 0) { bD = gesto(t, T_EXPLOSAO + .9, 99, tt => acenar(tt, 2.2, i), bD); bE = gesto(t, T_EXPLOSAO + .9, 99, tt => bracoCima(tt, i), bE); }
+    else if (m === 1) { bE = gesto(t, T_EXPLOSAO + .9, 99, tt => acenar(tt, 2.5, i), bE); }
+    else { bE = gesto(t, T_EXPLOSAO + .9, 99, tt => acenar(tt, 2.0, i), bE); bD = gesto(t, T_EXPLOSAO + .9, 99, tt => acenar(tt, 2.0, i + 2), bD); }
+    if (hp >= 0) ajusta(hp, { z: 2.3 + .15 * Math.sin(t * 5 + i), x: -.35 });
+    if (i === 2) { bD = gesto(t, T_EXPLOSAO + 1.2, 99, { z: 1.85, x: -.45 }, bD); if (k > 1.2) mD = 'joinha'; if (Math.sin(t * 1.1) > .7) e.piscaD = 1; }
     if (k < .9) { bE = bracoCima(t, i); bD = bracoCima(t, i + 1); }
-    alegria = .5;
-    if (t > 27) boca = .2 + fala(t, i * 4.1, .6) * .8;
+    alegria = .6;
+    if (t > 27) boca = .3 + fala(t, i * 4.1, .6) * .8;
   }
+  e.maoE = mE; e.maoD = mD; e.t = t;
+  e.cabeca = (e.cabeca || 0) + .05 * Math.sin(t * 6 + i) * clamp(boca);
   e.bracoE = bE; e.bracoD = bD; e.boca = boca; e.alegria = alegria;
   return e;
 }
@@ -766,7 +927,7 @@ const TOMADAS = [
     const k = [[5.0, [0, 5.2, 18], [0, 1.6, 0], 38]];
     ENTRADAS.forEach((te, i) => {
       const [x, z] = SLOT2[i], perto = i % 2 === 0;
-      k.push([te + .5, [x * .82 + (perto ? .6 : -.4), perto ? 1.25 : 1.6, z + (perto ? 4.4 : 6.6)], [x * .92, .95, z], perto ? 34 : 36]);
+      k.push([te + .5, [x * .82 + (perto ? .6 : -.4), perto ? 1.6 : 1.9, z + (perto ? 4.8 : 6.8)], [x * .92, 1.3, z], perto ? 34 : 36]);
     });
     k.push([14.0, [0, 2.4, 14.2], [0, 1.15, 0], 38], [15.4, [-2.6, 1.1, 11.6], [0, 1.25, .2], 38], [16.6, [0, .85, 11.0], [0, 1.45, .2], 40],
       [18.2, [2.4, 1.0, 11.3], [0, 1.35, .2], 39], [19.7, [0, 1.3, 12.0], [0, 1.4, 0], 38],

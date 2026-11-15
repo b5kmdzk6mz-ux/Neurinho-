@@ -23,19 +23,18 @@ def whoosh(d=.6):
     for k, c in enumerate(np.geomspace(500, 6000, 8)):
         s += filt(r, 'bandpass', [c * .7, c * 1.4]) * np.exp(-((t / d - (1 - (k + .5) / 8)) ** 2) / .02)
     return s / 3
-ENTR = [.15, .3, .45, .6, .8, .95, 1.1]
+ENTR = sorted(.95 + k * .17 for k in range(7))
 for k, e in enumerate(ENTR):
     add(bolha(320, 1300, .1), e + .05, .35, -.6 + k * .2)
     add(glock(hz([72, 74, 76, 77, 79, 81, 83][k])), e + .08, .07, -.6 + k * .2)
-add(whoosh(.55), 1.85, .35)                       # placa caindo
+add(whoosh(.55), 1.8, .35)                       # placa caindo
 add(boing(260, .5), 2.75, .25)
 for k, n in enumerate([84, 88, 91, 96]): add(glock(hz(n)), 2.72 + k * .05, .09, -.3 + k * .2)
 for e, n, p in [(2.0, 79, -.2), (4.65, 81, .3), (5.7, 84, .6), (6.75, 86, 0), (7.25, 88, -.6), (7.4, 91, -.3)]:
     add(glock(hz(n)), e, .06, p); add(bolha(500, 1600, .07), e + .02, .15, p)
-# festa final: "ta-da" com sininhos e bolhas
-for n in [72, 76, 79, 84]: add(glock(hz(n), 2.0), 8.78, .08)
-for k, n in enumerate([84, 86, 88, 91, 93, 96]): add(glock(hz(n)), 8.8 + k * .06, .07, -.5 + k * .2)
-for k in range(10): add(bolha(rng.uniform(450, 800), rng.uniform(1400, 2400), .07), 8.8 + rng.uniform(0, 1.0), .12, rng.uniform(-.8, .8))
+# saida: gotinhas mergulham (bolhas descendo) + sininho final
+for k in range(7): add(bolha(1300, 380, .12), 8.85 + abs(k - 3) * .07, .3, -.6 + k * .2)
+for k, n in enumerate([96, 91, 88, 84]): add(glock(hz(n)), 9.1 + k * .07, .06, .4 - k * .2)
 ir_t = t_(1.2); ir = filt(rng.standard_normal(len(ir_t)), 'lowpass', 6000) * np.exp(-ir_t / .3)
 out = out + np.stack([fftconvolve(c, ir)[:N] for c in out]) * .03
 out /= np.max(np.abs(out)) + 1e-9; out *= .9

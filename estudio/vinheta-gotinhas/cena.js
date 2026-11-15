@@ -625,7 +625,11 @@ class Gotinha {
   }
 
   atualizaBoca(ab) {
-    let tipo = ab >= .14 ? 'aberta' : (this.cfg.fechada || 'sorriso');
+    // histerese: evita a boca ficar trocando entre aberta e fechada a cada quadro
+    if (this._aberta === undefined) this._aberta = ab >= .14;
+    if (this._aberta && ab < .09) this._aberta = false; else if (!this._aberta && ab > .2) this._aberta = true;
+    let tipo = this._aberta ? 'aberta' : (this.cfg.fechada || 'sorriso');
+    ab = Math.max(ab, this._aberta ? .14 : 0);
     const largura = tipo === 'aberta' ? 1.12 + .08 * ab : .8, topo = -.04;
     const alt = tipo === 'aberta' ? .2 + .62 * clamp(ab, 0, 1.3) : .3;
     if (this.bocaMat.map !== BOCAS[tipo]) { this.bocaMat.map = BOCAS[tipo]; this.bocaMat.needsUpdate = true; }
@@ -656,9 +660,9 @@ class Gotinha {
     // olhos e sobrancelhas
     const cfg = this.cfg;
     this.olhos.forEach((o, k) => {
-      let fech = k === 0 ? e.piscaE : e.piscaD;
-      const base = (cfg.palp ? cfg.palp[k] : 0) * (1 - .6 * e.alegria);
-      fech = clamp(Math.max(fech, base));
+      const pisc = clamp(k === 0 ? e.piscaE : e.piscaD);
+      o.g.scale.y = 1 - .88 * pisc;   // piscar: o olho fecha achatando (sem palpebra saltada)
+      const fech = clamp((cfg.palp ? cfg.palp[k] : 0) * (1 - .6 * e.alegria));
       o.palp.rotation.x = lerp(-1.57, 1.57, fech);
       o.palp.visible = fech > .02;
       o.irisG.position.x = e.olharX * .06; o.irisG.position.y = e.olharY * .07;
@@ -695,9 +699,9 @@ function fala(t, seed, gate = 1) {
   return gate * g * (.15 + .75 * Math.abs(Math.sin(t * (9 + seed) + seed * 4) * Math.sin(t * 4.3 + seed)));
 }
 function piscada(t, i) {
-  const per = 2.4 + .41 * i, off = i * .73;
+  const per = 3.3 + .53 * i, off = i * .91;
   const u = ((t + off) % per);
-  return u < .16 ? Math.sin(Math.PI * u / .16) : 0;
+  return u < .14 ? Math.sin(Math.PI * u / .14) : 0;
 }
 const REPOUSO = { z: .5, x: -.1 };
 const acenar = (t, f = 2.6, fase = 0) => ({ z: 2.45 + .32 * Math.sin(t * f * 6.283 + fase), x: -.25 });

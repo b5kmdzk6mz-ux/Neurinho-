@@ -21,7 +21,7 @@ def tira_fundo(im, lim=238):
 placa, _ = tira_fundo(Image.open(UP + '60637971-image.png'))
 placa.crop(placa.getbbox()).save('recortes/placa.png')
 # gotinhas: grade 4x2, cortes nos vales de menor ocupacao
-im = Image.open(UP + '507d77a1-image.png')
+im = Image.open(UP + '504c62ef-image.png')
 rgba, alpha = tira_fundo(im)
 H, W = alpha.shape
 rs = alpha.sum(1); yc = 560 + int(np.argmin(rs[560:720]))

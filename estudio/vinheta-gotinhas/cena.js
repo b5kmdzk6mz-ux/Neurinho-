@@ -31,7 +31,8 @@ const GRITOS = [16.0, 18.0];
 const T_EXPLOSAO = 20.0;
 
 // ------------------------------------------------------------------ renderer
-const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
+const MODO = Q.get('modo') || 'vinheta';
+const renderer = new THREE.WebGLRenderer({ antialias: MODO === 'integrado', alpha: MODO === 'integrado', preserveDrawingBuffer: true, powerPreference: 'high-performance' });
 renderer.setPixelRatio(1);
 renderer.setSize(W, H);
 renderer.toneMapping = THREE.NeutralToneMapping;
@@ -646,7 +647,7 @@ class Gotinha {
     this.raiz.scale.setScalar(ESCALA * e.escala);
     this.corpo.scale.set(e.sx, e.sy, e.sx);
     this.corpo.rotation.z = e.incl; this.corpo.rotation.x = e.inclX || 0;
-    this.malha.rotation.z = e.cabeca || 0;
+    this.malha.rotation.z = e.cabeca || 0; this.malha.rotation.x = e.cabecaX || 0;
     const alt = Math.max(e.y, 0);
     this.sombra.position.set(e.x, .012, e.z);
     const ss = ESCALA * e.escala * (1.25 - Math.min(alt * .12, .5)) * e.sx;
@@ -998,6 +999,11 @@ function quadro(t) {
 }
 
 await montaTitulo();
+if (MODO === 'integrado') {
+  const mod = await import('./integrado.js');
+  await mod.prepara({ THREE, scene, camera, renderer, gotinhas, CONFIG, helpers: { clamp, lerp, sstep, easeOutBack, bump, salto, squash, fala, piscada, gesto, acenar, bracoCima, mix, REPOUSO, V, rng, canvasTex, pmrem, RoomEnvironment } });
+  window.renderFrame = t => { mod.quadro(t); renderer.render(scene, camera); return renderer.domElement.toDataURL('image/png'); };
+} else
 window.renderFrame = (t, q = .93) => { quadro(t); return renderer.domElement.toDataURL('image/jpeg', q); };
 window.debug = t => { quadro(t); const bad = []; scene.traverse(o => { if (o.visible) { const e = o.matrixWorld.elements; if (e.some(v => !isFinite(v))) bad.push(o.type + ':' + (o.parent?.type||'')); } }); return { cam: camera.position.toArray(), bad: bad.slice(0, 10), n: bad.length }; };
 window.px = (t, esconder) => { quadro(t); const ocultos = [];

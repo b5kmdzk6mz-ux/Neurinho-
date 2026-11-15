@@ -10,8 +10,8 @@ OUT = 'quadros_2d'
 os.makedirs(OUT, exist_ok=True)
 
 NOMES = ['transparente', 'amarelo-claro', 'amarela', 'laranja', 'castanha', 'esverdeada', 'vermelha']
-ALT = 345                       # altura de cada gotinha no video (px)
-PASSO = 152                     # distancia entre elas
+ALT = 425                       # altura de cada gotinha no video (px)
+PASSO = 141                     # distancia entre elas
 ORDEM = [3, 1, 5, 0, 4, 2, 6]   # ordem de entrada (do meio para fora, alternando)
 T_PLACA, T_SAI = 2.3, 8.75
 # momentos de reacao sincronizados com a fala

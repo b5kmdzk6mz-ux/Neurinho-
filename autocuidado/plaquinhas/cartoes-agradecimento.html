@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cartões de agradecimento</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<style>
+@page{size:A4 portrait;margin:0}
+*{box-sizing:border-box}
+body{margin:0;background:#ccd;font-family:"Open Sans",Arial,sans-serif;color:#151B3D}
+.folha{width:210mm;height:297mm;margin:10mm auto;background:#fff;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,1fr);position:relative;page-break-after:always}
+.folha .v{position:absolute;left:105mm;top:0;bottom:0;border-left:0.3mm dashed #9aa}
+.folha .h{position:absolute;left:0;right:0;border-top:0.3mm dashed #9aa}
+.cel{padding:3.5mm;display:flex}
+.cartao{flex:1;border-radius:5mm;overflow:hidden;background:#F3F4FA;border:0.4mm solid #D9DDEE;display:flex;flex-direction:column}
+.topo{background:linear-gradient(120deg,#1A2458 0%,#473C8F 75%,#534FA6 100%);color:#fff;display:flex;align-items:center;gap:2.5mm;padding:2.6mm 4mm}
+.topo img{width:10mm;height:10mm;border-radius:2.4mm}
+.topo b{font-family:"Montserrat",Arial,sans-serif;font-weight:800;font-size:11.5pt;line-height:1.05}
+.topo small{display:block;font-family:"Montserrat",Arial,sans-serif;font-weight:500;font-size:6.5pt;color:#A5C5E2;letter-spacing:.3mm;text-transform:uppercase}
+.msg{padding:2.6mm 4mm 0;font-size:8.6pt;line-height:1.3}
+.msg b{font-family:"Montserrat",Arial,sans-serif;font-weight:800;color:#473C8F;font-size:9.6pt;display:block;margin-bottom:0.8mm}
+.bis{margin:auto 4mm 0;height:17mm;border:0.45mm dashed #4F67B5;border-radius:3mm;display:flex;align-items:center;justify-content:center;color:#4F67B5;font-family:"Montserrat",Arial,sans-serif;font-weight:700;font-size:8pt;background:#fff}
+.pe{display:flex;justify-content:space-between;align-items:center;padding:1.6mm 4mm 2.2mm;font-size:6.2pt;color:#4A5070}
+.pe img{height:3.6mm}
+.dica{max-width:210mm;margin:0 auto;padding:6mm;font-size:12pt}
+@media print{body{background:#fff}.folha{margin:0}.dica{display:none}}
+</style>
+</head>
+<body>
+<p class="dica">Imprima em A4 retrato, sem margens e com "gráficos de fundo" ligado. São 8 cartões por folha, cada um com uma mensagem diferente. Recorte nas linhas tracejadas e prenda um Bis no espaço marcado com uma fita adesiva.</p>
+<script>
+const M=[
+ ["Obrigado pela presença!","Cuidar de você também é prover para quem você ama. Conte com a gente nessa."],
+ ["Homem que se cuida não é fraco.","É provedor. E hoje você mostrou isso: obrigado por estar aqui."],
+ ["Seu corpo fala.","Agora você sabe escutar os sinais. Na dúvida, a UBS está de portas abertas para você."],
+ ["Pedir ajuda é coragem.","Obrigado por participar. Cuidar da cabeça é tão importante quanto cuidar do corpo."],
+ ["Você deu o primeiro passo.","O próximo é marcar sua consulta. Você merece estar bem, hoje e por muitos anos."],
+ ["Se cuidar faz bem: pede bis!","Pressão, exames, sono e alegria: todo cuidado vale repetir. Obrigado pela presença."],
+ ["Confiança também é saúde.","Quem conhece o próprio corpo vive com mais segurança. Obrigado por estar com a gente."],
+ ["Sua família agradece.","Cada cuidado seu é presença garantida para quem você ama. Obrigado e conte com a gente."]
+];
+const corte='<div class="v"></div>'+[74.25,148.5,222.75].map(t=>'<div class="h" style="top:'+t+'mm"></div>').join('');
+const card=m=>'<div class="cel"><div class="cartao"><div class="topo"><img src="../logo.png" alt=""><div><small>Novembro Azul</small><b>Provedor do Autocuidado</b></div></div><div class="msg"><b>'+m[0]+'</b>'+m[1]+'</div><div class="bis">um Bis para você ♥</div><div class="pe"><span>Enfermagem · Grupo 2 · Saúde do Homem</span><img src="../../afya-logo.png" alt="Afya Faculdade Parnaíba"></div></div></div>';
+document.write('<section class="folha">'+M.map(card).join('')+corte+'</section>');
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plaquinhas Mito e Verdade</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<style>
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box}
+body{margin:0;background:#ccd;font-family:"Open Sans",Arial,sans-serif}
+.folha{width:297mm;height:210mm;margin:10mm auto;padding:10mm;background:#fff;page-break-after:always;display:flex}
+.placa{flex:1;border-radius:14mm;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.mito{background:#C62F2F}
+.verdade{background:#1F7A50}
+.icone{width:62mm;height:62mm;border-radius:50%;border:5mm solid rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;margin-bottom:6mm}
+.icone svg{width:36mm;height:36mm}
+.palavra{font-family:"Montserrat",Arial,sans-serif;font-weight:800;line-height:1;letter-spacing:2mm}
+.mito .palavra{font-size:150pt}
+.verdade .palavra{font-size:112pt}
+.rodape{position:absolute;bottom:8mm;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:4mm;font-family:"Montserrat",Arial,sans-serif;font-weight:700;font-size:13pt;opacity:.92}
+.rodape img{width:12mm;height:12mm;border-radius:3mm}
+.dica{max-width:297mm;margin:0 auto;padding:6mm;font-size:12pt}
+@media print{body{background:#fff}.folha{margin:0}.dica{display:none}}
+</style>
+</head>
+<body>
+<p class="dica">Imprima em A4 paisagem, sem margens e com "gráficos de fundo" ligado. Dica: cole as duas folhas costas com costas num papelão e prenda um palito embaixo.</p>
+<section class="folha"><div class="placa mito">
+<div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div>
+<div class="palavra">MITO</div>
+<div class="rodape"><img src="../logo.png" alt=""><span>Provedor do Autocuidado · Novembro Azul</span></div>
+</div></section>
+<section class="folha"><div class="placa verdade">
+<div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></div>
+<div class="palavra">VERDADE</div>
+<div class="rodape"><img src="../logo.png" alt=""><span>Provedor do Autocuidado · Novembro Azul</span></div>
+</div></section>
+</body>
+</html>

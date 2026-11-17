@@ -154,6 +154,17 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:9;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw}
 .toast.on{opacity:1}
 @media (min-width:640px){.grade{grid-template-columns:repeat(3,1fr)}}
+#mapa{height:340px;border-radius:14px;margin:10px 0 6px;border:1px solid var(--linha);background:#e8ecf3}
+.filtros{gap:6px;margin-top:10px}
+.filtros button{border:1.5px solid var(--linha);background:var(--card);color:var(--navy);border-radius:99px;padding:6px 12px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
+.filtros button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:#fff}
+.ponto{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none}
+.perto{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--linha)}
+.perto:last-child{border-bottom:0}
+.perto .t{flex:1;min-width:0}
+.perto .t small{display:block;color:var(--txt2)}
+.perto .dist{font-weight:800;color:var(--navy);white-space:nowrap;font-size:.9rem}
+.leaflet-popup-content{font-family:"Open Sans",system-ui,sans-serif;font-size:13px}
 .hist{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--linha)}
 .hist:last-child{border-bottom:0}
 .hist .t{flex:1}
@@ -831,11 +842,117 @@ DEPOIS.mente=()=>{
   };
 };
 
+/* ---------- Mapa: serviços de saúde perto de você ----------
+   Usa a localização do celular (só quando a pessoa toca no botão) e os dados
+   abertos do OpenStreetMap (Overpass API). A posição vai arredondada (~100 m). */
+const PARNAIBA=[-2.9046,-41.7764];
+const CATS={
+  ubs:{t:"UBS / posto de saúde",cor:"#1F7A50"},
+  urg:{t:"Hospital / pronto-socorro",cor:"#C62F2F"},
+  caps:{t:"CAPS (saúde mental)",cor:"#473C8F"},
+  farm:{t:"Farmácia",cor:"#B7791F"},
+  outro:{t:"Outro serviço (pode ser particular)",cor:"#4F67B5"}
+};
+let MAPA=null,MAPA_DADOS=null,MAPA_FILTRO="todos";
+function carregaLeaflet(){
+  if(window.L)return Promise.resolve();
+  return new Promise((ok,er)=>{const c=document.createElement("link");c.rel="stylesheet";c.href="vendor/leaflet/leaflet.css";document.head.appendChild(c);
+    const sc=document.createElement("script");sc.src="vendor/leaflet/leaflet.js";sc.onload=ok;sc.onerror=er;document.head.appendChild(sc)});
+}
+function minhaPosicao(){return new Promise(res=>{if(!navigator.geolocation)return res(null);
+  navigator.geolocation.getCurrentPosition(p=>res([p.coords.latitude,p.coords.longitude]),()=>res(null),{enableHighAccuracy:true,timeout:12000,maximumAge:60000})})}
+function distKm(a,b){const R=6371,r=x=>x*Math.PI/180,dl=r(b[0]-a[0]),dn=r(b[1]-a[1]);const h=Math.sin(dl/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function fmtDist(k){return k<1?Math.round(k*1000/10)*10+" m":k.toFixed(1).replace(".",",")+" km"}
+function categoria(t){
+  const n=(t.name||"")+" "+(t.official_name||"");
+  if(/\bcaps\b|psicossocial/i.test(n))return "caps";
+  if(t.amenity==="pharmacy"||t.healthcare==="pharmacy")return "farm";
+  if(t.amenity==="hospital"||t.healthcare==="hospital"||t.emergency==="yes"||/\bupa\b|pronto[- ]?socorro|hospital|urg[êe]ncia|maternidade/i.test(n))return "urg";
+  if(/\bubs\b|unidade b[áa]sica|posto de sa[úu]de|\besf\b|sa[úu]de da fam[íi]lia|centro de sa[úu]de|\bpsf\b/i.test(n)||t.healthcare==="centre")return "ubs";
+  return "outro";
+}
+async function buscaServicos(pos){
+  const lat=pos[0].toFixed(3),lon=pos[1].toFixed(3),R=6000;
+  const q=`[out:json][timeout:25];(nwr(around:${R},${lat},${lon})["amenity"~"^(clinic|hospital|doctors|pharmacy)$"];nwr(around:${R},${lat},${lon})["healthcare"];);out center tags 400;`;
+  const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q)});
+  if(!r.ok)throw new Error("overpass "+r.status);
+  const j=await r.json(),vistos=new Set(),out=[];
+  for(const e of j.elements||[]){
+    const la=e.lat??e.center?.lat,lo=e.lon??e.center?.lon,t=e.tags||{};if(la==null||lo==null)continue;
+    const cat=categoria(t);if(!t.name&&cat!=="urg")continue;
+    const nome=t.name||CATS[cat].t,ch=nome.toLowerCase()+"|"+la.toFixed(3)+lo.toFixed(3);if(vistos.has(ch))continue;vistos.add(ch);
+    const end=[t["addr:street"],t["addr:housenumber"],t["addr:suburb"]].filter(Boolean).join(", ");
+    out.push({nome,cat,la,lo,end,fone:t.phone||t["contact:phone"]||"",km:distKm(pos,[la,lo])});
+  }
+  return out.sort((a,b)=>a.km-b.km);
+}
+function desenhaMapa(){
+  if(!MAPA_DADOS)return;const {pos,lista,real}=MAPA_DADOS;
+  const vis=lista.filter(x=>MAPA_FILTRO==="todos"?true:x.cat===MAPA_FILTRO);
+  if(window.L&&$("#mapa")){
+    if(MAPA){MAPA.remove();MAPA=null}
+    MAPA=L.map("mapa",{zoomControl:true}).setView(pos,14);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© colaboradores do OpenStreetMap"}).addTo(MAPA);
+    L.circleMarker(pos,{radius:9,color:"#fff",weight:3,fillColor:"#2F6FD6",fillOpacity:1}).addTo(MAPA).bindPopup(real?"Você está aqui":"Centro de Parnaíba");
+    const lim=vis.filter(x=>x.cat!=="farm").slice(0,60).concat(vis.filter(x=>x.cat==="farm").slice(0,15));
+    lim.forEach(x=>L.circleMarker([x.la,x.lo],{radius:7,color:"#fff",weight:2,fillColor:CATS[x.cat].cor,fillOpacity:.95}).addTo(MAPA)
+      .bindPopup(`<b>${esc(x.nome)}</b><br>${CATS[x.cat].t}<br>${fmtDist(x.km)} daqui<br><a href="https://www.google.com/maps/dir/?api=1&destination=${x.la},${x.lo}" target="_blank" rel="noopener">Como chegar</a>`));
+    const perto=lim.slice(0,5).map(x=>[x.la,x.lo]);if(perto.length)MAPA.fitBounds(L.latLngBounds(perto.concat([pos])).pad(0.25),{maxZoom:16});
+  }
+  const top=(MAPA_FILTRO==="todos"?vis.filter(x=>x.cat!=="farm"):vis).slice(0,12);
+  $("#pertoLista").innerHTML=top.length?top.map((x,i)=>`<div class="perto"><span class="ponto" style="background:${CATS[x.cat].cor};margin-top:5px"></span><div class="t"><b>${esc(x.nome)}</b><small>${CATS[x.cat].t}${x.end?" · "+esc(x.end):""}</small>
+    <div class="linha" style="margin-top:6px"><a class="btn peq" href="https://www.google.com/maps/dir/?api=1&destination=${x.la},${x.lo}" target="_blank" rel="noopener">${ic("map")} Como chegar</a>${x.fone?`<a class="btn sec peq" href="tel:${esc(x.fone.replace(/[^0-9+]/g,""))}">${ic("phone")} Ligar</a>`:""}${x.cat==="ubs"?`<button class="btn sec peq" data-minhaubs="${i}">${ic("home")} É a minha UBS</button>`:""}</div></div><span class="dist">${fmtDist(x.km)}</span></div>`).join("")
+    :`<p class="mini">Nenhum serviço dessa categoria encontrado no mapa num raio de 6 km. Use os botões do Google Maps abaixo.</p>`;
+  document.querySelectorAll("[data-minhaubs]").forEach(b=>b.onclick=()=>{const x=top[+b.dataset.minhaubs];const m=LS.get("locais",[]);
+    if(m.some(l=>l.nome===x.nome)){toast("Já está em Meus locais");return}
+    m.unshift({nome:x.nome,info:x.end||"Salvo pelo mapa",fone:x.fone||""});LS.set("locais",m);toast("Salva como sua UBS em Meus locais")});
+}
+async function abrirMapa(){
+  const st=$("#mapStatus"),bt=$("#mapBtn");$("#mapaWrap").classList.remove("oculto");bt.disabled=true;
+  st.textContent="Pegando sua localização...";
+  let pos=await minhaPosicao(),real=!!pos;
+  if(!pos){pos=PARNAIBA;st.textContent="Não foi possível usar sua localização (permissão negada ou GPS desligado). Mostrando o centro de Parnaíba."}
+  try{await carregaLeaflet()}catch(e){}
+  st.textContent=(real?"":"Mostrando o centro de Parnaíba. ")+"Buscando serviços de saúde por perto...";
+  try{
+    const lista=await buscaServicos(pos);MAPA_DADOS={pos,lista,real};
+    LS.set("perto",{em:new Date().toISOString(),real,lista:lista.slice(0,30)});
+    st.textContent=(real?"Serviços perto de você":"Serviços perto do centro de Parnaíba")+": "+lista.length+" encontrados num raio de 6 km.";
+  }catch(e){
+    const c=LS.get("perto",null);
+    if(c){MAPA_DADOS={pos,lista:c.lista.map(x=>Object.assign({},x,{km:distKm(pos,[x.la,x.lo])})).sort((a,b)=>a.km-b.km),real};st.textContent="Sem conexão com o mapa agora. Mostrando a última busca, de "+fmtDH(c.em)+"."}
+    else{MAPA_DADOS={pos,lista:[],real};st.textContent="Sem internet ou o serviço do mapa está fora do ar. Use os botões do Google Maps abaixo ou os telefones."}
+  }
+  desenhaMapa();bt.disabled=false;bt.innerHTML=ic("pin")+" Atualizar minha localização";
+}
+
 PAGINAS.onde = ()=>{
   const meus=LS.get("locais",[]);
   return `
   <h2>Onde Buscar Atendimento</h2>
   <p>A <b>UBS do seu bairro</b> é a porta de entrada: lá você faz consulta, exames, vacinas e é encaminhado quando precisar. Os telefones funcionam mesmo sem internet.</p>
+  <section class="card" id="perto">
+    <h3>${ic("map")} Perto de você</h3>
+    <p class="mini" style="margin-top:0">Veja no mapa as UBS, hospitais, pronto-socorro, CAPS e farmácias mais perto de onde você está agora. Precisa de internet e de permissão para usar a localização.</p>
+    <button class="btn" id="mapBtn">${ic("pin")} Mostrar no mapa</button>
+    <div id="mapaWrap" class="oculto">
+      <div class="linha filtros" role="group" aria-label="Filtrar por tipo">
+        <button data-cat="todos" aria-pressed="true">Todos</button>
+        ${Object.entries(CATS).filter(([k])=>k!=="outro").map(([k,c])=>`<button data-cat="${k}" aria-pressed="false"><span class="ponto" style="background:${c.cor}"></span>${c.t.split(" (")[0]}</button>`).join("")}
+      </div>
+      <div id="mapa" role="region" aria-label="Mapa dos serviços de saúde próximos"></div>
+      <p class="mini" id="mapStatus" role="status"></p>
+      <div id="pertoLista"></div>
+      <p class="mini">Dados do mapa: © colaboradores do OpenStreetMap. Pode faltar algum serviço ou haver informação desatualizada: confirme antes de ir. Em emergência, ligue 192.</p>
+    </div>
+    <p class="mini" style="margin:12px 0 6px"><b>Ou busque direto no Google Maps</b> (ele usa a sua localização):</p>
+    <div class="linha">
+      <a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("UBS posto de saúde perto de mim")}" target="_blank" rel="noopener">${ic("map")} UBS</a>
+      <a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("pronto socorro UPA hospital perto de mim")}" target="_blank" rel="noopener">${ic("map")} Pronto-socorro</a>
+      <a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("CAPS centro de atenção psicossocial perto de mim")}" target="_blank" rel="noopener">${ic("map")} CAPS</a>
+      <a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Farmácia Popular perto de mim")}" target="_blank" rel="noopener">${ic("map")} Farmácia Popular</a>
+    </div>
+  </section>
   <section class="card">
     ${LOCAIS.map(l=>`<div class="local"><div class="tipo">${esc(l.tipo)}</div><b>${esc(l.nome)}</b>
       <p class="mini" style="margin:.2rem 0">${esc(l.desc)}</p>
@@ -859,6 +976,9 @@ PAGINAS.onde = ()=>{
   </details>`;
 };
 DEPOIS.onde=()=>{
+  MAPA=null;MAPA_FILTRO="todos";
+  $("#mapBtn").onclick=abrirMapa;
+  document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{MAPA_FILTRO=b.dataset.cat;document.querySelectorAll("[data-cat]").forEach(x=>x.setAttribute("aria-pressed",x===b));desenhaMapa()});
   $("#lOk").onclick=()=>{const n=$("#lN").value.trim();if(!n){toast("Escreva o nome do local");return}
     const m=LS.get("locais",[]);m.push({nome:n.slice(0,60),info:$("#lI").value.trim().slice(0,120),fone:$("#lF").value.trim().slice(0,20)});LS.set("locais",m);rota();toast("Local salvo")};
   document.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>{const m=LS.get("locais",[]);m.splice(+b.dataset.dl,1);LS.set("locais",m);rota()});
@@ -1177,7 +1297,7 @@ PAGINAS.sobre = ()=>`
   </section>
   <section class="card">
     <h3>Privacidade</h3>
-    <p>Tudo o que você anota (nome, humor, caminhadas, consultas) fica <b>somente neste celular</b>. Nada é enviado para a internet.</p>
+    <p>Tudo o que você anota (nome, humor, caminhadas, consultas, sintomas) fica <b>somente neste celular</b>. A única coisa enviada para a internet é a sua localização aproximada, e só quando você toca em <b>Mostrar no mapa</b>: ela vai para o OpenStreetMap buscar os serviços por perto e não é guardada pelo app em nenhum servidor.</p>
     <button class="btn sec" id="apagar">Apagar todos os meus dados</button>
   </section>
   <section class="card">

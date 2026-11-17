@@ -154,7 +154,7 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:9;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw}
 .toast.on{opacity:1}
 @media (min-width:640px){.grade{grid-template-columns:repeat(3,1fr)}}
-#mapa{height:340px;border-radius:14px;margin:10px 0 6px;border:1px solid var(--linha);background:#e8ecf3}
+#mapa{position:relative;z-index:0;height:340px;border-radius:14px;margin:10px 0 6px;border:1px solid var(--linha);background:#e8ecf3}
 .filtros{gap:6px;margin-top:10px}
 .filtros button{border:1.5px solid var(--linha);background:var(--card);color:var(--navy);border-radius:99px;padding:6px 12px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
 .filtros button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:#fff}
@@ -874,9 +874,17 @@ function categoria(t){
 async function buscaServicos(pos){
   const lat=pos[0].toFixed(3),lon=pos[1].toFixed(3),R=6000;
   const q=`[out:json][timeout:25];(nwr(around:${R},${lat},${lon})["amenity"~"^(clinic|hospital|doctors|pharmacy)$"];nwr(around:${R},${lat},${lon})["healthcare"];);out center tags 400;`;
-  const r=await fetch("https://overpass-api.de/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q)});
-  if(!r.ok)throw new Error("overpass "+r.status);
-  const j=await r.json(),vistos=new Set(),out=[];
+  /* tenta o servidor principal e, se falhar, os espelhos públicos */
+  let j=null;
+  const SRV=[["https://overpass-api.de",25000],["https://overpass.private.coffee",45000],["https://overpass.kumi.systems",90000]];
+  for(const [srv,ms] of SRV){
+    if(srv!==SRV[0][0]&&$("#mapStatus"))$("#mapStatus").textContent="O servidor do mapa está lento. Tentando outro, aguarde...";
+    try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),ms);
+      const r=await fetch(srv+"/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q),signal:ac.signal});
+      clearTimeout(to);if(r.ok){j=await r.json();break}}catch(e){}
+  }
+  if(!j)throw new Error("overpass indisponível");
+  const vistos=new Set(),out=[];
   for(const e of j.elements||[]){
     const la=e.lat??e.center?.lat,lo=e.lon??e.center?.lon,t=e.tags||{};if(la==null||lo==null)continue;
     const cat=categoria(t);if(!t.name&&cat!=="urg")continue;

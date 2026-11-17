@@ -154,6 +154,21 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:9;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw}
 .toast.on{opacity:1}
 @media (min-width:640px){.grade{grid-template-columns:repeat(3,1fr)}}
+.hist{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--linha)}
+.hist:last-child{border-bottom:0}
+.hist .t{flex:1}
+.hist small{display:block;color:var(--txt2)}
+.onde{font-size:.85rem;margin-top:4px;color:var(--navy)}
+.reg-ok{font-size:.82rem;color:var(--verde);font-weight:700;margin:.4rem 0 0}
+.rs table td,.rs table th{font-size:.88rem}
+.rs h3{margin-top:4px}
+@media print{
+  .topo,nav.baixo,.toast,.noprint,.ouvir{display:none!important}
+  body{background:#fff;padding:0;font-size:12pt}
+  main{max-width:none;padding:0}
+  .card{border:1px solid #bbb;break-inside:avoid}
+  .chip{border:1px solid #999}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -213,6 +228,9 @@ const LS = {
 };
 const hoje = ()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const fmtData = s=>{if(!s)return"";const [a,m,d]=s.split("-");return d+"/"+m+"/"+a};
+const fmtDH = iso=>{const d=new Date(iso);return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()+" às "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
+const minhaUBS = ()=>{const l=LS.get("locais",[]);return l.find(x=>/ubs|posto|unidade/i.test(x.nome))||l[0]||null};
+function statusCheck(c,d){if(!d)return "nao";const lim=new Date(d);lim.setMonth(lim.getMonth()+c.meses);return lim>new Date()?"ok":"refazer"}
 const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),2600)}
 function ouvirBtn(){return '<button class="ouvir" data-ouvir><svg class="ico" aria-hidden="true"><use href="#i-sound"/></svg> Ouvir</button>'}
@@ -313,16 +331,34 @@ const MITOS = [
 ];
 
 /* ---------- conteúdo: checklist de cuidados ---------- */
+/* Para onde ir em cada sinal de alerta (usado no histórico e no resumo) */
+const DEST = {
+ peito:{t:"SAMU 192 agora",tel:"192"},
+ avc:{t:"SAMU 192 agora",tel:"192"},
+ suic:{t:"CVV 188 agora (192 se houver risco imediato). Depois, CAPS ou UBS",tel:"188"},
+ pressao:{t:"UBS (para medir, também vale a farmácia)"},
+ diab:{t:"UBS: teste de glicemia"},
+ urina:{t:"UBS. Se não conseguir urinar nada: pronto-socorro"},
+ testic:{t:"UBS"},
+ ist:{t:"UBS ou CTA. Exposição de risco: PEP em até 72 h"},
+ intest:{t:"UBS"},
+ tosse:{t:"UBS: exame de escarro"},
+ boca:{t:"Dentista da UBS"},
+ erecao:{t:"Consulta na UBS"},
+ tristeza:{t:"UBS ou CAPS"}
+};
+const NIVEL = {verm:"Emergência",amar:"Procure a UBS",verde:"Converse na consulta"};
+
 const CHECK = [
- {id:"pa",t:"Medir a pressão",q:"Pelo menos 1 vez por ano (a cada consulta se for alta)",meses:12},
- {id:"gli",t:"Glicemia (açúcar no sangue)",q:"Se tem mais de 35 a 45 anos, excesso de peso ou pressão alta",meses:12},
- {id:"col",t:"Colesterol",q:"Conforme orientação, geralmente a cada 1 a 5 anos",meses:24},
- {id:"ist",t:"Testes rápidos: HIV, sífilis, hepatites B e C",q:"Pelo menos 1 vez na vida; mais vezes se teve relação sem camisinha",meses:12},
- {id:"dent",t:"Dentista",q:"1 vez por ano, inclusive para olhar a boca toda",meses:12},
- {id:"vac",t:"Conferir a caderneta de vacinas",q:"dT a cada 10 anos, hepatite B, febre amarela, gripe",meses:12},
- {id:"peso",t:"Peso e medida da cintura",q:"A cada consulta ou a cada 6 meses",meses:6},
- {id:"intest",t:"Sangue oculto nas fezes (50 a 75 anos)",q:"Pergunte na UBS sobre esse rastreamento",meses:24},
- {id:"prost",t:"Conversa sobre próstata (a partir dos 50, ou 45 se pai/irmão teve)",q:"Decisão compartilhada sobre PSA e toque retal",meses:12}
+ {id:"pa",t:"Medir a pressão",q:"Pelo menos 1 vez por ano (a cada consulta se for alta)",meses:12,onde:"UBS ou farmácia"},
+ {id:"gli",t:"Glicemia (açúcar no sangue)",q:"Se tem mais de 35 a 45 anos, excesso de peso ou pressão alta",meses:12,onde:"UBS"},
+ {id:"col",t:"Colesterol",q:"Conforme orientação, geralmente a cada 1 a 5 anos",meses:24,onde:"UBS (pedido na consulta)"},
+ {id:"ist",t:"Testes rápidos: HIV, sífilis, hepatites B e C",q:"Pelo menos 1 vez na vida; mais vezes se teve relação sem camisinha",meses:12,onde:"UBS ou CTA, com sigilo"},
+ {id:"dent",t:"Dentista",q:"1 vez por ano, inclusive para olhar a boca toda",meses:12,onde:"Dentista da UBS"},
+ {id:"vac",t:"Conferir a caderneta de vacinas",q:"dT a cada 10 anos, hepatite B, febre amarela, gripe",meses:12,onde:"Sala de vacina da UBS"},
+ {id:"peso",t:"Peso e medida da cintura",q:"A cada consulta ou a cada 6 meses",meses:6,onde:"UBS"},
+ {id:"intest",t:"Sangue oculto nas fezes (50 a 75 anos)",q:"Pergunte na UBS sobre esse rastreamento",meses:24,onde:"UBS"},
+ {id:"prost",t:"Conversa sobre próstata (a partir dos 50, ou 45 se pai/irmão teve)",q:"Decisão compartilhada sobre PSA e toque retal",meses:12,onde:"Consulta na UBS"}
 ];
 
 /* ---------- roteamento ---------- */
@@ -389,11 +425,15 @@ PAGINAS.inicio = ()=>{
     <button class="tile" data-ir="dados"><span class="ic d">${ic("chart")}</span><b>Por que se cuidar</b><span>Doenças que mais atingem os homens</span></button>
     <button class="tile" data-ir="onde"><span class="ic c">${ic("pin")}</span><b>Onde buscar atendimento</b><span>SUS, telefones e meus locais</span></button>
     <button class="tile" data-ir="jogo"><span class="ic b">${ic("ball")}</span><b>Hora do Jogo</b><span>Pênaltis e embaixadinhas para relaxar</span></button>
+    <button class="tile" data-ir="resumo"><span class="ic c">${ic("doc")}</span><b>Resumo para a consulta</b><span>Seu histórico para mostrar na UBS</span></button>
     <button class="tile" data-ir="compartilhar"><span class="ic a">${ic("qr")}</span><b>Compartilhar</b><span>QR Code do app</span></button>
   </div>
 
   <section class="card">
     <h3>Minha semana</h3>
+    ${(()=>{const f=LS.get("check",{});const n=CHECK.filter(c=>statusCheck(c,f[c.id])==="refazer").length;const u=LS.get("sintomas",[]).slice(-1)[0];const s=u&&SINAIS.find(y=>y.id===u.id);
+      return (n?`<p class="nivel amar" style="margin-top:0">${n===1?"1 cuidado está":n+" cuidados estão"} com hora de refazer. <a href="#cuidar">Ver onde fazer</a></p>`:"")+
+      (s&&(Date.now()-new Date(u.t))<14*864e5?`<p class="nivel ${s.lvl}" style="margin-top:0">Você registrou <b>${s.t.toLowerCase()}</b> em ${fmtDH(u.t)}. Para onde ir: ${DEST[s.id].t}.</p>`:"")})()}
     <p class="mini">Caminhada/atividade: <b>${sem} de 150 min</b></p>
     <div class="barra"><i style="width:${Math.min(100,sem/1.5)}%"></i></div>
     ${prox?`<p style="margin-top:12px">${ic("cal")} Próximo compromisso: <b>${esc(prox.titulo)}</b> em ${fmtData(prox.data)}${prox.hora?" às "+esc(prox.hora):""}</p>`:`<p class="mini" style="margin-top:12px">Nenhuma consulta marcada. <a href="#cuidar">Anotar uma</a></p>`}
@@ -410,6 +450,7 @@ PAGINAS.sinais = ()=>`
   <div class="topo-pag"><span class="icbox">${ic("steth")}</span><span>Conheça os principais sinais e o que fazer.</span></div>
   <p>Toque no que você está sentindo. As cores mostram a urgência:</p>
   <p class="linha"><span class="chip verm">Vermelho: ligue 192 / 188 agora</span><span class="chip amar">Amarelo: procure a UBS logo</span><span class="chip verde">Verde: converse na próxima consulta</span></p>
+  ${histCard()}
   <div class="sec-tit">Assuntos em destaque</div>
   ${SINAIS.map(s=>`
   <details id="s-${s.id}">
@@ -418,10 +459,34 @@ PAGINAS.sinais = ()=>`
       <p>${s.o}</p>
       <ul>${s.s.map(x=>"<li>"+x+"</li>").join("")}</ul>
       <div class="nivel ${s.lvl}"><b>O que fazer:</b> ${s.f}</div>
+      <p class="onde">${ic("pin")} <b>Para onde ir:</b> ${DEST[s.id].t}</p>
+      <div class="linha noprint" style="margin-top:8px">
+        ${DEST[s.id].tel?`<a class="btn peq" href="tel:${DEST[s.id].tel}">${ic("phone")} Ligar ${DEST[s.id].tel}</a>`:`<a class="btn sec peq" href="#onde">${ic("pin")} Ver onde ir</a>`}
+        <button class="btn sec peq" data-reg="${s.id}">${ic("clip")} Registrar que sinto isso</button>
+      </div>
+      <p class="reg-ok" data-regmsg="${s.id}">${ultimoReg(s.id)}</p>
       ${ouvirBtn()}
     </div>
   </details>`).join("")}
   <p class="aviso">Os sinais servem para você saber <b>quando procurar ajuda</b>, não para dar diagnóstico. Só o profissional de saúde pode avaliar.</p>`;
+
+function ultimoReg(id){const h=LS.get("sintomas",[]).filter(x=>x.id===id);return h.length?"Último registro: "+fmtDH(h[h.length-1].t):""}
+function histCard(){
+  const h=LS.get("sintomas",[]).slice(-3).reverse();
+  if(!h.length)return `<section class="card" id="histCard"><h3>${ic("clip")} Meu histórico</h3><p class="mini" style="margin:0">Quando sentir algo, abra o sinal e toque em <b>Registrar que sinto isso</b>. O app guarda a data e para onde você deve ir, e monta um resumo para mostrar na consulta.</p></section>`;
+  return `<section class="card" id="histCard"><h3>${ic("clip")} Meu histórico</h3>
+  ${h.map(x=>{const s=SINAIS.find(y=>y.id===x.id);return s?`<div class="hist"><div class="t"><b>${s.t}</b><small>${fmtDH(x.t)}</small><span class="chip ${s.lvl}">${NIVEL[s.lvl]}</span><p class="onde" style="margin:.2rem 0 0">${ic("pin")} ${DEST[s.id].t}</p></div></div>`:""}).join("")}
+  <a class="btn sec peq" href="#resumo" style="margin-top:8px">${ic("doc")} Ver resumo para a consulta</a></section>`;
+}
+DEPOIS.sinais=()=>{
+  document.querySelectorAll("[data-reg]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.reg,s=SINAIS.find(y=>y.id===id);
+    const h=LS.get("sintomas",[]);h.push({id,t:new Date().toISOString()});LS.set("sintomas",h.slice(-60));
+    const hc=$("#histCard");if(hc)hc.outerHTML=icoSum(histCard());
+    const m=document.querySelector('[data-regmsg="'+id+'"]');if(m)m.textContent="Registrado agora. Para onde ir: "+DEST[id].t;
+    toast(s.lvl==="verm"?"Registrado. Não espere: ligue "+DEST[id].tel+" agora.":"Registrado no seu histórico.");
+  });
+};
 
 PAGINAS.corpo = ()=>`
   <h2>Conheça seu corpo</h2>
@@ -526,11 +591,15 @@ PAGINAS.cuidar = ()=>{
   <div class="topo-pag"><span class="icbox">${ic("clip")}</span><span>Veja o que fazer em cada idade e anote suas consultas.</span></div>
   <section class="card">
     <h3>Meu check-up</h3>
+    <a class="btn sec peq noprint" href="#resumo" style="margin-bottom:8px">${ic("doc")} Resumo para levar à consulta</a>
     <p class="mini">Marque a data em que fez cada cuidado. O app avisa o que está em dia e o que já passou da hora. As idades e intervalos são uma referência: o profissional da UBS ajusta para você.</p>
     ${CHECK.map(c=>{
       const d=feitos[c.id];let st='<span class="chip azul">Não informado</span>';
       if(d){const lim=new Date(d);lim.setMonth(lim.getMonth()+c.meses);st=lim>new Date()?'<span class="chip verde">Em dia</span>':'<span class="chip amar">Hora de refazer</span>'}
-      return `<div class="ck"><div class="t"><b>${c.t}</b><small>${c.q}</small>${st}${d?' <small style="display:inline">· feito em '+fmtData(d)+'</small>':''}</div>
+      const sc=statusCheck(c,d),ubs=minhaUBS();
+      const onde=sc!=="ok"?`<p class="onde" style="margin:.3rem 0 0">${ic("pin")} <b>Onde fazer:</b> ${c.onde}${ubs&&/UBS/.test(c.onde)?" · sua UBS: "+esc(ubs.nome)+(ubs.fone?` <a href="tel:${esc(ubs.fone.replace(/[^0-9+]/g,""))}">${esc(ubs.fone)}</a>`:""):""}</p>
+        <div class="linha noprint" style="margin-top:6px"><a class="btn sec peq" href="#onde">${ic("pin")} Ver serviços</a><button class="btn sec peq" data-agendar="${esc(c.t)}" data-onde="${esc(c.onde)}">${ic("cal")} Anotar na agenda</button></div>`:"";
+      return `<div class="ck"><div class="t"><b>${c.t}</b><small>${c.q}</small>${st}${d?' <small style="display:inline">· feito em '+fmtData(d)+'</small>':''}${onde}</div>
       <input type="date" data-ck="${c.id}" value="${d||""}" max="${hoje()}" aria-label="Data: ${c.t}" style="max-width:150px;border:1px solid var(--linha);border-radius:10px;padding:8px;background:var(--card)"></div>`}).join("")}
   </section>
 
@@ -590,6 +659,10 @@ DEPOIS.cuidar=()=>{
   };
   const ag=LS.get("agenda",[]).sort((a,b)=>a.data<b.data?-1:1);
   document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ag.splice(+b.dataset.del,1);LS.set("agenda",ag);rota()});
+  document.querySelectorAll("[data-agendar]").forEach(b=>b.onclick=()=>{
+    $("#agT").value=b.dataset.agendar.slice(0,80);const u=minhaUBS();$("#agL").value=(u&&/UBS/.test(b.dataset.onde)?u.nome:b.dataset.onde).slice(0,80);
+    $("#agT").scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>$("#agD").focus(),400);toast("Agora escolha a data e salve");
+  });
   document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>baixarIcs(ag[+b.dataset.ics]));
 };
 function baixarIcs(a){
@@ -1030,6 +1103,69 @@ function embaixada(g,W,H,est){
     g.font="600 15px 'Open Sans',sans-serif";g.fillStyle="#fff";g.fillText(parada?"Toque na bola para começar":msg||"embaixadinhas",W/2,182);
     if(fim)painel(g,W,n+(n===1?" embaixadinha":" embaixadinhas"),dica+"  Toque para jogar de novo.");
   };
+}
+
+PAGINAS.resumo = ()=>{
+  const nome=LS.get("nome",""),f=LS.get("check",{}),h=LS.get("sintomas",[]).slice().reverse();
+  const ag=LS.get("agenda",[]).filter(a=>a.data>=hoje()).sort((a,b)=>a.data<b.data?-1:1);
+  const hum=LS.get("humor",{}),ops=["Ótimo","Bem","Mais ou menos","Mal","Muito mal"];
+  const dias=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");if(hum[k]!=null)dias.push(hum[k])}
+  const ruins=dias.filter(x=>x>=3).length,med=LS.get("medidas",{}),sem=semanaMin();
+  let imc="";if(+med.pP&&+med.pA){imc=(med.pP/((med.pA/100)**2)).toFixed(1).replace(".",",")}
+  const stTxt={nao:"Não informado",ok:"Em dia",refazer:"Hora de refazer"},stCor={nao:"azul",ok:"verde",refazer:"amar"};
+  return `
+  <h2>Resumo para a consulta</h2>
+  <p class="noprint">Mostre esta tela para a enfermeira ou o médico, imprima ou envie para você mesmo. Os dados só saem do celular se você quiser.</p>
+  <div class="linha noprint" style="margin-bottom:14px"><button class="btn" id="rsImp">${ic("doc")} Imprimir ou salvar PDF</button><button class="btn sec" id="rsEnv">${ic("share")} Enviar</button></div>
+  <section class="card rs">
+    <p style="margin:0"><b>${nome?esc(nome):"Paciente"}</b> · resumo gerado em ${fmtData(hoje())}</p>
+    <p class="mini" style="margin:.2rem 0 0">Registros feitos pela própria pessoa no app Provedor do Autocuidado. Não são diagnóstico.</p>
+  </section>
+  <section class="card rs">
+    <h3>Sintomas registrados</h3>
+    ${h.length?`<table><tr><th>Quando</th><th>Sintoma</th><th>Orientação do app</th></tr>${h.slice(0,15).map(x=>{const s=SINAIS.find(y=>y.id===x.id);return s?`<tr><td>${fmtDH(x.t)}</td><td>${s.t}<br><span class="chip ${s.lvl}">${NIVEL[s.lvl]}</span></td><td>${DEST[s.id].t}</td></tr>`:""}).join("")}</table>
+    <button class="btn sec peq noprint" id="rsLimpa" style="margin-top:8px">${ic("trash")} Apagar histórico de sintomas</button>`:`<p class="mini" style="margin:0">Nenhum sintoma registrado. Em <a href="#sinais">Sintomas e Cuidados</a>, toque em “Registrar que sinto isso”.</p>`}
+  </section>
+  <section class="card rs">
+    <h3>Check-up</h3>
+    <table><tr><th>Cuidado</th><th>Última vez</th><th>Situação</th></tr>${CHECK.map(c=>{const st=statusCheck(c,f[c.id]);return `<tr><td>${c.t}</td><td>${f[c.id]?fmtData(f[c.id]):"—"}</td><td><span class="chip ${stCor[st]}">${stTxt[st]}</span>${st!=="ok"?`<br><small>${c.onde}</small>`:""}</td></tr>`}).join("")}</table>
+  </section>
+  <section class="card rs">
+    <h3>Humor e hábitos</h3>
+    <p style="margin:.2rem 0">Humor nos últimos 14 dias: ${dias.length?`${dias.length} registro(s), <b>${ruins}</b> dia(s) “mal” ou “muito mal”.`:"sem registros."}</p>
+    ${ruins>=5?`<p class="nivel amar" style="margin:.3rem 0">Muitos dias difíceis: vale conversar sobre saúde mental na consulta. CAPS e CVV 188 também ajudam.</p>`:""}
+    <p style="margin:.2rem 0">Atividade física nos últimos 7 dias: <b>${sem} min</b> (meta: 150 min).</p>
+    ${med.pP||med.pC?`<p style="margin:.2rem 0">Medidas anotadas: ${med.pP?"peso "+esc(med.pP)+" kg":""}${imc?" · IMC "+imc:""}${med.pC?" · cintura "+esc(med.pC)+" cm":""}</p>`:""}
+  </section>
+  <section class="card rs">
+    <h3>Próximas consultas</h3>
+    ${ag.length?ag.map(a=>`<p style="margin:.2rem 0">${fmtData(a.data)}${a.hora?" às "+esc(a.hora):""}: <b>${esc(a.titulo)}</b>${a.local?" · "+esc(a.local):""}</p>`).join(""):`<p class="mini" style="margin:0">Nenhuma marcada.</p>`}
+  </section>
+  <section class="card rs">
+    <h3>Perguntas para levar</h3>
+    <textarea id="rsPerg" rows="4" placeholder="Ex.: Preciso fazer o PSA? Esse remédio pode dar sono?" style="width:100%;border:1px solid var(--linha);border-radius:12px;padding:10px;background:var(--card)">${esc(LS.get("perguntas",""))}</textarea>
+  </section>
+  <p class="aviso">Na dúvida, procure a UBS. Em emergência, ligue 192.</p>`;
+};
+DEPOIS.resumo=()=>{
+  $("#rsPerg").oninput=e=>LS.set("perguntas",e.target.value.slice(0,1000));
+  $("#rsImp").onclick=()=>window.print();
+  const l=$("#rsLimpa");if(l)l.onclick=()=>{if(confirm("Apagar o histórico de sintomas?")){LS.set("sintomas",[]);rota()}};
+  $("#rsEnv").onclick=async()=>{
+    const t=textoResumo();
+    if(navigator.share){try{await navigator.share({title:"Resumo para a consulta",text:t})}catch(e){}}
+    else{try{await navigator.clipboard.writeText(t);toast("Resumo copiado. Cole no WhatsApp ou nas notas.")}catch(e){toast("Não foi possível copiar.")}}
+  };
+};
+function textoResumo(){
+  const nome=LS.get("nome",""),f=LS.get("check",{}),h=LS.get("sintomas",[]).slice().reverse().slice(0,10),ag=LS.get("agenda",[]).filter(a=>a.data>=hoje());
+  const L=["RESUMO PARA A CONSULTA"+(nome?" - "+nome:""),"Gerado em "+fmtData(hoje())+" pelo app Provedor do Autocuidado (registros da própria pessoa, não é diagnóstico).",""];
+  L.push("SINTOMAS REGISTRADOS:");if(!h.length)L.push("- nenhum");h.forEach(x=>{const s=SINAIS.find(y=>y.id===x.id);if(s)L.push("- "+fmtDH(x.t)+": "+s.t+" ("+NIVEL[s.lvl]+"). Orientação: "+DEST[s.id].t)});
+  L.push("","CHECK-UP:");CHECK.forEach(c=>{const st=statusCheck(c,f[c.id]);L.push("- "+c.t+": "+(f[c.id]?"feito em "+fmtData(f[c.id]):"não informado")+(st==="refazer"?" (hora de refazer)":""))});
+  L.push("","Atividade física (7 dias): "+semanaMin()+" min");
+  if(ag.length){L.push("","PRÓXIMAS CONSULTAS:");ag.forEach(a=>L.push("- "+fmtData(a.data)+(a.hora?" "+a.hora:"")+": "+a.titulo+(a.local?" ("+a.local+")":"")))}
+  const pg=LS.get("perguntas","");if(pg)L.push("","PERGUNTAS:",pg);
+  return L.join("\n");
 }
 
 PAGINAS.sobre = ()=>`

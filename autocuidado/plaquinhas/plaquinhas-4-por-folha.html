@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plaquinhas 4 por folha</title>
+<link rel="stylesheet" href="../fontes/fontes.css">
+<style>
+@page{size:A4 portrait;margin:0}
+*{box-sizing:border-box}
+body{margin:0;background:#ccd;font-family:"Open Sans",Arial,sans-serif}
+.folha{width:210mm;height:297mm;margin:10mm auto;background:#fff;page-break-after:always;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;position:relative}
+.cel{padding:6mm;display:flex}
+/* linhas de corte */
+.folha::before{content:"";position:absolute;left:105mm;top:0;bottom:0;border-left:0.3mm dashed #9aa}
+.folha::after{content:"";position:absolute;top:148.5mm;left:0;right:0;border-top:0.3mm dashed #9aa}
+.placa{flex:1;border-radius:8mm;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative}
+.mito{background:#C62F2F}
+.verdade{background:#1F7A50}
+.icone{width:40mm;height:40mm;border-radius:50%;border:3.4mm solid rgba(255,255,255,.9);display:flex;align-items:center;justify-content:center;margin-bottom:6mm}
+.icone svg{width:23mm;height:23mm}
+.palavra{font-family:"Montserrat",Arial,sans-serif;font-weight:800;line-height:1;letter-spacing:0.8mm}
+.mito .palavra{font-size:62pt}
+.verdade .palavra{font-size:38pt}
+.rodape{position:absolute;bottom:5mm;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:2mm;font-family:"Montserrat",Arial,sans-serif;font-weight:700;font-size:7.5pt;opacity:.92}
+.rodape img{width:7mm;height:7mm;border-radius:1.6mm}
+.dica{max-width:210mm;margin:0 auto;padding:6mm;font-size:12pt}
+@media print{body{background:#fff}.folha{margin:0}.dica{display:none}}
+</style>
+</head>
+<body>
+<p class="dica">Imprima em A4 retrato, sem margens e com "gráficos de fundo" ligado. Página 1: 4 MITO. Página 2: 4 VERDADE. Recorte nas linhas tracejadas e cole um MITO e um VERDADE costas com costas.</p>
+<script>
+const placa=(t)=>t==='m'
+ ?'<div class="cel"><div class="placa mito"><div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></div><div class="palavra">MITO</div><div class="rodape"><img src="../logo.png" alt=""><span>Provedor do Autocuidado · Novembro Azul</span></div></div></div>'
+ :'<div class="cel"><div class="placa verdade"><div class="icone"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5l5 5L19.5 7"/></svg></div><div class="palavra">VERDADE</div><div class="rodape"><img src="../logo.png" alt=""><span>Provedor do Autocuidado · Novembro Azul</span></div></div></div>';
+document.write('<section class="folha">'+placa('m').repeat(4)+'</section>');
+document.write('<section class="folha">'+placa('v').repeat(4)+'</section>');
+</script>
+</body>
+</html>

@@ -154,6 +154,32 @@ td.n{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
 .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-size:.9rem;z-index:9;opacity:0;transition:opacity .3s;pointer-events:none;max-width:90vw}
 .toast.on{opacity:1}
 @media (min-width:640px){.grade{grid-template-columns:repeat(3,1fr)}}
+#mapa{position:relative;z-index:0;height:340px;border-radius:14px;margin:10px 0 6px;border:1px solid var(--linha);background:#e8ecf3}
+.filtros{gap:6px;margin-top:10px}
+.filtros button{border:1.5px solid var(--linha);background:var(--card);color:var(--navy);border-radius:99px;padding:6px 12px;font-size:.82rem;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px}
+.filtros button[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:#fff}
+.ponto{display:inline-block;width:12px;height:12px;border-radius:50%;flex:none}
+.perto{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--linha)}
+.perto:last-child{border-bottom:0}
+.perto .t{flex:1;min-width:0}
+.perto .t small{display:block;color:var(--txt2)}
+.perto .dist{font-weight:800;color:var(--navy);white-space:nowrap;font-size:.9rem}
+.leaflet-popup-content{font-family:"Open Sans",system-ui,sans-serif;font-size:13px}
+.hist{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-bottom:1px solid var(--linha)}
+.hist:last-child{border-bottom:0}
+.hist .t{flex:1}
+.hist small{display:block;color:var(--txt2)}
+.onde{font-size:.85rem;margin-top:4px;color:var(--navy)}
+.reg-ok{font-size:.82rem;color:var(--verde);font-weight:700;margin:.4rem 0 0}
+.rs table td,.rs table th{font-size:.88rem}
+.rs h3{margin-top:4px}
+@media print{
+  .topo,nav.baixo,.toast,.noprint,.ouvir{display:none!important}
+  body{background:#fff;padding:0;font-size:12pt}
+  main{max-width:none;padding:0}
+  .card{border:1px solid #bbb;break-inside:avoid}
+  .chip{border:1px solid #999}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -213,6 +239,9 @@ const LS = {
 };
 const hoje = ()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};
 const fmtData = s=>{if(!s)return"";const [a,m,d]=s.split("-");return d+"/"+m+"/"+a};
+const fmtDH = iso=>{const d=new Date(iso);return String(d.getDate()).padStart(2,"0")+"/"+String(d.getMonth()+1).padStart(2,"0")+"/"+d.getFullYear()+" às "+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
+const minhaUBS = ()=>{const l=LS.get("locais",[]);return l.find(x=>/ubs|posto|unidade/i.test(x.nome))||l[0]||null};
+function statusCheck(c,d){if(!d)return "nao";const lim=new Date(d);lim.setMonth(lim.getMonth()+c.meses);return lim>new Date()?"ok":"refazer"}
 const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),2600)}
 function ouvirBtn(){return '<button class="ouvir" data-ouvir><svg class="ico" aria-hidden="true"><use href="#i-sound"/></svg> Ouvir</button>'}
@@ -313,16 +342,34 @@ const MITOS = [
 ];
 
 /* ---------- conteúdo: checklist de cuidados ---------- */
+/* Para onde ir em cada sinal de alerta (usado no histórico e no resumo) */
+const DEST = {
+ peito:{t:"SAMU 192 agora",tel:"192"},
+ avc:{t:"SAMU 192 agora",tel:"192"},
+ suic:{t:"CVV 188 agora (192 se houver risco imediato). Depois, CAPS ou UBS",tel:"188"},
+ pressao:{t:"UBS (para medir, também vale a farmácia)"},
+ diab:{t:"UBS: teste de glicemia"},
+ urina:{t:"UBS. Se não conseguir urinar nada: pronto-socorro"},
+ testic:{t:"UBS"},
+ ist:{t:"UBS ou CTA. Exposição de risco: PEP em até 72 h"},
+ intest:{t:"UBS"},
+ tosse:{t:"UBS: exame de escarro"},
+ boca:{t:"Dentista da UBS"},
+ erecao:{t:"Consulta na UBS"},
+ tristeza:{t:"UBS ou CAPS"}
+};
+const NIVEL = {verm:"Emergência",amar:"Procure a UBS",verde:"Converse na consulta"};
+
 const CHECK = [
- {id:"pa",t:"Medir a pressão",q:"Pelo menos 1 vez por ano (a cada consulta se for alta)",meses:12},
- {id:"gli",t:"Glicemia (açúcar no sangue)",q:"Se tem mais de 35 a 45 anos, excesso de peso ou pressão alta",meses:12},
- {id:"col",t:"Colesterol",q:"Conforme orientação, geralmente a cada 1 a 5 anos",meses:24},
- {id:"ist",t:"Testes rápidos: HIV, sífilis, hepatites B e C",q:"Pelo menos 1 vez na vida; mais vezes se teve relação sem camisinha",meses:12},
- {id:"dent",t:"Dentista",q:"1 vez por ano, inclusive para olhar a boca toda",meses:12},
- {id:"vac",t:"Conferir a caderneta de vacinas",q:"dT a cada 10 anos, hepatite B, febre amarela, gripe",meses:12},
- {id:"peso",t:"Peso e medida da cintura",q:"A cada consulta ou a cada 6 meses",meses:6},
- {id:"intest",t:"Sangue oculto nas fezes (50 a 75 anos)",q:"Pergunte na UBS sobre esse rastreamento",meses:24},
- {id:"prost",t:"Conversa sobre próstata (a partir dos 50, ou 45 se pai/irmão teve)",q:"Decisão compartilhada sobre PSA e toque retal",meses:12}
+ {id:"pa",t:"Medir a pressão",q:"Pelo menos 1 vez por ano (a cada consulta se for alta)",meses:12,onde:"UBS ou farmácia"},
+ {id:"gli",t:"Glicemia (açúcar no sangue)",q:"Se tem mais de 35 a 45 anos, excesso de peso ou pressão alta",meses:12,onde:"UBS"},
+ {id:"col",t:"Colesterol",q:"Conforme orientação, geralmente a cada 1 a 5 anos",meses:24,onde:"UBS (pedido na consulta)"},
+ {id:"ist",t:"Testes rápidos: HIV, sífilis, hepatites B e C",q:"Pelo menos 1 vez na vida; mais vezes se teve relação sem camisinha",meses:12,onde:"UBS ou CTA, com sigilo"},
+ {id:"dent",t:"Dentista",q:"1 vez por ano, inclusive para olhar a boca toda",meses:12,onde:"Dentista da UBS"},
+ {id:"vac",t:"Conferir a caderneta de vacinas",q:"dT a cada 10 anos, hepatite B, febre amarela, gripe",meses:12,onde:"Sala de vacina da UBS"},
+ {id:"peso",t:"Peso e medida da cintura",q:"A cada consulta ou a cada 6 meses",meses:6,onde:"UBS"},
+ {id:"intest",t:"Sangue oculto nas fezes (50 a 75 anos)",q:"Pergunte na UBS sobre esse rastreamento",meses:24,onde:"UBS"},
+ {id:"prost",t:"Conversa sobre próstata (a partir dos 50, ou 45 se pai/irmão teve)",q:"Decisão compartilhada sobre PSA e toque retal",meses:12,onde:"Consulta na UBS"}
 ];
 
 /* ---------- roteamento ---------- */
@@ -389,11 +436,15 @@ PAGINAS.inicio = ()=>{
     <button class="tile" data-ir="dados"><span class="ic d">${ic("chart")}</span><b>Por que se cuidar</b><span>Doenças que mais atingem os homens</span></button>
     <button class="tile" data-ir="onde"><span class="ic c">${ic("pin")}</span><b>Onde buscar atendimento</b><span>SUS, telefones e meus locais</span></button>
     <button class="tile" data-ir="jogo"><span class="ic b">${ic("ball")}</span><b>Hora do Jogo</b><span>Pênaltis e embaixadinhas para relaxar</span></button>
+    <button class="tile" data-ir="resumo"><span class="ic c">${ic("doc")}</span><b>Resumo para a consulta</b><span>Seu histórico para mostrar na UBS</span></button>
     <button class="tile" data-ir="compartilhar"><span class="ic a">${ic("qr")}</span><b>Compartilhar</b><span>QR Code do app</span></button>
   </div>
 
   <section class="card">
     <h3>Minha semana</h3>
+    ${(()=>{const f=LS.get("check",{});const n=CHECK.filter(c=>statusCheck(c,f[c.id])==="refazer").length;const u=LS.get("sintomas",[]).slice(-1)[0];const s=u&&SINAIS.find(y=>y.id===u.id);
+      return (n?`<p class="nivel amar" style="margin-top:0">${n===1?"1 cuidado está":n+" cuidados estão"} com hora de refazer. <a href="#cuidar">Ver onde fazer</a></p>`:"")+
+      (s&&(Date.now()-new Date(u.t))<14*864e5?`<p class="nivel ${s.lvl}" style="margin-top:0">Você registrou <b>${s.t.toLowerCase()}</b> em ${fmtDH(u.t)}. Para onde ir: ${DEST[s.id].t}.</p>`:"")})()}
     <p class="mini">Caminhada/atividade: <b>${sem} de 150 min</b></p>
     <div class="barra"><i style="width:${Math.min(100,sem/1.5)}%"></i></div>
     ${prox?`<p style="margin-top:12px">${ic("cal")} Próximo compromisso: <b>${esc(prox.titulo)}</b> em ${fmtData(prox.data)}${prox.hora?" às "+esc(prox.hora):""}</p>`:`<p class="mini" style="margin-top:12px">Nenhuma consulta marcada. <a href="#cuidar">Anotar uma</a></p>`}
@@ -410,6 +461,7 @@ PAGINAS.sinais = ()=>`
   <div class="topo-pag"><span class="icbox">${ic("steth")}</span><span>Conheça os principais sinais e o que fazer.</span></div>
   <p>Toque no que você está sentindo. As cores mostram a urgência:</p>
   <p class="linha"><span class="chip verm">Vermelho: ligue 192 / 188 agora</span><span class="chip amar">Amarelo: procure a UBS logo</span><span class="chip verde">Verde: converse na próxima consulta</span></p>
+  ${histCard()}
   <div class="sec-tit">Assuntos em destaque</div>
   ${SINAIS.map(s=>`
   <details id="s-${s.id}">
@@ -418,10 +470,34 @@ PAGINAS.sinais = ()=>`
       <p>${s.o}</p>
       <ul>${s.s.map(x=>"<li>"+x+"</li>").join("")}</ul>
       <div class="nivel ${s.lvl}"><b>O que fazer:</b> ${s.f}</div>
+      <p class="onde">${ic("pin")} <b>Para onde ir:</b> ${DEST[s.id].t}</p>
+      <div class="linha noprint" style="margin-top:8px">
+        ${DEST[s.id].tel?`<a class="btn peq" href="tel:${DEST[s.id].tel}">${ic("phone")} Ligar ${DEST[s.id].tel}</a>`:`<a class="btn sec peq" href="#onde">${ic("pin")} Ver onde ir</a>`}
+        <button class="btn sec peq" data-reg="${s.id}">${ic("clip")} Registrar que sinto isso</button>
+      </div>
+      <p class="reg-ok" data-regmsg="${s.id}">${ultimoReg(s.id)}</p>
       ${ouvirBtn()}
     </div>
   </details>`).join("")}
   <p class="aviso">Os sinais servem para você saber <b>quando procurar ajuda</b>, não para dar diagnóstico. Só o profissional de saúde pode avaliar.</p>`;
+
+function ultimoReg(id){const h=LS.get("sintomas",[]).filter(x=>x.id===id);return h.length?"Último registro: "+fmtDH(h[h.length-1].t):""}
+function histCard(){
+  const h=LS.get("sintomas",[]).slice(-3).reverse();
+  if(!h.length)return `<section class="card" id="histCard"><h3>${ic("clip")} Meu histórico</h3><p class="mini" style="margin:0">Quando sentir algo, abra o sinal e toque em <b>Registrar que sinto isso</b>. O app guarda a data e para onde você deve ir, e monta um resumo para mostrar na consulta.</p></section>`;
+  return `<section class="card" id="histCard"><h3>${ic("clip")} Meu histórico</h3>
+  ${h.map(x=>{const s=SINAIS.find(y=>y.id===x.id);return s?`<div class="hist"><div class="t"><b>${s.t}</b><small>${fmtDH(x.t)}</small><span class="chip ${s.lvl}">${NIVEL[s.lvl]}</span><p class="onde" style="margin:.2rem 0 0">${ic("pin")} ${DEST[s.id].t}</p></div></div>`:""}).join("")}
+  <a class="btn sec peq" href="#resumo" style="margin-top:8px">${ic("doc")} Ver resumo para a consulta</a></section>`;
+}
+DEPOIS.sinais=()=>{
+  document.querySelectorAll("[data-reg]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.reg,s=SINAIS.find(y=>y.id===id);
+    const h=LS.get("sintomas",[]);h.push({id,t:new Date().toISOString()});LS.set("sintomas",h.slice(-60));
+    const hc=$("#histCard");if(hc)hc.outerHTML=icoSum(histCard());
+    const m=document.querySelector('[data-regmsg="'+id+'"]');if(m)m.textContent="Registrado agora. Para onde ir: "+DEST[id].t;
+    toast(s.lvl==="verm"?"Registrado. Não espere: ligue "+DEST[id].tel+" agora.":"Registrado no seu histórico.");
+  });
+};
 
 PAGINAS.corpo = ()=>`
   <h2>Conheça seu corpo</h2>
@@ -526,11 +602,15 @@ PAGINAS.cuidar = ()=>{
   <div class="topo-pag"><span class="icbox">${ic("clip")}</span><span>Veja o que fazer em cada idade e anote suas consultas.</span></div>
   <section class="card">
     <h3>Meu check-up</h3>
+    <a class="btn sec peq noprint" href="#resumo" style="margin-bottom:8px">${ic("doc")} Resumo para levar à consulta</a>
     <p class="mini">Marque a data em que fez cada cuidado. O app avisa o que está em dia e o que já passou da hora. As idades e intervalos são uma referência: o profissional da UBS ajusta para você.</p>
     ${CHECK.map(c=>{
       const d=feitos[c.id];let st='<span class="chip azul">Não informado</span>';
       if(d){const lim=new Date(d);lim.setMonth(lim.getMonth()+c.meses);st=lim>new Date()?'<span class="chip verde">Em dia</span>':'<span class="chip amar">Hora de refazer</span>'}
-      return `<div class="ck"><div class="t"><b>${c.t}</b><small>${c.q}</small>${st}${d?' <small style="display:inline">· feito em '+fmtData(d)+'</small>':''}</div>
+      const sc=statusCheck(c,d),ubs=minhaUBS();
+      const onde=sc!=="ok"?`<p class="onde" style="margin:.3rem 0 0">${ic("pin")} <b>Onde fazer:</b> ${c.onde}${ubs&&/UBS/.test(c.onde)?" · sua UBS: "+esc(ubs.nome)+(ubs.fone?` <a href="tel:${esc(ubs.fone.replace(/[^0-9+]/g,""))}">${esc(ubs.fone)}</a>`:""):""}</p>
+        <div class="linha noprint" style="margin-top:6px"><a class="btn sec peq" href="#onde">${ic("pin")} Ver serviços</a><button class="btn sec peq" data-agendar="${esc(c.t)}" data-onde="${esc(c.onde)}">${ic("cal")} Anotar na agenda</button></div>`:"";
+      return `<div class="ck"><div class="t"><b>${c.t}</b><small>${c.q}</small>${st}${d?' <small style="display:inline">· feito em '+fmtData(d)+'</small>':''}${onde}</div>
       <input type="date" data-ck="${c.id}" value="${d||""}" max="${hoje()}" aria-label="Data: ${c.t}" style="max-width:150px;border:1px solid var(--linha);border-radius:10px;padding:8px;background:var(--card)"></div>`}).join("")}
   </section>
 
@@ -590,6 +670,10 @@ DEPOIS.cuidar=()=>{
   };
   const ag=LS.get("agenda",[]).sort((a,b)=>a.data<b.data?-1:1);
   document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ag.splice(+b.dataset.del,1);LS.set("agenda",ag);rota()});
+  document.querySelectorAll("[data-agendar]").forEach(b=>b.onclick=()=>{
+    $("#agT").value=b.dataset.agendar.slice(0,80);const u=minhaUBS();$("#agL").value=(u&&/UBS/.test(b.dataset.onde)?u.nome:b.dataset.onde).slice(0,80);
+    $("#agT").scrollIntoView({behavior:"smooth",block:"center"});setTimeout(()=>$("#agD").focus(),400);toast("Agora escolha a data e salve");
+  });
   document.querySelectorAll("[data-ics]").forEach(b=>b.onclick=()=>baixarIcs(ag[+b.dataset.ics]));
 };
 function baixarIcs(a){
@@ -758,11 +842,125 @@ DEPOIS.mente=()=>{
   };
 };
 
+/* ---------- Mapa: serviços de saúde perto de você ----------
+   Usa a localização do celular (só quando a pessoa toca no botão) e os dados
+   abertos do OpenStreetMap (Overpass API). A posição vai arredondada (~100 m). */
+const PARNAIBA=[-2.9046,-41.7764];
+const CATS={
+  ubs:{t:"UBS / posto de saúde",cor:"#1F7A50"},
+  urg:{t:"Hospital / pronto-socorro",cor:"#C62F2F"},
+  caps:{t:"CAPS (saúde mental)",cor:"#473C8F"},
+  farm:{t:"Farmácia",cor:"#B7791F"},
+  outro:{t:"Outro serviço (pode ser particular)",cor:"#4F67B5"}
+};
+let MAPA=null,MAPA_DADOS=null,MAPA_FILTRO="todos";
+function carregaLeaflet(){
+  if(window.L)return Promise.resolve();
+  return new Promise((ok,er)=>{const c=document.createElement("link");c.rel="stylesheet";c.href="vendor/leaflet/leaflet.css";document.head.appendChild(c);
+    const sc=document.createElement("script");sc.src="vendor/leaflet/leaflet.js";sc.onload=ok;sc.onerror=er;document.head.appendChild(sc)});
+}
+function minhaPosicao(){return new Promise(res=>{if(!navigator.geolocation)return res(null);
+  navigator.geolocation.getCurrentPosition(p=>res([p.coords.latitude,p.coords.longitude]),()=>res(null),{enableHighAccuracy:true,timeout:12000,maximumAge:60000})})}
+function distKm(a,b){const R=6371,r=x=>x*Math.PI/180,dl=r(b[0]-a[0]),dn=r(b[1]-a[1]);const h=Math.sin(dl/2)**2+Math.cos(r(a[0]))*Math.cos(r(b[0]))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h))}
+function fmtDist(k){return k<1?Math.round(k*1000/10)*10+" m":k.toFixed(1).replace(".",",")+" km"}
+function categoria(t){
+  const n=(t.name||"")+" "+(t.official_name||"");
+  if(/\bcaps\b|psicossocial/i.test(n))return "caps";
+  if(t.amenity==="pharmacy"||t.healthcare==="pharmacy")return "farm";
+  if(t.amenity==="hospital"||t.healthcare==="hospital"||t.emergency==="yes"||/\bupa\b|pronto[- ]?socorro|hospital|urg[êe]ncia|maternidade/i.test(n))return "urg";
+  if(/\bubs\b|unidade b[áa]sica|posto de sa[úu]de|\besf\b|sa[úu]de da fam[íi]lia|centro de sa[úu]de|\bpsf\b/i.test(n)||t.healthcare==="centre")return "ubs";
+  return "outro";
+}
+async function buscaServicos(pos){
+  const lat=pos[0].toFixed(3),lon=pos[1].toFixed(3),R=6000;
+  const q=`[out:json][timeout:25];(nwr(around:${R},${lat},${lon})["amenity"~"^(clinic|hospital|doctors|pharmacy)$"];nwr(around:${R},${lat},${lon})["healthcare"];);out center tags 400;`;
+  /* tenta o servidor principal e, se falhar, os espelhos públicos */
+  let j=null;
+  const SRV=[["https://overpass-api.de",25000],["https://overpass.private.coffee",45000],["https://overpass.kumi.systems",90000]];
+  for(const [srv,ms] of SRV){
+    if(srv!==SRV[0][0]&&$("#mapStatus"))$("#mapStatus").textContent="O servidor do mapa está lento. Tentando outro, aguarde...";
+    try{const ac=new AbortController(),to=setTimeout(()=>ac.abort(),ms);
+      const r=await fetch(srv+"/api/interpreter",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:"data="+encodeURIComponent(q),signal:ac.signal});
+      clearTimeout(to);if(r.ok){j=await r.json();break}}catch(e){}
+  }
+  if(!j)throw new Error("overpass indisponível");
+  const vistos=new Set(),out=[];
+  for(const e of j.elements||[]){
+    const la=e.lat??e.center?.lat,lo=e.lon??e.center?.lon,t=e.tags||{};if(la==null||lo==null)continue;
+    const cat=categoria(t);if(!t.name&&cat!=="urg")continue;
+    const nome=t.name||CATS[cat].t,ch=nome.toLowerCase()+"|"+la.toFixed(3)+lo.toFixed(3);if(vistos.has(ch))continue;vistos.add(ch);
+    const end=[t["addr:street"],t["addr:housenumber"],t["addr:suburb"]].filter(Boolean).join(", ");
+    out.push({nome,cat,la,lo,end,fone:t.phone||t["contact:phone"]||"",km:distKm(pos,[la,lo])});
+  }
+  return out.sort((a,b)=>a.km-b.km);
+}
+function desenhaMapa(){
+  if(!MAPA_DADOS)return;const {pos,lista,real}=MAPA_DADOS;
+  const vis=lista.filter(x=>MAPA_FILTRO==="todos"?true:x.cat===MAPA_FILTRO);
+  if(window.L&&$("#mapa")){
+    if(MAPA){MAPA.remove();MAPA=null}
+    MAPA=L.map("mapa",{zoomControl:true}).setView(pos,14);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© colaboradores do OpenStreetMap"}).addTo(MAPA);
+    L.circleMarker(pos,{radius:9,color:"#fff",weight:3,fillColor:"#2F6FD6",fillOpacity:1}).addTo(MAPA).bindPopup(real?"Você está aqui":"Centro de Parnaíba");
+    const lim=vis.filter(x=>x.cat!=="farm").slice(0,60).concat(vis.filter(x=>x.cat==="farm").slice(0,15));
+    lim.forEach(x=>L.circleMarker([x.la,x.lo],{radius:7,color:"#fff",weight:2,fillColor:CATS[x.cat].cor,fillOpacity:.95}).addTo(MAPA)
+      .bindPopup(`<b>${esc(x.nome)}</b><br>${CATS[x.cat].t}<br>${fmtDist(x.km)} daqui<br><a href="https://www.google.com/maps/dir/?api=1&destination=${x.la},${x.lo}" target="_blank" rel="noopener">Como chegar</a>`));
+    const perto=lim.slice(0,5).map(x=>[x.la,x.lo]);if(perto.length)MAPA.fitBounds(L.latLngBounds(perto.concat([pos])).pad(0.25),{maxZoom:16});
+  }
+  const top=(MAPA_FILTRO==="todos"?vis.filter(x=>x.cat!=="farm"):vis).slice(0,12);
+  $("#pertoLista").innerHTML=top.length?top.map((x,i)=>`<div class="perto"><span class="ponto" style="background:${CATS[x.cat].cor};margin-top:5px"></span><div class="t"><b>${esc(x.nome)}</b><small>${CATS[x.cat].t}${x.end?" · "+esc(x.end):""}</small>
+    <div class="linha" style="margin-top:6px"><a class="btn peq" href="https://www.google.com/maps/dir/?api=1&destination=${x.la},${x.lo}" target="_blank" rel="noopener">${ic("map")} Como chegar</a>${x.fone?`<a class="btn sec peq" href="tel:${esc(x.fone.replace(/[^0-9+]/g,""))}">${ic("phone")} Ligar</a>`:""}${x.cat==="ubs"?`<button class="btn sec peq" data-minhaubs="${i}">${ic("home")} É a minha UBS</button>`:""}</div></div><span class="dist">${fmtDist(x.km)}</span></div>`).join("")
+    :`<p class="mini">Nenhum serviço dessa categoria encontrado no mapa num raio de 6 km. Use os botões do Google Maps abaixo.</p>`;
+  document.querySelectorAll("[data-minhaubs]").forEach(b=>b.onclick=()=>{const x=top[+b.dataset.minhaubs];const m=LS.get("locais",[]);
+    if(m.some(l=>l.nome===x.nome)){toast("Já está em Meus locais");return}
+    m.unshift({nome:x.nome,info:x.end||"Salvo pelo mapa",fone:x.fone||""});LS.set("locais",m);toast("Salva como sua UBS em Meus locais")});
+}
+async function abrirMapa(){
+  const st=$("#mapStatus"),bt=$("#mapBtn");$("#mapaWrap").classList.remove("oculto");bt.disabled=true;
+  st.textContent="Pegando sua localização...";
+  let pos=await minhaPosicao(),real=!!pos;
+  if(!pos){pos=PARNAIBA;st.textContent="Não foi possível usar sua localização (permissão negada ou GPS desligado). Mostrando o centro de Parnaíba."}
+  try{await carregaLeaflet()}catch(e){}
+  st.textContent=(real?"":"Mostrando o centro de Parnaíba. ")+"Buscando serviços de saúde por perto...";
+  try{
+    const lista=await buscaServicos(pos);MAPA_DADOS={pos,lista,real};
+    LS.set("perto",{em:new Date().toISOString(),real,lista:lista.slice(0,30)});
+    st.textContent=(real?"Serviços perto de você":"Serviços perto do centro de Parnaíba")+": "+lista.length+" encontrados num raio de 6 km.";
+  }catch(e){
+    const c=LS.get("perto",null);
+    if(c){MAPA_DADOS={pos,lista:c.lista.map(x=>Object.assign({},x,{km:distKm(pos,[x.la,x.lo])})).sort((a,b)=>a.km-b.km),real};st.textContent="Sem conexão com o mapa agora. Mostrando a última busca, de "+fmtDH(c.em)+"."}
+    else{MAPA_DADOS={pos,lista:[],real};st.textContent="Sem internet ou o serviço do mapa está fora do ar. Use os botões do Google Maps abaixo ou os telefones."}
+  }
+  desenhaMapa();bt.disabled=false;bt.innerHTML=ic("pin")+" Atualizar minha localização";
+}
+
 PAGINAS.onde = ()=>{
   const meus=LS.get("locais",[]);
   return `
   <h2>Onde Buscar Atendimento</h2>
   <p>A <b>UBS do seu bairro</b> é a porta de entrada: lá você faz consulta, exames, vacinas e é encaminhado quando precisar. Os telefones funcionam mesmo sem internet.</p>
+  <section class="card" id="perto">
+    <h3>${ic("map")} Perto de você</h3>
+    <p class="mini" style="margin-top:0">Veja no mapa as UBS, hospitais, pronto-socorro, CAPS e farmácias mais perto de onde você está agora. Precisa de internet e de permissão para usar a localização.</p>
+    <button class="btn" id="mapBtn">${ic("pin")} Mostrar no mapa</button>
+    <div id="mapaWrap" class="oculto">
+      <div class="linha filtros" role="group" aria-label="Filtrar por tipo">
+        <button data-cat="todos" aria-pressed="true">Todos</button>
+        ${Object.entries(CATS).filter(([k])=>k!=="outro").map(([k,c])=>`<button data-cat="${k}" aria-pressed="false"><span class="ponto" style="background:${c.cor}"></span>${c.t.split(" (")[0]}</button>`).join("")}
+      </div>
+      <div id="mapa" role="region" aria-label="Mapa dos serviços de saúde próximos"></div>
+      <p class="mini" id="mapStatus" role="status"></p>
+      <div id="pertoLista"></div>
+      <p class="mini">Dados do mapa: © colaboradores do OpenStreetMap. Pode faltar algum serviço ou haver informação desatualizada: confirme antes de ir. Em emergência, ligue 192.</p>
+    </div>
+    <p class="mini" style="margin:12px 0 6px"><b>Ou busque direto no Google Maps</b> (ele usa a sua localização):</p>
+    <div class="linha">
+      <a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("UBS posto de saúde perto de mim")}" target="_blank" rel="noopener">${ic("map")} UBS</a>
+      <a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("pronto socorro UPA hospital perto de mim")}" target="_blank" rel="noopener">${ic("map")} Pronto-socorro</a>
+      <a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("CAPS centro de atenção psicossocial perto de mim")}" target="_blank" rel="noopener">${ic("map")} CAPS</a>
+      <a class="btn sec peq" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent("Farmácia Popular perto de mim")}" target="_blank" rel="noopener">${ic("map")} Farmácia Popular</a>
+    </div>
+  </section>
   <section class="card">
     ${LOCAIS.map(l=>`<div class="local"><div class="tipo">${esc(l.tipo)}</div><b>${esc(l.nome)}</b>
       <p class="mini" style="margin:.2rem 0">${esc(l.desc)}</p>
@@ -786,6 +984,9 @@ PAGINAS.onde = ()=>{
   </details>`;
 };
 DEPOIS.onde=()=>{
+  MAPA=null;MAPA_FILTRO="todos";
+  $("#mapBtn").onclick=abrirMapa;
+  document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>{MAPA_FILTRO=b.dataset.cat;document.querySelectorAll("[data-cat]").forEach(x=>x.setAttribute("aria-pressed",x===b));desenhaMapa()});
   $("#lOk").onclick=()=>{const n=$("#lN").value.trim();if(!n){toast("Escreva o nome do local");return}
     const m=LS.get("locais",[]);m.push({nome:n.slice(0,60),info:$("#lI").value.trim().slice(0,120),fone:$("#lF").value.trim().slice(0,20)});LS.set("locais",m);rota();toast("Local salvo")};
   document.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>{const m=LS.get("locais",[]);m.splice(+b.dataset.dl,1);LS.set("locais",m);rota()});
@@ -1032,6 +1233,69 @@ function embaixada(g,W,H,est){
   };
 }
 
+PAGINAS.resumo = ()=>{
+  const nome=LS.get("nome",""),f=LS.get("check",{}),h=LS.get("sintomas",[]).slice().reverse();
+  const ag=LS.get("agenda",[]).filter(a=>a.data>=hoje()).sort((a,b)=>a.data<b.data?-1:1);
+  const hum=LS.get("humor",{}),ops=["Ótimo","Bem","Mais ou menos","Mal","Muito mal"];
+  const dias=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");if(hum[k]!=null)dias.push(hum[k])}
+  const ruins=dias.filter(x=>x>=3).length,med=LS.get("medidas",{}),sem=semanaMin();
+  let imc="";if(+med.pP&&+med.pA){imc=(med.pP/((med.pA/100)**2)).toFixed(1).replace(".",",")}
+  const stTxt={nao:"Não informado",ok:"Em dia",refazer:"Hora de refazer"},stCor={nao:"azul",ok:"verde",refazer:"amar"};
+  return `
+  <h2>Resumo para a consulta</h2>
+  <p class="noprint">Mostre esta tela para a enfermeira ou o médico, imprima ou envie para você mesmo. Os dados só saem do celular se você quiser.</p>
+  <div class="linha noprint" style="margin-bottom:14px"><button class="btn" id="rsImp">${ic("doc")} Imprimir ou salvar PDF</button><button class="btn sec" id="rsEnv">${ic("share")} Enviar</button></div>
+  <section class="card rs">
+    <p style="margin:0"><b>${nome?esc(nome):"Paciente"}</b> · resumo gerado em ${fmtData(hoje())}</p>
+    <p class="mini" style="margin:.2rem 0 0">Registros feitos pela própria pessoa no app Provedor do Autocuidado. Não são diagnóstico.</p>
+  </section>
+  <section class="card rs">
+    <h3>Sintomas registrados</h3>
+    ${h.length?`<table><tr><th>Quando</th><th>Sintoma</th><th>Orientação do app</th></tr>${h.slice(0,15).map(x=>{const s=SINAIS.find(y=>y.id===x.id);return s?`<tr><td>${fmtDH(x.t)}</td><td>${s.t}<br><span class="chip ${s.lvl}">${NIVEL[s.lvl]}</span></td><td>${DEST[s.id].t}</td></tr>`:""}).join("")}</table>
+    <button class="btn sec peq noprint" id="rsLimpa" style="margin-top:8px">${ic("trash")} Apagar histórico de sintomas</button>`:`<p class="mini" style="margin:0">Nenhum sintoma registrado. Em <a href="#sinais">Sintomas e Cuidados</a>, toque em “Registrar que sinto isso”.</p>`}
+  </section>
+  <section class="card rs">
+    <h3>Check-up</h3>
+    <table><tr><th>Cuidado</th><th>Última vez</th><th>Situação</th></tr>${CHECK.map(c=>{const st=statusCheck(c,f[c.id]);return `<tr><td>${c.t}</td><td>${f[c.id]?fmtData(f[c.id]):"—"}</td><td><span class="chip ${stCor[st]}">${stTxt[st]}</span>${st!=="ok"?`<br><small>${c.onde}</small>`:""}</td></tr>`}).join("")}</table>
+  </section>
+  <section class="card rs">
+    <h3>Humor e hábitos</h3>
+    <p style="margin:.2rem 0">Humor nos últimos 14 dias: ${dias.length?`${dias.length} registro(s), <b>${ruins}</b> dia(s) “mal” ou “muito mal”.`:"sem registros."}</p>
+    ${ruins>=5?`<p class="nivel amar" style="margin:.3rem 0">Muitos dias difíceis: vale conversar sobre saúde mental na consulta. CAPS e CVV 188 também ajudam.</p>`:""}
+    <p style="margin:.2rem 0">Atividade física nos últimos 7 dias: <b>${sem} min</b> (meta: 150 min).</p>
+    ${med.pP||med.pC?`<p style="margin:.2rem 0">Medidas anotadas: ${med.pP?"peso "+esc(med.pP)+" kg":""}${imc?" · IMC "+imc:""}${med.pC?" · cintura "+esc(med.pC)+" cm":""}</p>`:""}
+  </section>
+  <section class="card rs">
+    <h3>Próximas consultas</h3>
+    ${ag.length?ag.map(a=>`<p style="margin:.2rem 0">${fmtData(a.data)}${a.hora?" às "+esc(a.hora):""}: <b>${esc(a.titulo)}</b>${a.local?" · "+esc(a.local):""}</p>`).join(""):`<p class="mini" style="margin:0">Nenhuma marcada.</p>`}
+  </section>
+  <section class="card rs">
+    <h3>Perguntas para levar</h3>
+    <textarea id="rsPerg" rows="4" placeholder="Ex.: Preciso fazer o PSA? Esse remédio pode dar sono?" style="width:100%;border:1px solid var(--linha);border-radius:12px;padding:10px;background:var(--card)">${esc(LS.get("perguntas",""))}</textarea>
+  </section>
+  <p class="aviso">Na dúvida, procure a UBS. Em emergência, ligue 192.</p>`;
+};
+DEPOIS.resumo=()=>{
+  $("#rsPerg").oninput=e=>LS.set("perguntas",e.target.value.slice(0,1000));
+  $("#rsImp").onclick=()=>window.print();
+  const l=$("#rsLimpa");if(l)l.onclick=()=>{if(confirm("Apagar o histórico de sintomas?")){LS.set("sintomas",[]);rota()}};
+  $("#rsEnv").onclick=async()=>{
+    const t=textoResumo();
+    if(navigator.share){try{await navigator.share({title:"Resumo para a consulta",text:t})}catch(e){}}
+    else{try{await navigator.clipboard.writeText(t);toast("Resumo copiado. Cole no WhatsApp ou nas notas.")}catch(e){toast("Não foi possível copiar.")}}
+  };
+};
+function textoResumo(){
+  const nome=LS.get("nome",""),f=LS.get("check",{}),h=LS.get("sintomas",[]).slice().reverse().slice(0,10),ag=LS.get("agenda",[]).filter(a=>a.data>=hoje());
+  const L=["RESUMO PARA A CONSULTA"+(nome?" - "+nome:""),"Gerado em "+fmtData(hoje())+" pelo app Provedor do Autocuidado (registros da própria pessoa, não é diagnóstico).",""];
+  L.push("SINTOMAS REGISTRADOS:");if(!h.length)L.push("- nenhum");h.forEach(x=>{const s=SINAIS.find(y=>y.id===x.id);if(s)L.push("- "+fmtDH(x.t)+": "+s.t+" ("+NIVEL[s.lvl]+"). Orientação: "+DEST[s.id].t)});
+  L.push("","CHECK-UP:");CHECK.forEach(c=>{const st=statusCheck(c,f[c.id]);L.push("- "+c.t+": "+(f[c.id]?"feito em "+fmtData(f[c.id]):"não informado")+(st==="refazer"?" (hora de refazer)":""))});
+  L.push("","Atividade física (7 dias): "+semanaMin()+" min");
+  if(ag.length){L.push("","PRÓXIMAS CONSULTAS:");ag.forEach(a=>L.push("- "+fmtData(a.data)+(a.hora?" "+a.hora:"")+": "+a.titulo+(a.local?" ("+a.local+")":"")))}
+  const pg=LS.get("perguntas","");if(pg)L.push("","PERGUNTAS:",pg);
+  return L.join("\n");
+}
+
 PAGINAS.sobre = ()=>`
   <h2>Sobre o app</h2>
   <section class="card">
@@ -1041,7 +1305,7 @@ PAGINAS.sobre = ()=>`
   </section>
   <section class="card">
     <h3>Privacidade</h3>
-    <p>Tudo o que você anota (nome, humor, caminhadas, consultas) fica <b>somente neste celular</b>. Nada é enviado para a internet.</p>
+    <p>Tudo o que você anota (nome, humor, caminhadas, consultas, sintomas) fica <b>somente neste celular</b>. A única coisa enviada para a internet é a sua localização aproximada, e só quando você toca em <b>Mostrar no mapa</b>: ela vai para o OpenStreetMap buscar os serviços por perto e não é guardada pelo app em nenhum servidor.</p>
     <button class="btn sec" id="apagar">Apagar todos os meus dados</button>
   </section>
   <section class="card">

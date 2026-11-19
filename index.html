@@ -1176,6 +1176,34 @@ function go(t){tab=t;ttsStop();render();window.scrollTo(0,0)}
 
 
 
+/* ---------- contador de acessos (GoatCounter) ---------- */
+/* Conta acessos sem identificar ninguém: sem cookies, sem nome, sem e-mail e sem dados de estudo.
+   Fica desligado enquanto GC_CODE estiver vazio. Só envia quando há internet. */
+var GC_CODE='';
+var GCKEY='neurinho.gc';
+function gcHit(path,ev,done){
+  if(!GC_CODE||(navigator.onLine===false))return;
+  try{
+    var im=new Image();
+    if(done){im.onload=done;im.onerror=done}
+    im.src='https://'+GC_CODE+'.goatcounter.com/count?p='+encodeURIComponent(path)+(ev?'&e=true':'')+'&t='+encodeURIComponent('Neurinho')+'&rnd='+Math.random().toString(36).slice(2);
+  }catch(e){}
+}
+function gcStart(){
+  if(!GC_CODE)return;
+  var g={};try{g=JSON.parse(localStorage.getItem(GCKEY)||'{}')||{}}catch(e){}
+  var t=today();
+  /* uma vez por aparelho: separa quem já usava o app de quem chegou agora */
+  if(!g.dev){
+    var antiga=S.xp>0||Object.keys(S.log||{}).length>0;
+    gcHit(antiga?'/aparelho-que-ja-usava':'/aparelho-novo',true,function(){g.dev=1;try{localStorage.setItem(GCKEY,JSON.stringify(g))}catch(e){}});
+  }
+  /* uma vez por dia por aparelho */
+  if(g.day!==t){
+    gcHit('/',false,function(){g.day=t;try{localStorage.setItem(GCKEY,JSON.stringify(g))}catch(e){}});
+  }
+}
+
 /* ---------- assinatura (R$ 9,99 por mês, Pix manual) ---------- */
 /* O bloqueio só liga quando LIC_PUB, PAY.pix e PAY.zap estão preenchidos.
    LIC_PUB é a chave pública do Gerador (gerador.html). Ela não é secreta: serve só para
@@ -2356,11 +2384,12 @@ function importCards(){
 
 applyAcc();
 licTick();
+gcStart();
 licFromHash();
 render();
 licRecheck();
 window.addEventListener('hashchange',licFromHash);
-document.addEventListener('visibilitychange',function(){if(document.hidden)return;var b=licState();licTick();if(licState()!==b)render()});
+document.addEventListener('visibilitychange',function(){if(document.hidden)return;gcStart();var b=licState();licTick();if(licState()!==b)render()});
 newsNotify();
 })();
 </script>

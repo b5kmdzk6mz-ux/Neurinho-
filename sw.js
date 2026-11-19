@@ -1,5 +1,5 @@
-/* Neurinho: service worker. Versao do conteudo: e10515bd44 */
-var VER='neurinho-e10515bd44';
+/* Neurinho: service worker. Versao do conteudo: 09897b7e27 */
+var VER='neurinho-09897b7e27';
 var CORE=['./','index.html','OpenDyslexic-Regular.otf','OpenDyslexic-Bold.otf','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','afya-logo.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VER).then(function(c){return c.addAll(CORE)}).then(function(){return self.skipWaiting()}));

@@ -1180,7 +1180,7 @@ function go(t){tab=t;ttsStop();render();window.scrollTo(0,0)}
 /* O bloqueio só liga quando LIC_PUB, PAY.pix e PAY.zap estão preenchidos.
    LIC_PUB é a chave pública do Gerador (gerador.html). Ela não é secreta: serve só para
    conferir os códigos. A chave secreta, que cria os códigos, fica só no aparelho da Erika. */
-var LIC_PUB=null;
+var LIC_PUB={"kty":"EC","crv":"P-256","x":"OxPH1F2iN-JbheKbfR4cmdLOlqVPn32lqAl_lJVpaKY","y":"ecwz1J0F786kSsu_pfdvBXIyatbz6JwaSIst_XAT_mw"};
 var PAY={valor:'R$ 9,99',pix:'erikamourato88@hotmail.com',pixTipo:'e-mail',zap:'5586995900958',nome:'Erika'};
 var TRIAL_DAYS=7;
 var LKEY='neurinho.lic';

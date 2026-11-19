@@ -1,5 +1,5 @@
-/* Neurinho: service worker. Versao do conteudo: b755cb704a */
-var VER='neurinho-b755cb704a';
+/* Neurinho: service worker. Versao do conteudo: bd00ece8b0 */
+var VER='neurinho-bd00ece8b0';
 var CORE=['./','index.html','OpenDyslexic-Regular.otf','OpenDyslexic-Bold.otf','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','afya-logo.png'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VER).then(function(c){return c.addAll(CORE)}).then(function(){return self.skipWaiting()}));
@@ -21,8 +21,9 @@ self.addEventListener('fetch',function(e){
   if(r.mode==='navigate'||(same&&u.pathname.slice(-5)==='.html')){
     /* rede primeiro, para as novidades chegarem; cache se estiver offline */
     e.respondWith(fetch(r).then(function(res){
-      var cp=res.clone();caches.open(VER).then(function(c){c.put('index.html',cp)});return res;
-    }).catch(function(){return caches.match('index.html').then(function(m){return m||caches.match('./')})}));
+      var app=/\/$|\/index\.html$/.test(u.pathname),cp=res.clone();
+      if(res&&res.ok)caches.open(VER).then(function(c){c.put(app?'index.html':r,cp)});return res;
+    }).catch(function(){return caches.match(/\/$|\/index\.html$/.test(u.pathname)?'index.html':r).then(function(m){return m||caches.match('index.html')||caches.match('./')})}));
     return;
   }
   e.respondWith(caches.match(r).then(function(m){

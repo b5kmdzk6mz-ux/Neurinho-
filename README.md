@@ -27,3 +27,9 @@ App separado na pasta [`autocuidado/`](autocuidado/), feito para a ação de edu
 - Fontes Montserrat e Open Sans em `autocuidado/fontes/` (licença OFL)
 - Prompts para gerar logo, cartaz e post no ChatGPT: [`autocuidado/PROMPTS.md`](autocuidado/PROMPTS.md)
 - Para editar os locais de atendimento, mude a lista `LOCAIS` no começo do script de `autocuidado/index.html`.
+
+## Assinatura (R$ 9,99 por mês, Pix manual)
+
+- O app dá 7 dias grátis e depois pede a assinatura. A aluna faz o Pix, envia o comprovante pelo WhatsApp e recebe um link ou código de ativação que vale por um mês.
+- Os códigos são criados em `gerador.html`, uma página só da dona do app. A chave secreta fica só no aparelho dela; o app confere os códigos com a chave pública (`LIC_PUB` no `index.html`), sem internet e sem servidor.
+- O bloqueio só liga quando `LIC_PUB`, `PAY.pix` e `PAY.zap` estão preenchidos no `index.html`. Enquanto estiverem vazios, o app funciona como antes.

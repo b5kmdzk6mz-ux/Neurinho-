@@ -239,6 +239,8 @@ textarea{min-height:92px; resize:vertical}
 .att-in{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 label.btn{text-align:center;cursor:pointer}
 .att-ia summary,.att-x summary{cursor:pointer;display:flex;justify-content:space-between;gap:10px;align-items:center}
+.lic-ban{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.lic-pix{display:flex;flex-direction:column;gap:2px;margin:8px 0;padding:10px 12px;border:1.5px dashed var(--line);border-radius:12px;word-break:break-all}
 .att-steps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:15px}
 a.btn{text-decoration:none}
 .att-c{display:flex;flex-direction:column;gap:2px;padding:8px 0;border-top:1px solid var(--line)}
@@ -739,6 +741,7 @@ function viewHome(){
   var n=LENS[S.len]||6;
   var ready=Math.min(n,c.tot);
   var h='<div class="top"><span class="brand">Neurinho</span><span class="pill">Sequência: '+streak()+' '+plural(streak(),'dia','dias')+'</span></div>';
+  h+=licBanner();
   h+='<div class="card hero">'+mascot(116,st,'happy')+'<div class="bubble"><div class="label" style="margin-bottom:4px">Oi'+(S.nome?', '+esc(S.nome):'')+'!</div>'+esc(phrase)+'</div></div>';
   h+='<button class="btn big" data-act="go-start" data-disc="todas">Estudar agora<small>'+ready+' '+plural(ready,'cartão','cartões')+', cerca de '+S.len+' min</small></button>';
   h+='<p class="muted small" style="margin-top:-6px;text-align:center">Hoje: '+c.due+' para revisar e '+c.fresh+' '+plural(c.fresh,'novo','novos')+'</p>';
@@ -1042,6 +1045,7 @@ function viewProgresso(){
   var tot=0,ok=0,sec=0;Object.keys(S.log).forEach(function(d){tot+=S.log[d].n||0;ok+=S.log[d].ok||0;sec+=S.log[d].sec||0});
   var h='<div><h1>Progresso</h1></div>';
   h+='<div class="card hero" style="grid-template-columns:auto 1fr">'+mascot(110,st,'happy')+'<div><h2>'+esc(STAGES[st].nome)+'</h2><p class="muted small" style="margin:4px 0 8px">'+S.xp+' XP'+(next?'. Faltam '+(next.xp-S.xp)+' para evoluir.':'. Nível máximo.')+'</p><div class="bar"><i style="width:'+pct+'%;background:var(--accent)"></i></div></div></div>';
+  h+=licCard();
   h+='<div class="stats"><div class="stat"><span class="muted small">Sequência</span><b>'+streak()+' '+plural(streak(),'dia','dias')+'</b></div><div class="stat"><span class="muted small">Cartões estudados</span><b>'+tot+'</b></div><div class="stat"><span class="muted small">Taxa de acerto</span><b>'+(tot?Math.round(ok/tot*100):0)+'%</b></div><div class="stat"><span class="muted small">Tempo de estudo</span><b>'+mins(sec)+' min</b></div></div>';
   var days=[],mx=5;
   for(var i=6;i>=0;i--){var d=addDays(today(),-i),p=d.split('-').map(Number),n=(S.log[d]&&S.log[d].n)||0;days.push({d:d,n:n,w:['D','S','T','Q','Q','S','S'][new Date(p[0],p[1]-1,p[2]).getDay()]});if(n>mx)mx=n}
@@ -1159,15 +1163,148 @@ function accCard(){
 function stopBreath(){if(breathTimer){clearTimeout(breathTimer);breathTimer=null}}
 function render(){
   stopBreath();stopStretch();
-  var v={home:viewHome,estudar:viewEstudar,resumos:viewResumos,agenda:viewAgenda,cartoes:viewCartoes,cuidar:viewCuidar,progresso:viewProgresso,jogo:viewJogo,feedback:viewFeedback}[tab]();
+  var lock=licState()==='locked';
+  if(tab==='assinar'&&!payOn())tab='home';
+  var v=lock?viewPay():{home:viewHome,estudar:viewEstudar,resumos:viewResumos,agenda:viewAgenda,cartoes:viewCartoes,cuidar:viewCuidar,progresso:viewProgresso,jogo:viewJogo,feedback:viewFeedback,assinar:viewPay}[tab]();
   document.getElementById('app').innerHTML=v;
-  document.getElementById('tabs').innerHTML=TABS.map(function(t){
+  var nav=document.querySelector('nav.tabs');if(nav)nav.hidden=lock;
+  document.getElementById('tabs').innerHTML=lock?'':TABS.map(function(t){
     return '<button class="tab" data-act="tab" data-t="'+t[0]+'"'+(t[0]===tab?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[t[0]]+'</svg>'+t[1]+'</button>';
   }).join('');
 }
 function go(t){tab=t;ttsStop();render();window.scrollTo(0,0)}
 
 
+
+/* ---------- assinatura (R$ 9,99 por mês, Pix manual) ---------- */
+/* O bloqueio só liga quando LIC_PUB, PAY.pix e PAY.zap estão preenchidos.
+   LIC_PUB é a chave pública do Gerador (gerador.html). Ela não é secreta: serve só para
+   conferir os códigos. A chave secreta, que cria os códigos, fica só no aparelho da Erika. */
+var LIC_PUB=null;
+var PAY={valor:'R$ 9,99',pix:'',pixTipo:'',zap:'',nome:'Erika'};
+var TRIAL_DAYS=7;
+var LKEY='neurinho.lic';
+var LIC=(function(){try{var l=JSON.parse(localStorage.getItem(LKEY)||'{}');return l&&typeof l==='object'?l:{}}catch(e){return {}}})();
+var licFlash=null;
+function licSave(){try{localStorage.setItem(LKEY,JSON.stringify(LIC))}catch(e){}}
+function payOn(){return !!(LIC_PUB&&PAY.pix&&PAY.zap&&window.crypto&&crypto.subtle)}
+function dDiff(a,b){var p=a.split('-').map(Number),q=b.split('-').map(Number);return Math.round((Date.UTC(q[0],q[1]-1,q[2])-Date.UTC(p[0],p[1]-1,p[2]))/864e5)}
+function fmtBR(d){var p=String(d||'').split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:''}
+/* Se o relógio do aparelho voltar no tempo, vale a data mais recente já vista. */
+function licNow(){var t=today();return LIC.last&&t<LIC.last?LIC.last:t}
+function licTick(){
+  if(!payOn())return;
+  var t=today(),ch=false;
+  if(!LIC.t0){LIC.t0=t;ch=true}
+  if(!LIC.last||t>LIC.last){LIC.last=t;ch=true}
+  if(ch)licSave();
+}
+function trialEnd(){return LIC.t0?addDays(LIC.t0,TRIAL_DAYS-1):''}
+function licState(){
+  if(!payOn())return 'free';
+  var n=licNow();
+  if(LIC.ok&&LIC.x&&n<=LIC.x)return 'paid';
+  if(LIC.t0&&n<=trialEnd())return 'trial';
+  return 'locked';
+}
+function licLeft(){var s=licState();return s==='paid'?dDiff(licNow(),LIC.x)+1:s==='trial'?dDiff(licNow(),trialEnd())+1:0}
+function b64uDec(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+var licKeyP=null;
+function licKey(){if(!licKeyP)licKeyP=crypto.subtle.importKey('jwk',LIC_PUB,{name:'ECDSA',namedCurve:'P-256'},false,['verify']);return licKeyP}
+/* Código = base64url(dados em JSON) + "." + base64url(assinatura ECDSA P-256). Aceita o link inteiro também. */
+function licParse(raw){
+  var s=String(raw||''),m=s.match(/ativar=([A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+)/);
+  s=m?m[1]:s.replace(/\s+/g,'');
+  var parts=s.split('.');
+  if(parts.length!==2||!parts[0]||!parts[1])return null;
+  try{
+    var p=JSON.parse(new TextDecoder().decode(b64uDec(parts[0])));
+    if(!p||!/^\d{4}-\d{2}-\d{2}$/.test(p.x))return null;
+    return {code:s,p:p,sig:b64uDec(parts[1]),data:new TextEncoder().encode(parts[0])};
+  }catch(e){return null}
+}
+function licVerify(raw){
+  var c=licParse(raw);
+  if(!c||!payOn())return Promise.resolve(null);
+  return licKey().then(function(k){return crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},k,c.sig,c.data)})
+    .then(function(ok){return ok?c:null},function(){return null});
+}
+function licActivate(raw){
+  return licVerify(raw).then(function(c){
+    if(!c)return {err:'Código inválido. Confira se copiou o código ou o link inteiro.'};
+    if(c.p.x<licNow())return {err:'Este código venceu em '+fmtBR(c.p.x)+'. Peça um código novo.'};
+    if(!(LIC.ok&&LIC.x&&LIC.x>c.p.x)){LIC.code=c.code;LIC.x=c.p.x;LIC.n=c.p.n||'';LIC.ok=1}
+    licSave();
+    return {ok:1,x:LIC.x,n:LIC.n,code:c.code};
+  });
+}
+/* Ao abrir o app, confere de novo o código salvo (alguém pode ter mexido nos dados). */
+function licRecheck(){
+  if(!payOn())return;
+  if(!LIC.code){if(LIC.ok){LIC.ok=0;licSave();render()}return}
+  licVerify(LIC.code).then(function(c){
+    var was=!!LIC.ok;
+    if(c){LIC.ok=1;LIC.x=c.p.x;LIC.n=c.p.n||''}else{LIC.ok=0;delete LIC.code;delete LIC.x;delete LIC.n}
+    licSave();
+    if(was!==!!LIC.ok)render();
+  });
+}
+function licBanner(){
+  var s=licState(),n=licLeft();
+  if(s==='trial')return '<div class="note info lic-ban"><span><b>Teste grátis:</b> '+(n<=1?'último dia':'faltam '+n+' dias')+'.</span><button class="btn soft sm" data-act="tab" data-t="assinar">Assinar</button></div>';
+  if(s==='paid'&&n<=3)return '<div class="note warn lic-ban"><span>Sua assinatura vence '+(n<=1?'hoje':'em '+n+' dias')+'.</span><button class="btn soft sm" data-act="tab" data-t="assinar">Renovar</button></div>';
+  return '';
+}
+function licCard(){
+  if(!payOn())return '';
+  var s=licState();
+  return '<div class="card"><h3>Assinatura</h3><p class="muted small" style="margin:4px 0 10px">'+
+    (s==='paid'?'Ativa'+(LIC.n?', em nome de '+esc(LIC.n):'')+', até '+fmtBR(LIC.x)+'.':s==='trial'?'Teste grátis até '+fmtBR(trialEnd())+'.':'Vencida.')+
+    '</p><button class="btn soft sm" data-act="tab" data-t="assinar">'+(s==='paid'?'Renovar ou ativar código':'Assinar')+'</button></div>';
+}
+function viewPay(){
+  var s=licState(),lock=s==='locked',h='',f=licFlash;
+  if(!lock)h+='<div class="row"><button class="btn soft" data-act="tab" data-t="home">‹ Voltar</button></div>';
+  var tit=s==='paid'?'Assinatura ativa':lock?(LIC.x?'Sua assinatura venceu':'Seu teste grátis acabou'):'Assine o Neurinho';
+  var sub=s==='paid'?'Acesso'+(LIC.n?' de '+esc(LIC.n):'')+' até '+fmtBR(LIC.x)+'. Para renovar, faça o Pix e ative o código novo antes dessa data.':
+    s==='trial'?'Você está no teste grátis. '+(licLeft()<=1?'Hoje é o último dia.':'Faltam '+licLeft()+' dias.'):
+    LIC.x?'Venceu em '+fmtBR(LIC.x)+'. Renove para continuar estudando.':'Os '+TRIAL_DAYS+' dias grátis terminaram. Assine para continuar estudando.';
+  h+='<div class="card hero" style="grid-template-columns:1fr;justify-items:center;text-align:center">'+mascot(110,stageIdx(S.xp),lock?'sleep':'happy')+'<h1>'+tit+'</h1><p>'+sub+'</p>'+(lock?'<p class="muted small">Seus estudos continuam salvos neste aparelho.</p>':'')+'</div>';
+  if(f&&f.ok){
+    h+='<div class="note good"><b>Pronto! Acesso liberado até '+fmtBR(f.x)+'.</b><div style="margin-top:6px">Se você usa o Neurinho instalado na tela inicial, o link pode ter aberto no navegador. Nesse caso, copie o código, abra o app e cole na tela de assinatura.</div><button class="btn soft sm" style="margin-top:8px" data-act="lic-copycode">Copiar código</button></div>';
+    h+='<button class="btn big" data-act="lic-start">Começar a estudar</button>';
+  }
+  h+='<div class="card"><h3>Como assinar: '+PAY.valor+' por mês</h3><ol class="att-steps" style="margin-top:10px">';
+  h+='<li>Faça um Pix de <b>'+PAY.valor+'</b> para '+esc(PAY.nome)+'.<div class="lic-pix"><span class="muted small">Chave Pix'+(PAY.pixTipo?' ('+esc(PAY.pixTipo)+')':'')+'</span><b>'+esc(PAY.pix)+'</b></div><button class="btn soft sm" data-act="lic-copypix">Copiar chave Pix</button></li>';
+  h+='<li>Envie o comprovante pelo WhatsApp.<div><a class="btn soft sm" style="margin-top:6px" href="https://wa.me/'+esc(PAY.zap)+'?text='+encodeURIComponent('Oi! Fiz o Pix de '+PAY.valor+' da assinatura do Neurinho. Meu nome é ')+'" target="_blank" rel="noopener">Enviar comprovante</a></div></li>';
+  h+='<li>Você recebe um link de ativação. Toque nele ou cole o código aqui:</li></ol>';
+  h+='<div class="field" style="margin-top:10px"><textarea id="licin" style="min-height:90px" placeholder="Cole aqui o código ou o link de ativação" autocomplete="off" autocapitalize="off" spellcheck="false"></textarea></div>';
+  if(f&&f.err)h+='<div class="note bad" style="margin-top:10px">'+esc(f.err)+'</div>';
+  h+='<button class="btn" style="margin-top:10px;width:100%" data-act="lic-act">Ativar</button>';
+  h+='<p class="muted small" style="margin-top:10px">Cada código vale por um mês e fica no nome de quem assinou.</p></div>';
+  return h;
+}
+function licAct(a){
+  switch(a){
+    case 'lic-act':
+      var el=document.getElementById('licin'),v=el?el.value:'';
+      if(!v.trim()){toast('Cole o código ou o link de ativação.');return}
+      licActivate(v).then(function(r){licFlash=r;if(r.ok){tab='assinar';toast('Assinatura ativada!')}render();window.scrollTo(0,0)});
+      break;
+    case 'lic-copypix':copyText(PAY.pix).then(function(){toast('Chave Pix copiada.')},function(){toast('Não consegui copiar. Toque e segure na chave.')});break;
+    case 'lic-copycode':copyText((licFlash&&licFlash.code)||LIC.code||'').then(function(){toast('Código copiado.')},function(){toast('Não consegui copiar.')});break;
+    case 'lic-start':licFlash=null;go('home');break;
+  }
+}
+/* Link de ativação: ...#ativar=CÓDIGO */
+function licFromHash(){
+  var h=location.hash||'';
+  if(h.indexOf('#ativar=')!==0)return;
+  try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}
+  if(!payOn())return;
+  tab='assinar';
+  licActivate(decodeURIComponent(h.slice(8))).then(function(r){licFlash=r;render()});
+}
 
 /* ---------- anexar arquivo e gerar resumo ---------- */
 /* Bibliotecas ficam em vendor/ e só carregam quando a pessoa anexa um arquivo. */
@@ -2059,6 +2196,8 @@ document.addEventListener('click',function(e){
   var el=e.target.closest('[data-act]');if(!el)return;
   var a=el.getAttribute('data-act'),D=el.dataset,t=today();
   if(a!=='del'&&a!=='deld'&&a!=='rmex'&&a!=='reset'&&a!=='delev'&&a!=='delh')confirmKey=null;
+  if(a.slice(0,4)==='lic-'){licAct(a);return}
+  if(licState()==='locked'&&a!=='tts')return;
   if(a.slice(0,2)==='g-'){gameAct(a,D);return}
   if(a.slice(0,4)==='att-'||a.slice(0,3)==='ia-'||a==='delres'){if(a!=='delres')resDelAsk='';attAct(a,D);return}
   resDelAsk='';
@@ -2216,7 +2355,12 @@ function importCards(){
 }
 
 applyAcc();
+licTick();
+licFromHash();
 render();
+licRecheck();
+window.addEventListener('hashchange',licFromHash);
+document.addEventListener('visibilitychange',function(){if(document.hidden)return;var b=licState();licTick();if(licState()!==b)render()});
 newsNotify();
 })();
 </script>

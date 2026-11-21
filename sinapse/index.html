@@ -140,6 +140,20 @@ body.editing .aura i{animation-play-state:paused}
 .cover[data-cover=strawberry] .cover-title{left:32px;right:22px;bottom:28px;font-weight:400}
 .cover[data-cover=mystic]{background:radial-gradient(circle at 50% 38%,rgba(255,255,255,.55) 0,transparent 32%),#CDAEF0}
 .cover[data-cover=swirl]{--ct:#FFF6FF;background:radial-gradient(circle at 70% 75%,rgba(20,10,40,.55),transparent 55%),conic-gradient(from 210deg at 55% 48%,#2B1B4A,#E2589B,#F6A25B,#F7E3C7,#9A6BDA,#2B6E8A,#2B1B4A)}
+.cover[data-cover=aura]{background-image:url(arte/capa-aura.jpg)}
+.cover[data-cover=holo]{background-image:url(arte/capa-holo.jpg)}
+.cover[data-cover=peach]{background-image:url(arte/capa-peach.jpg)}
+.cover[data-cover=waves]{background-image:url(arte/capa-waves.jpg)}
+.cover[data-cover=mystic]{background-image:url(arte/capa-mystic.jpg)}
+.cover[data-cover=aura],.cover[data-cover=holo],.cover[data-cover=peach],.cover[data-cover=waves],.cover[data-cover=mystic]{background-size:cover;background-position:center}
+.cover[data-cover=aura] .spark,.cover[data-cover=holo] .spark,.cover[data-cover=peach] .spark,.cover[data-cover=waves] .spark,.cover[data-cover=mystic] .spark{display:none}
+.cover .cover-title{text-shadow:0 0 14px rgba(255,255,255,.75),0 0 3px rgba(255,255,255,.6)}
+.cover[data-cover=swirl] .cover-title,.cover[data-cover=cosmos] .cover-title{text-shadow:0 1px 12px rgba(20,8,40,.6)}
+.cover[data-cover=waves] .cover-title{background:rgba(255,255,255,.55);border-radius:10px;padding:6px 8px;left:18px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.stk-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.stk-grid button{aspect-ratio:1;min-width:0;overflow:hidden;border-radius:18px;display:grid;place-items:center;padding:13px;background:var(--surface-2);transition:transform .15s}
+.stk-grid button:hover{transform:scale(1.06) rotate(-3deg)}
+.stk-grid img{width:100%;height:100%;object-fit:contain;min-width:0;filter:drop-shadow(0 3px 6px rgba(90,40,140,.25))}
 .cover[data-cover=cosmos]{--ct:#FFF6FF;background:radial-gradient(circle at 28% 18%,#9256E6 0,transparent 50%),radial-gradient(circle at 82% 82%,#E05FA8 0,transparent 46%),#1E1238}
 .card-meta{display:flex;align-items:flex-start;gap:4px;margin-top:12px}
 .card-meta>div{flex:1;min-width:0}
@@ -255,11 +269,12 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
     <div class="brand"><img src="icon-192.png" alt=""><h1>Sinapse</h1><svg class="spark" aria-hidden="true"><use href="#spark"/></svg></div>
     <div class="lib-actions">
       <button id="btnImport" class="btn">Importar PDF</button>
+      <button id="btnBackup" class="btn">Backup</button>
       <button id="btnNew" class="btn primary">Novo caderno</button>
     </div>
   </header>
   <p class="hello" id="hello">Olá ✦</p>
-  <p class="lib-sub">Seus cadernos ficam salvos neste aparelho.</p>
+  <p class="lib-sub" id="libSub">Seus cadernos ficam salvos neste aparelho.</p>
   <div id="grid" class="grid"></div>
   <div id="empty" class="empty" hidden>
     <div class="empty-art"><img src="icon-192.png" alt=""><svg class="spark" aria-hidden="true"><use href="#spark"/></svg><svg class="spark" aria-hidden="true"><use href="#spark"/></svg><svg class="spark" aria-hidden="true"><use href="#spark"/></svg></div>
@@ -278,6 +293,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
       <button class="icon tool" data-tool="hl" aria-label="Marca-texto" title="Marca-texto (H)"><svg class="i" viewBox="0 0 24 24"><path d="M10 14l-5 5h6l2-2"/><path d="M9 13.5l4.5 4.5 7-7-4.5-4.5z"/></svg></button>
       <button class="icon tool" data-tool="eraser" aria-label="Borracha" title="Borracha (E)"><svg class="i" viewBox="0 0 24 24"><path d="M9 20h11"/><path d="M4.6 14.6l9.2-9.2a2 2 0 0 1 2.8 0l3 3a2 2 0 0 1 0 2.8L12.4 18.4a2 2 0 0 1-1.4.6H8.8a2 2 0 0 1-1.4-.6l-2.8-2.8a1 1 0 0 1 0-1z"/><path d="M9.5 9.7l4.8 4.8"/></svg></button>
       <button class="icon tool" data-tool="lasso" aria-label="Laço: selecionar e mover" title="Laço (L)"><svg class="i" viewBox="0 0 24 24"><path d="M7.5 15C5 14 3.5 12.2 3.5 10c0-3.3 3.8-6 8.5-6s8.5 2.7 8.5 6-3.8 6-8.5 6c-1 0-2-.1-2.9-.4" stroke-dasharray="2.5 2.6"/><path d="M8.5 14.5c-1.2 1.4-1 3.6 1 5"/></svg></button>
+      <button class="icon tool" id="btnSticker" aria-label="Adesivos" title="Adesivos"><svg class="i" viewBox="0 0 24 24"><path d="M20 12.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6.5z"/><path d="M12.5 20v-5.5a2 2 0 0 1 2-2H20"/><path d="M9 9.5h.01M14.5 9.5h.01M9 13.5c.8.9 1.8 1.3 3 1"/></svg></button>
       <span class="sep"></span>
       <div id="colors" class="colors"></div>
       <span class="sep" id="sepSizes"></span>
@@ -298,6 +314,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
 <dialog id="dlg"></dialog>
 <div id="toast" class="toast" role="status" hidden></div>
 <input type="file" id="pdfInput" accept="application/pdf,.pdf" hidden>
+<input type="file" id="backupInput" accept=".json,application/json" hidden>
 
 <script>
 'use strict';
@@ -350,6 +367,10 @@ const TEMPLATES=[['blank','Liso'],['lined','Pautado'],['grid','Quadriculado'],['
 const PREF_KEY='sinapse-prefs';
 const P=Object.assign({tool:'pen',penColor:PEN_COLORS[0],hlColor:HL_COLORS[0],size:{pen:1,hl:1,eraser:1},penOnly:false,penSeen:false},
   (()=>{try{return JSON.parse(localStorage.getItem(PREF_KEY))||{}}catch(e){return{}}})());
+const STICKERS=[['brilho','Brilho'],['lua','Lua'],['olho','Olho místico'],['cristal','Cristal'],['borboleta','Borboleta'],['laco','Laço'],['morango','Morango'],['coracao','Coração'],['estrela-cadente','Estrela cadente'],['nuvem','Nuvem'],['bolha','Bolha'],['neuronios','Neurônios']];
+const STK={};
+const stickersReady=Promise.all(STICKERS.map(([id])=>new Promise(res=>{const im=new Image();im.onload=im.onerror=()=>res();im.src='arte/adesivos/'+id+'.webp';STK[id]=im})))
+  .then(()=>{if(S.nb)S.pages.forEach(rt=>rt.canvas&&renderPage(rt))});
 const savePrefs=()=>{try{localStorage.setItem(PREF_KEY,JSON.stringify(P))}catch(e){}};
 
 /* ---------- Estado do caderno aberto ---------- */
@@ -397,6 +418,7 @@ function tracePath(c,p,n){
   if(n>1)c.lineTo(p[(n-1)*3],p[(n-1)*3+1]);else c.lineTo(p[0]+.01,p[1]);
 }
 function drawStroke(c,st,dx=0,dy=0){
+  if(st.t==='img'){const im=STK[st.src];if(im&&im.complete&&im.naturalWidth)c.drawImage(im,st.x+dx,st.y+dy,st.w,st.h);return}
   const p=st.p,n=p.length/3;if(!n)return;
   c.save();if(dx||dy)c.translate(dx,dy);
   c.lineCap='round';c.lineJoin='round';
@@ -434,6 +456,7 @@ async function loadBg(id){
 /* ---------- Geometria ---------- */
 const bboxCache=new WeakMap();
 function bbox(st){
+  if(st.t==='img')return {x:st.x,y:st.y,w:st.w,h:st.h};
   let b=bboxCache.get(st);if(b)return b;
   const p=st.p,pad=st.t==='hl'?st.s/2:widthAt(st,1)/2;
   let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
@@ -446,6 +469,7 @@ function segDist(px,py,ax,ay,bx,by){
 }
 function hitStroke(st,x,y,r){
   const b=bbox(st);if(x<b.x-r||x>b.x+b.w+r||y<b.y-r||y>b.y+b.h+r)return false;
+  if(st.t==='img')return true;
   const p=st.p,n=p.length/3,lim=r+(st.t==='hl'?st.s/2:widthAt(st,.5)/2);
   if(n===1)return Math.hypot(p[0]-x,p[1]-y)<=lim;
   for(let i=0;i<n-1;i++){const j=i*3;if(segDist(x,y,p[j],p[j+1],p[j+3],p[j+4])<=lim)return true}
@@ -460,7 +484,15 @@ function inPoly(x,y,poly){
   return ins;
 }
 function translateStrokes(list,dx,dy){
-  for(const st of list){const p=st.p;for(let i=0;i<p.length;i+=3){p[i]=r1(p[i]+dx);p[i+1]=r1(p[i+1]+dy)}bboxCache.delete(st)}
+  for(const st of list){
+    if(st.t==='img'){st.x=r1(st.x+dx);st.y=r1(st.y+dy);continue}
+    const p=st.p;for(let i=0;i<p.length;i+=3){p[i]=r1(p[i]+dx);p[i+1]=r1(p[i+1]+dy)}bboxCache.delete(st)}
+}
+function scaleStrokes(list,f,cx,cy){
+  for(const st of list){
+    if(st.t==='img'){st.x=r1(cx+(st.x-cx)*f);st.y=r1(cy+(st.y-cy)*f);st.w=r1(st.w*f);st.h=r1(st.h*f);continue}
+    const p=st.p;for(let i=0;i<p.length;i+=3){p[i]=r1(cx+(p[i]-cx)*f);p[i+1]=r1(cy+(p[i+1]-cy)*f)}
+    st.s=Math.round(st.s*f*100)/100;bboxCache.delete(st)}
 }
 function unionBox(list){
   let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
@@ -701,6 +733,7 @@ function applyAction(a,dir){
     else a.items.forEach(({st})=>{const i=s.indexOf(st);if(i>=0)s.splice(i,1)});
   }else if(a.t==='move')translateStrokes(a.items,a.dx*dir,a.dy*dir);
   else if(a.t==='color')a.items.forEach((st,j)=>st.c=dir<0?a.from[j]:a.to);
+  else if(a.t==='scale')scaleStrokes(a.items,dir<0?1/a.f:a.f,a.cx,a.cy);
   clearSelection();renderPage(a.rt);save(a.rt);
 }
 function undo(){const a=S.undo.pop();if(!a)return;applyAction(a,-1);S.redo.push(a);updateUndo();scrollToRt(a.rt)}
@@ -711,7 +744,7 @@ function scrollToRt(rt){const r=rt.el.getBoundingClientRect(),dr=desk.getBoundin
 /* ---------- Barra de ferramentas ---------- */
 function setTool(t){P.tool=t;savePrefs();clearSelection();updateToolbar()}
 function updateToolbar(){
-  document.querySelectorAll('.tool').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===P.tool));
+  document.querySelectorAll('.tool[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===P.tool));
   const colors=$('#colors'),sizes=$('#sizes'),t=P.tool;
   const hasColor=t==='pen'||t==='hl',hasSize=t!=='lasso';
   colors.hidden=!hasColor;$('#sepSizes').hidden=!hasColor||!hasSize;sizes.hidden=!hasSize;
@@ -733,7 +766,8 @@ function setColor(c,keepOpen){
   if(P.tool==='hl')P.hlColor=c;else P.penColor=c;savePrefs();
   if(!keepOpen)updateToolbar();
 }
-document.querySelectorAll('.tool').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+document.querySelectorAll('.tool[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+$('#btnSticker').onclick=stickerPicker;
 $('#btnUndo').onclick=undo;$('#btnRedo').onclick=redo;
 $('#btnBack').onclick=closeNotebook;
 $('#nbTitle').onclick=renameCurrent;
@@ -880,7 +914,7 @@ function drawEraser(pt){
 /* ---------- Laço: selecionar, mover, recolorir, duplicar, apagar ---------- */
 function selectInLasso(rt,poly){
   if(poly.length<8){clearSelection();return}
-  const items=rt.d.strokes.filter(st=>{const p=st.p,n=p.length/3;let inside=0;
+  const items=rt.d.strokes.filter(st=>{if(st.t==='img')return inPoly(st.x+st.w/2,st.y+st.h/2,poly);const p=st.p,n=p.length/3;let inside=0;
     for(let i=0;i<p.length;i+=3)if(inPoly(p[i],p[i+1],poly))inside++;return inside/n>=.5});
   if(!items.length){clearSelection();return}
   S.sel={rt,items,set:new Set(items),box:unionBox(items),dragging:false};
@@ -896,10 +930,12 @@ function drawSelection(){
 function clearSelection(){if(!S.sel)return;const rt=S.sel.rt;S.sel=null;$('#selBar').hidden=true;if(live.parentNode===rt.el)clearLive();renderPage(rt)}
 function showSelBar(){
   const s=S.sel,bar=$('#selBar');if(!s)return;
-  bar.innerHTML=`<button class="btn" data-a="dup">Duplicar</button><button class="btn" data-a="del" style="color:var(--danger)">Apagar</button><span class="sep"></span>`+
+  bar.innerHTML=`<button class="btn" data-a="minus" aria-label="Diminuir" title="Diminuir">−</button><button class="btn" data-a="plus" aria-label="Aumentar" title="Aumentar">+</button><span class="sep"></span><button class="btn" data-a="dup">Duplicar</button><button class="btn" data-a="del" style="color:var(--danger)">Apagar</button><span class="sep"></span>`+
     PEN_COLORS.map(c=>`<button class="swatch" data-c="${c}" style="--sw:${c}" aria-label="Pintar de ${c}"><span></span></button>`).join('');
   bar.querySelector('[data-a=del]').onclick=deleteSelection;
   bar.querySelector('[data-a=dup]').onclick=duplicateSelection;
+  bar.querySelector('[data-a=minus]').onclick=()=>scaleSelection(1/1.2);
+  bar.querySelector('[data-a=plus]').onclick=()=>scaleSelection(1.2);
   bar.querySelectorAll('.swatch').forEach(b=>b.onclick=()=>recolorSelection(b.dataset.c));
   bar.hidden=false;placeSelBar();
 }
@@ -919,10 +955,34 @@ function deleteSelection(){
 }
 function duplicateSelection(){
   const s=S.sel;if(!s)return;const rt=s.rt;
-  const copies=s.items.map(st=>({...st,p:st.p.slice()}));translateStrokes(copies,24,24);
+  const copies=s.items.map(st=>st.p?{...st,p:st.p.slice()}:{...st});translateStrokes(copies,24,24);
   rt.d.strokes.push(...copies);pushUndo({t:'add',rt,items:copies});save(rt);
   S.sel={rt,items:copies,set:new Set(copies),box:unionBox(copies),dragging:false};
   renderPage(rt);ensureLive(rt);drawSelection();showSelBar();
+}
+function scaleSelection(f){
+  const s=S.sel;if(!s)return;const b=s.box,cx=b.x+b.w/2,cy=b.y+b.h/2;
+  scaleStrokes(s.items,f,cx,cy);pushUndo({t:'scale',rt:s.rt,items:[...s.items],f,cx,cy});
+  s.box=unionBox(s.items);renderPage(s.rt);ensureLive(s.rt);drawSelection();placeSelBar();save(s.rt);
+}
+/* ---------- Adesivos ---------- */
+async function stickerPicker(){
+  const id=await openDlg(`<h2>Adesivos</h2><div class="stk-grid">${STICKERS.map(([id,n])=>`<button data-s="${id}" aria-label="${n}" title="${n}"><img src="arte/adesivos/${id}.webp" alt=""></button>`).join('')}</div>`,
+    (d,done)=>d.querySelectorAll('.stk-grid button').forEach(b=>b.onclick=()=>done(b.dataset.s)));
+  if(id)placeSticker(id);
+}
+function placeSticker(id){
+  const rt=S.pages[S.cur];if(!rt)return;const d=rt.d,im=STK[id];
+  const r=rt.el.getBoundingClientRect(),dr=desk.getBoundingClientRect();
+  const w=180,h=im&&im.naturalWidth?Math.round(w*im.naturalHeight/im.naturalWidth):w;
+  const cx=clamp(((dr.left+dr.width/2)-r.left)/r.width*d.w,w/2,d.w-w/2),cy=clamp(((dr.top+dr.height/2)-r.top)/r.height*d.h,h/2,d.h-h/2);
+  const st={t:'img',src:id,x:r1(cx-w/2),y:r1(cy-h/2),w,h};
+  d.strokes.push(st);pushUndo({t:'add',rt,items:[st]});save(rt);
+  P.tool='lasso';savePrefs();updateToolbar();
+  if(!rt.canvas)return;renderPage(rt);
+  S.sel={rt,items:[st],set:new Set([st]),box:unionBox([st]),dragging:false};
+  ensureLive(rt);drawSelection();showSelBar();
+  toast('Arraste para mover. Use − e + para mudar o tamanho.');
 }
 function recolorSelection(c){
   const s=S.sel;if(!s)return;const items=s.items.filter(st=>st.t==='pen');if(!items.length)return;
@@ -1089,6 +1149,7 @@ async function importPDF(file,target){
 /* Monta um PDF simples: cada página vira uma imagem JPEG. Não precisa de biblioteca. */
 async function exportPDF(title,pages){
   try{
+    await stickersReady;
     const enc=new TextEncoder(),chunks=[],offs=[];let len=0;
     const w=s=>{const b=typeof s==='string'?enc.encode(s):s;chunks.push(b);len+=b.length};
     const n=pages.length,total=2+n*3;
@@ -1112,16 +1173,64 @@ async function exportPDF(title,pages){
     w(x+`trailer\n<< /Size ${total+1} /Root 1 0 R >>\nstartxref\n${xo}\n%%EOF\n`);
     const name=(title.replace(/[\\/:*?"<>|]+/g,' ').trim()||'Caderno')+'.pdf';
     const file=new File(chunks,name,{type:'application/pdf'});
-    hideToast();
-    const canShare=navigator.canShare&&navigator.canShare({files:[file]});
-    const a=await menu('PDF pronto',[
-      ...(canShare?[{id:'share',label:'Compartilhar',sub:'Enviar, salvar em Arquivos ou imprimir'}]:[]),
-      {id:'down',label:'Baixar o arquivo',sub:name}
-    ]);
-    if(a==='share'){try{await navigator.share({files:[file],title})}catch(e){if(e.name!=='AbortError')download(file)}}
-    else if(a==='down')download(file);
+    hideToast();await offerFile(file,title,'PDF pronto','Enviar, salvar em Arquivos ou imprimir');
   }catch(e){console.error(e);hideToast();toast('Não consegui gerar o PDF.',4000)}
 }
+async function offerFile(file,title,heading,shareSub){
+  const canShare=navigator.canShare&&navigator.canShare({files:[file]});
+  const a=await menu(heading,[
+    ...(canShare?[{id:'share',label:'Compartilhar',sub:shareSub}]:[]),
+    {id:'down',label:'Baixar o arquivo',sub:file.name}
+  ]);
+  if(a==='share'){try{await navigator.share({files:[file],title});return true}catch(e){if(e.name!=='AbortError'){download(file);return true}return false}}
+  if(a==='down'){download(file);return true}
+  return false;
+}
+
+/* =====================================================================
+   Backup: um arquivo com todos os cadernos, páginas e PDFs
+   ===================================================================== */
+const blobToData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(b)});
+async function makeBackup(){
+  try{
+    toast('Preparando o backup…',0);
+    const notebooks=await DB.all('notebooks'),pages=await DB.all('pages'),blobs=[];
+    for(const b of await DB.all('blobs'))blobs.push({id:b.id,data:await blobToData(b.blob)});
+    const date=new Date().toISOString().slice(0,10);
+    const file=new File([JSON.stringify({app:'sinapse',versao:1,data:new Date().toISOString(),notebooks,pages,blobs})],`Sinapse backup ${date}.json`,{type:'application/json'});
+    hideToast();
+    if(await offerFile(file,'Backup do Sinapse','Backup pronto','Guarde no iCloud Drive, Google Drive ou Arquivos')){P.lastBackup=Date.now();savePrefs();backupNote()}
+  }catch(e){console.error(e);hideToast();toast('Não consegui criar o backup.',4000)}
+}
+async function restoreBackup(file){
+  let data;
+  try{data=JSON.parse(await file.text())}catch(e){toast('Esse arquivo não é um backup do Sinapse.',4000);return}
+  if(!data||data.app!=='sinapse'||!Array.isArray(data.notebooks)){toast('Esse arquivo não é um backup do Sinapse.',4000);return}
+  const n=data.notebooks.length;
+  if(!(await confirmDlg('Restaurar '+n+(n===1?' caderno?':' cadernos?'),'Os cadernos do backup voltam para este aparelho. Se um deles já existir aqui, a versão do backup substitui a atual. Os outros cadernos não mudam.','Restaurar')))return;
+  try{
+    toast('Restaurando…',0);
+    for(const b of data.blobs||[])await DB.put('blobs',{id:b.id,blob:await (await fetch(b.data)).blob()});
+    for(const pg of data.pages||[])await DB.put('pages',pg);
+    for(const nb of data.notebooks)await DB.put('notebooks',nb);
+    hideToast();await renderLibrary();toast(n+(n===1?' caderno restaurado ✦':' cadernos restaurados ✦'));
+  }catch(e){console.error(e);hideToast();toast('Não consegui restaurar tudo. Tente de novo.',5000)}
+}
+function backupNote(){
+  const t=P.lastBackup,el=$('#libSub');if(!el)return;
+  let msg='Seus cadernos ficam salvos neste aparelho. ';
+  if(!t)msg+='Faça um backup de vez em quando para não perder nada.';
+  else{const d=Math.floor((Date.now()-t)/864e5);msg+='Último backup: '+(d<1?'hoje':d===1?'ontem':'há '+d+' dias')+'.'}
+  el.textContent=msg;
+}
+$('#btnBackup').onclick=async()=>{
+  const a=await menu('Backup',[
+    {id:'save',label:'Fazer backup agora',sub:'Um arquivo com todos os cadernos, para guardar na nuvem'},
+    {id:'load',label:'Restaurar um backup',sub:'Traz de volta os cadernos de um arquivo de backup'}
+  ]);
+  if(a==='save')makeBackup();else if(a==='load')$('#backupInput').click();
+};
+$('#backupInput').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)restoreBackup(f)};
 function download(file){const u=URL.createObjectURL(file),a=document.createElement('a');a.href=u;a.download=file.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),10000)}
 
 /* =====================================================================
@@ -1136,7 +1245,7 @@ $('#btnImport').onclick=()=>{pdfTarget=null;$('#pdfInput').click()};
   await DB.open();
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   const m=location.hash.match(/^#c=(.+)$/);
-  await renderLibrary();
+  await renderLibrary();backupNote();
   if(m)openNotebook(m[1]);
   if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();

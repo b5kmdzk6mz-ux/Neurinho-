@@ -17,8 +17,8 @@
 6. Modelos prontos: planner do dia ✓, semana ✓, mês ✓, diário ✓, lista de tarefas ✓, Cornell ✓
 7. Busca no texto digitado, divisórias, nomes de cadernos e PDFs ✓ (a escrita à mão entra na Fase 4)
 8. Modo apresentação para tela externa, com ponteiro laser ✓; imprimir ◐ (pelo PDF)
-9. Gravar áudio da aula ligado às anotações (tocar o trecho de quando você escreveu) ○
-10. Ferramentas de desenho: quadro branco infinito ✓, mapas mentais e fluxogramas ○
+9. Gravar áudio da aula ligado às anotações (tocar o trecho de quando você escreveu) ✓
+10. Ferramentas de desenho: quadro branco infinito ✓, mapas mentais ✓, fluxogramas ◐ (com formas e setas)
 
 ## Fase 2: estudo
 Flashcards, perguntas e respostas, repetição espaçada, testes de revisão, criar cartões a partir das anotações. O Neurinho já tem isso pronto e dá para reaproveitar. ○

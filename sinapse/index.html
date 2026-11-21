@@ -246,7 +246,9 @@ body.editing .aura i{animation-play-state:paused}
   -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
 .title{font:italic 700 18px/1 var(--f-serif);padding:0 10px;height:44px;max-width:22vw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-radius:14px}
 .title:hover{background:var(--surface-2)}
-.tools{flex:1;display:flex;align-items:center;justify-content:center;gap:4px;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tools{flex:1;display:flex;align-items:center;justify-content:flex-start;gap:4px;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tools>:first-child{margin-left:auto}
+.tools>:last-child{margin-right:auto}
 .tools::-webkit-scrollbar{display:none}
 .tool{color:var(--muted)}
 .tool[aria-pressed="true"]{background:var(--holo);color:#2A1B3D;box-shadow:inset 0 0 0 1px rgba(255,255,255,.6),0 4px 14px rgba(170,120,230,.35)}
@@ -262,8 +264,17 @@ body.editing .aura i{animation-play-state:paused}
 .size[aria-pressed="true"]{background:var(--accent-soft)}
 .size[aria-pressed="true"] span{background:var(--accent)}
 .bar-right{display:flex;align-items:center}
-@media (max-width:760px){
-  .tools{order:3;flex-basis:100%;justify-content:flex-start}
+@media (max-width:1280px){
+  .bar .icon{width:40px;height:40px}
+  .bar .swatch,.bar .size{width:32px;height:32px}
+  .bar .swatch span{width:22px;height:22px}
+  .bar .sep{margin:0 3px}
+  .font-btn{padding:0 10px}
+  .font-btn .fb-name{display:none}
+}
+@media (max-width:1024px){
+  .tools{order:3;flex-basis:100%}
+  .panel{top:calc(env(safe-area-inset-top) + 124px)}
   .title{max-width:none;flex:1;text-align:left}
 }
 .desk{flex:1;overflow:auto;position:relative;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;overscroll-behavior:contain;
@@ -1104,9 +1115,9 @@ function updateToolbar(){
   if(t==='pen'){const k=PEN_KINDS.find(x=>x[0]===P.penKind)||PEN_KINDS[0];pb.textContent=k[1];pb.title='Tipo de caneta'}
   if(t==='eraser'){const m=ERASER_MODES.find(x=>x[0]===P.eraserMode)||ERASER_MODES[0];eb.textContent=m[1];eb.title='Como a borracha apaga'}
   const sb=$('#shapeBtn');sb.hidden=t!=='shape';
-  if(t==='shape'){const sh=SHAPES.find(x=>x[0]===P.shape)||SHAPES[0];sb.innerHTML=`<svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:-4px;margin-right:6px">${sh[2]}</svg>${sh[1]}`;sb.title='Escolher a forma'}
+  if(t==='shape'){const sh=SHAPES.find(x=>x[0]===P.shape)||SHAPES[0];sb.innerHTML=`<svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:-4px;margin-right:6px">${sh[2]}</svg><span class="fb-name">${sh[1]}</span>`;sb.title='Forma: '+sh[1]}
   const fb=$('#fontBtn');fb.hidden=t!=='text';
-  if(t==='text'){const f=fontOf(P.textFont);fb.style.font=`${f[3]} 17px "${f[1]}", sans-serif`;fb.textContent='Aa  '+f[2];fb.title='Escolher a fonte'}
+  if(t==='text'){const f=fontOf(P.textFont);fb.style.font=`${f[3]} 17px "${f[1]}", sans-serif`;fb.innerHTML='Aa<span class="fb-name"> '+f[2]+'</span>';fb.title='Fonte: '+f[2]}
   colors.hidden=!hasColor;$('#sepSizes').hidden=!hasColor||!hasSize;sizes.hidden=!hasSize;
   if(hasColor){
     const pal=t==='hl'?HL_COLORS:PEN_COLORS,cur=t==='hl'?P.hlColor:t==='text'?P.textColor:P.penColor,custom=!pal.includes(cur);

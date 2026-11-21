@@ -1,0 +1,17 @@
+{
+  "name": "Sinapse: cadernos à mão",
+  "short_name": "Sinapse",
+  "description": "Cadernos para escrever à mão, com caneta, marca-texto e PDFs.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F7F0EA",
+  "theme_color": "#F7F0EA",
+  "icons": [
+    {"src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}

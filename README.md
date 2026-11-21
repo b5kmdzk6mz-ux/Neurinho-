@@ -33,3 +33,15 @@ App separado na pasta [`autocuidado/`](autocuidado/), feito para a ação de edu
 - O app dá 7 dias grátis e depois pede a assinatura. A aluna faz o Pix, envia o comprovante pelo WhatsApp e recebe um link ou código de ativação que vale por um mês.
 - Os códigos são criados em `gerador.html`, uma página só da dona do app. A chave secreta fica só no aparelho dela; o app confere os códigos com a chave pública (`LIC_PUB` no `index.html`), sem internet e sem servidor.
 - O bloqueio só liga quando `LIC_PUB`, `PAY.pix` e `PAY.zap` estão preenchidos no `index.html`. Enquanto estiverem vazios, o app funciona como antes.
+
+## Sinapse: cadernos à mão
+
+App separado, na pasta [`sinapse/`](sinapse/). É um caderno digital no estilo GoodNotes, pensado primeiro para iPad com Apple Pencil. Endereço: https://b5kmdzk6mz-ux.github.io/Neurinho-/sinapse/
+
+- **Cadernos** com capa colorida e papel liso, pautado, quadriculado, pontilhado ou Cornell (branco ou creme).
+- **Caneta com pressão**, marca-texto, borracha e laço (selecionar, mover, duplicar, recolorir e apagar).
+- **Segure a caneta parada** no fim do traço e ele vira uma linha reta.
+- **Só a caneta escreve:** quando o app percebe a caneta, o dedo passa a rolar a página e a palma da mão é ignorada.
+- **Pinça com dois dedos** para dar zoom. No computador, use Ctrl + rolagem.
+- **PDF:** importa um PDF para anotar por cima e exporta o caderno inteiro em PDF.
+- Funciona offline e salva tudo no próprio aparelho (IndexedDB). O leitor de PDF reaproveita o `vendor/pdf.min.mjs` do Neurinho.

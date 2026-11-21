@@ -271,6 +271,58 @@ mark{background:linear-gradient(transparent 35%,#FFD6EC 35%);color:inherit;borde
 .player .pl-t{font-size:12px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .player .pl-sp{font-weight:700;font-size:13px;min-width:44px;height:36px;border-radius:999px;background:var(--surface-2)}
 .recording .page-ind{bottom:calc(env(safe-area-inset-bottom) + 76px)}
+.deck-actions{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
+.deck-stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.deck-stats span{padding:6px 12px;border-radius:999px;background:var(--surface-2);font-size:13px;font-weight:700;color:var(--muted)}
+.deck-stats b{color:var(--accent)}
+.card-list{display:flex;flex-direction:column;gap:8px;max-height:46vh;overflow:auto;margin:0 -4px;padding:2px 4px}
+.crow{display:grid;grid-template-columns:1fr auto;gap:2px 12px;text-align:left;padding:12px 14px;border-radius:16px;background:var(--surface-2)}
+.crow:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+.crow b{font:600 15px/1.35 var(--f-serif);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow span{grid-column:1;font-size:13px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.crow small{grid-row:1/3;grid-column:2;align-self:center;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.dlg textarea{width:100%;min-height:86px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:12px 14px;font:inherit;resize:vertical}
+.cimg{position:relative;display:inline-block;margin-top:8px}
+.cimg img{max-width:100%;max-height:180px;border-radius:12px;box-shadow:0 0 0 1px var(--line)}
+.cimg button{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-weight:700}
+.gen-list{display:flex;flex-direction:column;gap:6px;max-height:46vh;overflow:auto;margin:0 -4px;padding:2px 4px}
+.gen-list label{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:start;padding:10px 12px;border-radius:14px;background:var(--surface-2);cursor:pointer}
+.gen-list input{width:20px;height:20px;margin-top:2px;accent-color:#8B5CF6;grid-row:1/4}
+.gen-list small{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent)}
+.gen-list b{font-weight:600;font-size:14px}
+.gen-list span{font-size:13px;color:var(--muted)}
+.gen-list img{max-width:100%;max-height:90px;border-radius:8px}
+.study{position:fixed;inset:0;z-index:45;overflow:auto;background:radial-gradient(circle at 15% 10%,var(--a1),transparent 55%),radial-gradient(circle at 90% 25%,var(--a2),transparent 50%),radial-gradient(circle at 40% 100%,var(--a3),transparent 60%),var(--bg);
+  padding:calc(env(safe-area-inset-top) + 16px) 16px calc(env(safe-area-inset-bottom) + 24px)}
+.study::before{content:"";position:fixed;inset:0;background-image:var(--noise);opacity:.2;mix-blend-mode:soft-light;pointer-events:none}
+.st-wrap{position:relative;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:18px;min-height:100%}
+.st-top{display:flex;align-items:center;gap:12px}
+.st-title{flex:1;font:italic 700 20px/1.2 var(--f-serif)}
+.st-prog{font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+.st-bar{height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.st-bar i{display:block;height:100%;background:var(--cta);border-radius:999px;transition:width .3s}
+.st-card{background:var(--glass-strong);border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);padding:30px 28px;min-height:300px;display:flex;flex-direction:column;gap:12px;
+  -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+.st-card small{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.st-q{font:600 26px/1.35 var(--f-serif);white-space:pre-wrap;word-break:break-word}
+.st-a{font-size:19px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.st-card img{max-width:100%;max-height:44vh;border-radius:14px;align-self:center;box-shadow:0 0 0 1px var(--line)}
+.st-hr{border:0;height:2px;background:var(--holo);border-radius:2px;margin:8px 0}
+.st-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.st-actions .btn{min-height:54px;font-size:16px;padding:0 26px}
+.rate{flex:1;min-width:120px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:12px 8px;border-radius:20px;font-weight:700;font-size:16px;box-shadow:var(--shadow)}
+.rate small{font-weight:600;font-size:12px;opacity:.8}
+.rate[data-g="0"]{background:#FFE0E8;color:#B42B52}.rate[data-g="1"]{background:#FFF0D2;color:#9A6413}.rate[data-g="2"]{background:#DDF5E6;color:#1F7A48}.rate[data-g="3"]{background:#E2ECFF;color:#3160C8}
+.st-src{align-self:center;color:var(--accent);font-weight:600;font-size:14px;text-decoration:underline;text-underline-offset:3px}
+.opt{width:100%;text-align:left;padding:16px 18px;border-radius:18px;background:var(--glass-strong);border:2px solid var(--line);font-size:17px;line-height:1.4;white-space:pre-wrap;box-shadow:var(--shadow)}
+.opt:hover{border-color:var(--accent)}
+.opt.ok{border-color:#22A06B;background:#E3F7EC;color:#14532d}.opt.bad{border-color:#E2547A;background:#FFE3EA;color:#7a1730}
+.st-done{text-align:center;padding:40px 10px}
+.st-done h2{font:italic 700 34px/1.15 var(--f-serif);margin:10px 0}
+.st-done .big{font:800 64px/1 var(--f-display);background:var(--cta);-webkit-background-clip:text;background-clip:text;color:transparent}
+.review-pill{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 82px);transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;
+  border-radius:999px;background:var(--holo);color:#2A1B3D;font-weight:700;font-size:14px;box-shadow:var(--shadow)}
+.review-pill button{padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.75);font-weight:700}
 .stk-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .stk-grid button{aspect-ratio:1;min-width:0;overflow:hidden;border-radius:18px;display:grid;place-items:center;padding:13px;background:var(--surface-2);transition:transform .15s}
 .stk-grid button:hover{transform:scale(1.06) rotate(-3deg)}
@@ -355,6 +407,7 @@ mark{background:linear-gradient(transparent 35%,#FFD6EC 35%);color:inherit;borde
 
 /* ---------- Janelas ---------- */
 dialog{border:0;padding:0;background:transparent;color:var(--ink);max-width:calc(100vw - 32px);width:460px}
+dialog.wide{width:700px}
 dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
 .dlg{background:var(--glass-strong);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:22px;
   max-height:calc(100dvh - 48px);overflow:auto;-webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%)}
@@ -406,6 +459,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
       <button id="btnImport" class="btn">Importar PDF</button>
       <button id="btnBackup" class="btn">Backup</button>
       <button id="btnFolder" class="btn">Nova pasta</button>
+      <button id="btnStudy" class="btn">✦ Estudar</button>
       <button id="btnNew" class="btn primary">Novo caderno</button>
     </div>
   </header>
@@ -457,6 +511,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
   <div id="pageInd" class="page-ind">1 / 1</div>
   <div id="zoomInd" class="page-ind zoom-ind" hidden>100%</div>
   <button id="backPill" class="page-ind back-pill" hidden></button>
+  <div id="reviewPill" class="review-pill" hidden>Modo revisão · toque no que está coberto <button>Sair</button></div>
   <div id="recPill" class="rec-pill" hidden title="Parar a gravação"><i></i><span>00:00</span> Gravando · toque para parar</div>
   <div id="player" class="player" hidden>
     <button class="icon pl-play" aria-label="Tocar ou pausar">▶</button>
@@ -477,6 +532,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
 
 <dialog id="dlg"></dialog>
 <div id="toast" class="toast" role="status" hidden></div>
+<div id="study" class="study" hidden><div class="st-wrap"></div></div>
 <div id="present" class="present" hidden aria-label="Modo apresentação">
   <canvas class="pv-page"></canvas><canvas class="pv-laser"></canvas>
   <div class="pv-ctrl">
@@ -509,12 +565,13 @@ const PAGE_W=1000, A4_H=1414;
 const DB={
   db:null,
   open(){return new Promise((res,rej)=>{
-    const r=indexedDB.open('sinapse',2);
+    const r=indexedDB.open('sinapse',3);
     r.onupgradeneeded=()=>{const d=r.result,has=n=>d.objectStoreNames.contains(n);
       if(!has('notebooks'))d.createObjectStore('notebooks',{keyPath:'id'});
       if(!has('pages'))d.createObjectStore('pages',{keyPath:'id'}).createIndex('nb','nb');
       if(!has('blobs'))d.createObjectStore('blobs',{keyPath:'id'});
-      if(!has('folders'))d.createObjectStore('folders',{keyPath:'id'});};
+      if(!has('folders'))d.createObjectStore('folders',{keyPath:'id'});
+      if(!has('cards'))d.createObjectStore('cards',{keyPath:'id'}).createIndex('nb','nb');};
     r.onsuccess=()=>{DB.db=r.result;res()};r.onerror=()=>rej(r.error);
   })},
   tx(store,mode,fn){return new Promise((res,rej)=>{
@@ -526,7 +583,8 @@ const DB={
   put:(s,v)=>DB.tx(s,'readwrite',x=>x.put(v)),
   del:(s,id)=>DB.tx(s,'readwrite',x=>x.delete(id)),
   all:s=>DB.tx(s,'readonly',x=>x.getAll()),
-  pagesOf:id=>DB.tx('pages','readonly',x=>x.index('nb').getAll(id))
+  pagesOf:id=>DB.tx('pages','readonly',x=>x.index('nb').getAll(id)),
+  cardsOf:id=>DB.tx('cards','readonly',x=>x.index('nb').getAll(id))
 };
 
 /* ---------- Preferências ---------- */
@@ -974,6 +1032,7 @@ async function notebookMenu(nb){
     {id:'rename',label:'Renomear'},
     {id:'cover',label:'Mudar a capa'},
     {id:'move',label:'Mover para pasta'},
+    {id:'cards',label:'Cartões e revisão',sub:'Flashcards, repetição espaçada e testes'},
     {id:'dup',label:'Duplicar'},
     {id:'pdf',label:'Exportar em PDF',sub:'Para compartilhar, imprimir ou guardar uma cópia'},
     {id:'del',label:'Apagar caderno',danger:true}
@@ -981,12 +1040,14 @@ async function notebookMenu(nb){
   if(a==='open')openNotebook(nb.id);
   else if(a==='rename'){const t=await ask('Renomear caderno',nb.title);if(t){nb.title=t;await DB.put('notebooks',nb);renderLibrary()}}
   else if(a==='cover'){const c=await pickCover(coverOf(nb));if(c){nb.cover=c;await DB.put('notebooks',nb);renderLibrary()}}
+  else if(a==='cards')cardsDialog(nb);
   else if(a==='move'){const t=await pickFolder('Mover “'+nb.title+'” para');if(t!==undefined){nb.folder=t;await DB.put('notebooks',nb);renderLibrary();toast('Caderno movido ✦')}}
   else if(a==='dup')duplicateNotebook(nb);
   else if(a==='pdf'){const pages=await orderedPages(nb);exportPDF(nb.title,pages)}
   else if(a==='del'){
     if(await confirmDlg('Apagar “'+nb.title+'”?','O caderno e todas as páginas somem deste aparelho. Isso não pode ser desfeito.','Apagar')){
       for(const r of nb.recs||[])await DB.del('blobs',r.bid);
+      for(const c of await DB.cardsOf(nb.id)){for(const b of [c.qi,c.ai])if(b)await DB.del('blobs',b);await DB.del('cards',c.id)}
       for(const p of await DB.pagesOf(nb.id)){for(const b of blobIdsOf(p))await DB.del('blobs',b);await DB.del('pages',p.id)}
       await DB.del('notebooks',nb.id);renderLibrary();toast('Caderno apagado');
     }
@@ -1030,6 +1091,8 @@ async function duplicateNotebook(nb){
       for(const st of np.strokes)if(st.bid){const b=await DB.get('blobs',st.bid);if(b){st.bid=uid();await DB.put('blobs',{id:st.bid,blob:b.blob})}}
       await DB.put('pages',np);copy.order.push(np.id);
     }
+    for(const c of await DB.cardsOf(nb.id)){const n={...c,id:uid(),nb:copy.id};for(const k of ['qi','ai'])if(c[k]){const b=await DB.get('blobs',c[k]);if(b){n[k]=uid();await DB.put('blobs',{id:n[k],blob:b.blob})}}
+      if(n.src&&idMap.has(n.src.p))n.src={...n.src,p:idMap.get(n.src.p)};await DB.put('cards',n)}
     if(copy.recs)for(const r of copy.recs){const b=await DB.get('blobs',r.bid);if(b){r.bid=uid();await DB.put('blobs',{id:r.bid,blob:b.blob})}}
     await DB.put('notebooks',copy);hideToast();renderLibrary();toast('Caderno duplicado ✦');
   }catch(e){console.error(e);hideToast();toast('Não consegui duplicar.',4000)}
@@ -1051,9 +1114,9 @@ async function newNotebookDialog(){
    ===================================================================== */
 const dlg=$('#dlg');
 dlg.addEventListener('click',e=>{if(e.target===dlg)dlg.close('')});
-function openDlg(html,setup){
+function openDlg(html,setup,wide){
   return new Promise(res=>{
-    dlg.innerHTML='<div class="dlg">'+html+'</div>';dlg.returnValue='';
+    dlg.classList.toggle('wide',!!wide);dlg.innerHTML='<div class="dlg">'+html+'</div>';dlg.returnValue='';
     const done=v=>{dlg._val=v;dlg.close('x')};dlg._val=undefined;
     setup&&setup(dlg,done);
     dlg.onclose=()=>{if(dlg.open)return;const v=dlg._val;dlg.onclose=null;res(v)};
@@ -1142,6 +1205,7 @@ async function openNotebook(id,opt){
   else if(opt&&opt.pageId){const i=S.pages.findIndex(r=>r.d.id===opt.pageId);if(i>0)requestAnimationFrame(()=>{desk.scrollTop=S.pages[i].el.offsetTop-24;updateIndicator()})}
 }
 async function closeNotebook(){
+  setReview(false);
   commitText();clearSelection();togglePanel(false);toggleRuler(false);closePlayer();if(REC.on)await stopRec();await flushSaves();
   io.disconnect();S.pages.forEach(detach);pagesEl.innerHTML='';desk.classList.remove('boardmode');$('#pageInd').hidden=false;BT=null;
   S.nb=null;S.pages=[];S.undo=[];S.redo=[];
@@ -1212,6 +1276,7 @@ function renderPage(rt){
   if(rt.board)paintBoard(c,rt,hide);else paint(c,rt.d,rt.bgImg,hide);
   FADE=null;
   drawLinkBadges(c,rt);
+  if(S.review)drawCovers(c,rt);
 }
 function ensureLive(rt){
   if(live.parentNode!==rt.el)rt.el.append(live);
@@ -1418,6 +1483,7 @@ pagesEl.addEventListener('pointerdown',e=>{
   }
   if(e.target.closest('.tbox'))return;
   if(act||pinch)return;
+  if(S.review&&!(e.pointerType==='touch'&&P.penOnly)&&revealAt(e)){e.preventDefault();return}
   if(e.pointerType==='touch'&&P.penOnly)return;
   if(e.pointerType==='mouse'&&e.button!==0)return;
   const el=e.target.closest('.page');
@@ -1652,10 +1718,11 @@ function drawSelection(){
 function clearSelection(){if(!S.sel)return;const rt=S.sel.rt;S.sel=null;$('#selBar').hidden=true;if(live.parentNode===rt.el)clearLive();renderPage(rt)}
 function showSelBar(){
   const s=S.sel,bar=$('#selBar');if(!s)return;
-  bar.innerHTML=`<button class="btn" data-a="minus" aria-label="Diminuir" title="Diminuir">−</button><button class="btn" data-a="plus" aria-label="Aumentar" title="Aumentar">+</button><button class="btn" data-a="rot" aria-label="Girar 90 graus" title="Girar 90°">↻ 90°</button><button class="btn" data-a="link" title="Criar link">🔗 Link</button><span class="sep"></span><button class="btn" data-a="dup">Duplicar</button><button class="btn" data-a="del" style="color:var(--danger)">Apagar</button><span class="sep"></span>`+
+  bar.innerHTML=`<button class="btn" data-a="minus" aria-label="Diminuir" title="Diminuir">−</button><button class="btn" data-a="plus" aria-label="Aumentar" title="Aumentar">+</button><button class="btn" data-a="rot" aria-label="Girar 90 graus" title="Girar 90°">↻ 90°</button><button class="btn" data-a="link" title="Criar link">🔗 Link</button><button class="btn" data-a="card" title="Criar cartão de estudo">🃏 Cartão</button><span class="sep"></span><button class="btn" data-a="dup">Duplicar</button><button class="btn" data-a="del" style="color:var(--danger)">Apagar</button><span class="sep"></span>`+
     PEN_COLORS.map(c=>`<button class="swatch" data-c="${c}" style="--sw:${c}" aria-label="Pintar de ${c}"><span></span></button>`).join('');
   bar.querySelector('[data-a=del]').onclick=deleteSelection;
   bar.querySelector('[data-a=dup]').onclick=duplicateSelection;
+  bar.querySelector('[data-a=card]').onclick=cardFromSelection;
   bar.querySelector('[data-a=minus]').onclick=()=>scaleSelection(1/1.2);
   bar.querySelector('[data-a=plus]').onclick=()=>scaleSelection(1.2);
   bar.querySelector('[data-a=link]').onclick=linkDialog;
@@ -1847,6 +1914,7 @@ pagesEl.addEventListener('pointerup',e=>{
   tryLinkAt(e);
 });
 function tryLinkAt(e){
+  if(S.review&&revealAt(e))return true;
   const el=e.target.closest&&e.target.closest('.page');if(!el||!el._rt)return false;const rt=el._rt;
   const pt=clientToPage(rt,el.getBoundingClientRect(),e.clientX,e.clientY),au=audioAt(rt.d,pt);if(au){seekTo(au.t-1500);return true}
   const l=linkAt(rt.d,pt);if(!l)return false;followLink(l);return true;
@@ -2183,6 +2251,8 @@ async function editorMenu(){
     {id:'sec',label:rt.d.sec?'Renomear a divisória “'+rt.d.sec+'”':'Criar divisória nesta página',sub:'Marca o começo de uma seção, como as abas de um fichário'},
     ...(rt.d.sec?[{id:'secDel',label:'Remover a divisória'}]:[]),
     ...(isPdf||isBoard()?[]:[{id:'tpl',label:'Mudar o modelo desta página',sub:'Liso, pautado, quadriculado, pontilhado ou Cornell'}]),
+    {id:'cards',label:'Cartões e revisão',sub:'Flashcards, repetição espaçada e testes'},
+    {id:'review',label:S.review?'Sair do modo revisão':'Modo revisão',sub:'Cobre o que está com marca-texto; toque para revelar'},
     {id:'present',label:'Apresentar',sub:'Tela cheia com ponteiro laser. Espelhe o iPad na TV ou no projetor'},
     {id:'search',label:'Buscar neste caderno'},
     {id:'img',label:'Inserir imagem ou foto',sub:'Da galeria, da câmera ou dos arquivos'},
@@ -2200,6 +2270,8 @@ async function editorMenu(){
   else if(a==='secDel'){delete rt.d.sec;save(rt);decoratePage(rt);renderPanel()}
   else if(a==='tpl'){const r=await templateForm(rt.d);if(r){rt.d.tpl=r.tpl;rt.d.paper=r.paper;layout();renderPage(rt);save(rt)}}
   else if(a==='present')startPresent(i);
+  else if(a==='cards'){await flushSaves();cardsDialog(S.nb)}
+  else if(a==='review')setReview(!S.review);
   else if(a==='search'){togglePanel(true);setTimeout(()=>$('#pageSearch').focus(),50)}
   else if(a==='img')$('#imgInput').click();
   else if(a==='pdfIn'){pdfTarget=S.nb;$('#pdfInput').click()}
@@ -2290,9 +2362,225 @@ pv.addEventListener('pointerup',e=>{
 pv.addEventListener('pointercancel',()=>{PV.down=null});
 window.addEventListener('resize',()=>{if(PV.on)drawPresent()});
 
+/* =====================================================================
+   Estudo: cartões, repetição espaçada, testes e modo revisão
+   ===================================================================== */
+const DAY=864e5;
+function srs(card,g){
+  const c={...card},now=Date.now(),e=c.ease||2.5,r=c.reps||0,prev=c.ivl||0;
+  if(g===0){c.lapses=(c.lapses||0)+1;c.reps=0;c.ivl=0;c.ease=Math.max(1.3,e-.2);c.due=now+60e3}
+  else if(g===1&&r===0){c.ivl=0;c.due=now+10*60e3}
+  else{let ivl;
+    if(g===1){ivl=r===0?1:Math.max(1,Math.round(prev*1.2));c.ease=Math.max(1.3,e-.15)}
+    else if(g===2)ivl=r===0?1:r===1?3:Math.max(prev+1,Math.round(prev*e));
+    else{ivl=r===0?4:Math.max(prev+2,Math.round(prev*e*1.3));c.ease=e+.15}
+    c.ivl=ivl;c.reps=r+1;c.due=now+ivl*DAY}
+  c.last=now;return c;
+}
+const ivlLabel=(card,g)=>{const d=(srs(card,g).due-Date.now())/DAY;return d<1/24?Math.max(1,Math.round(d*1440))+' min':d<1?Math.round(d*24)+' h':d<30?Math.round(d)+(Math.round(d)===1?' dia':' dias'):d<365?Math.round(d/30)+(Math.round(d/30)===1?' mês':' meses'):(d/365).toFixed(1).replace('.',',')+' anos'};
+const dueLabel=c=>{if(!c.reps&&!c.last)return 'Novo';const d=(c.due-Date.now())/DAY;return d<=0?'Para hoje':d<1?'Hoje mais tarde':'Em '+Math.ceil(d)+(Math.ceil(d)===1?' dia':' dias')};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const htmlT=t=>esc(t||'').replace(/\n/g,'<br>');
+const imgUrls=new Map();
+async function imgUrl(bid){if(!bid)return null;if(imgUrls.has(bid))return imgUrls.get(bid);const b=await DB.get('blobs',bid);if(!b)return null;const u=URL.createObjectURL(b.blob);imgUrls.set(bid,u);return u}
+async function updateStudyBtn(){
+  const due=(await DB.all('cards')).filter(c=>c.due<=Date.now()).length,b=$('#btnStudy');
+  b.textContent=due?'✦ Estudar · '+due:'✦ Estudar';b.classList.toggle('primary',due>0&&false);
+}
+async function studyHome(){
+  const cards=await DB.all('cards'),nbs=await DB.all('notebooks'),now=Date.now(),due=cards.filter(c=>c.due<=now);
+  const by=new Map();for(const c of cards){const x=by.get(c.nb)||{n:0,d:0};x.n++;if(c.due<=now)x.d++;by.set(c.nb,x)}
+  const list=nbs.filter(n=>by.has(n.id)).sort((a,b)=>by.get(b.id).d-by.get(a.id).d);
+  const a=await menu('Estudar',[
+    {id:'all',label:'Revisar tudo que vence hoje ('+due.length+')',sub:due.length?'Cartões de todos os cadernos':'Nada para hoje ✦ Volte amanhã ou crie cartões'},
+    ...list.map(n=>({id:n.id,label:n.title,sub:by.get(n.id).n+' cartões · '+by.get(n.id).d+' para hoje'})),
+    ...(!cards.length?[{id:'help',label:'Como criar cartões',sub:'Abra um caderno › ⋯ › Cartões e revisão'}]:[])
+  ]);
+  if(a==='all')startStudy(due,'Revisão de hoje');
+  else if(a&&a!=='help'){const nb=nbs.find(n=>n.id===a);if(nb)cardsDialog(nb)}
+}
+async function cardsDialog(nb){
+  for(;;){
+    const cards=(await DB.cardsOf(nb.id)).sort((a,b)=>(a.due||0)-(b.due||0)),now=Date.now(),due=cards.filter(c=>c.due<=now);
+    const fresh=cards.filter(c=>!c.reps&&!c.last).length;
+    const r=await openDlg(`<h2>Cartões · ${esc(nb.title)}</h2>
+      <div class="deck-stats"><span><b>${cards.length}</b> cartões</span><span><b>${due.length}</b> para hoje</span><span><b>${fresh}</b> novos</span></div>
+      <div class="deck-actions"><button class="btn primary" data-a="study">Estudar (${due.length})</button><button class="btn" data-a="quiz">Teste</button>
+      <button class="btn" data-a="new">+ Novo cartão</button><button class="btn" data-a="gen">✦ Gerar das anotações</button></div>
+      <div class="card-list">${cards.length?cards.map(c=>`<button class="crow" data-id="${c.id}"><b>${c.qi?'🖼 ':''}${esc(c.q||'(imagem)')}</b><span>${c.ai?'🖼 ':''}${esc(c.a||(c.ai?'(imagem)':''))}</span><small>${dueLabel(c)}</small></button>`).join(''):'<p>Nenhum cartão ainda. Crie um, gere das suas anotações, ou selecione algo no caderno com o laço e toque em 🃏 Cartão.</p>'}</div>
+      <div class="actions"><button class="btn" data-x>Fechar</button></div>`,
+      (d,done)=>{d.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>done(b.dataset.a));d.querySelectorAll('.crow').forEach(b=>b.onclick=()=>done('e:'+b.dataset.id));$('[data-x]',d).onclick=()=>done(null)},true);
+    if(!r)return;
+    if(r==='study'){startStudy(due,nb.title,nb);return}
+    if(r==='quiz'){startQuiz(cards,nb.title);return}
+    if(r==='new')await editCard(null,nb,{});
+    else if(r==='gen')await generateCards(nb);
+    else if(r.startsWith('e:'))await editCard(cards.find(c=>c.id===r.slice(2)),nb);
+  }
+}
+async function editCard(card,nb,preset){
+  const c=card?{...card}:{id:uid(),nb:nb.id,q:'',a:'',created:Date.now(),due:Date.now(),reps:0,ivl:0,ease:2.5,...preset};
+  const [qu,au]=[await imgUrl(c.qi),await imgUrl(c.ai)];
+  const r=await openDlg(`<h2>${card?'Editar cartão':'Novo cartão'}</h2><form>
+      <label class="f" for="cq">Pergunta (frente)</label><textarea id="cq" placeholder="Ex.: O que é sinapse?">${esc(c.q)}</textarea>
+      ${qu?`<div class="cimg" data-k="qi"><img src="${qu}" alt=""><button type="button" aria-label="Tirar imagem">×</button></div>`:''}
+      <label class="f" for="ca">Resposta (verso)</label><textarea id="ca" placeholder="Ex.: Ligação entre dois neurônios">${esc(c.a)}</textarea>
+      ${au?`<div class="cimg" data-k="ai"><img src="${au}" alt=""><button type="button" aria-label="Tirar imagem">×</button></div>`:''}
+      ${(qu||au)?'<p style="margin-top:12px"><button type="button" class="btn" data-swap>⇅ Trocar a imagem de lado</button></p>':''}
+      <div class="actions">${card?'<button type="button" class="btn" data-del style="color:var(--danger);margin-right:auto">Apagar</button>':''}<button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Salvar</button></div></form>`,
+    (d,done)=>{
+      d.querySelectorAll('.cimg button').forEach(b=>b.onclick=()=>{c[b.parentNode.dataset.k]=null;b.parentNode.remove()});
+      const sw=$('[data-swap]',d);if(sw)sw.onclick=()=>{done({swap:true,q:$('#cq',d).value,a:$('#ca',d).value})};
+      $('[data-x]',d).onclick=()=>done(null);const dl=$('[data-del]',d);if(dl)dl.onclick=()=>done('del');
+      $('form',d).onsubmit=e=>{e.preventDefault();done({q:$('#cq',d).value.trim(),a:$('#ca',d).value.trim()})};
+      setTimeout(()=>$('#cq',d).focus(),60);
+    },true);
+  if(!r)return null;
+  if(r==='del'){if(await confirmDlg('Apagar este cartão?','O progresso de revisão dele também sai.','Apagar')){for(const b of [card.qi,card.ai])if(b)await DB.del('blobs',b);await DB.del('cards',card.id);updateStudyBtn()}return null}
+  if(r.swap){c.q=r.q;c.a=r.a;[c.qi,c.ai]=[c.ai||null,c.qi||null];return editCard(card?c:null,nb,card?undefined:c)}
+  if(!r.q&&!c.qi){toast('Escreva a pergunta (ou deixe uma imagem na frente).',4000);return editCard(card,nb,{...c,...r})}
+  c.q=r.q;c.a=r.a;await DB.put('cards',c);updateStudyBtn();toast(card?'Cartão salvo ✦':'Cartão criado ✦');return c;
+}
+async function renderCrop(d,rect,cover,maxW=1100){
+  const k=Math.min(2.2,maxW/rect.w),cv=document.createElement('canvas');cv.width=Math.round(rect.w*k);cv.height=Math.round(rect.h*k);
+  const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.setTransform(k,0,0,k,-rect.x*k,-rect.y*k);
+  let bg=null;if(d.bg)bg=await loadBg(d.bg);await ensureImgs([d]);paint(x,d,bg);if(bg&&bg.close)bg.close();
+  if(cover){for(const b of cover){rrect(x,b.x-4,b.y-4,b.w+8,b.h+8,8);x.fillStyle='#CDB8F4';x.fill();x.lineWidth=2;x.strokeStyle='#8B5CF6';x.stroke();
+    x.fillStyle='#4A3570';x.font=`700 ${Math.min(34,b.h*.8)}px "DM Sans", sans-serif`;x.textAlign='center';x.textBaseline='middle';x.fillText('?',b.x+b.w/2,b.y+b.h/2)}}
+  const blob=await toBlob(cv,'image/jpeg',.88),bid=uid();cv.width=cv.height=0;await DB.put('blobs',{id:bid,blob});return bid;
+}
+async function cardFromSelection(){
+  const s=S.sel;if(!s)return;const rt=s.rt,items=s.items,texts=items.filter(x=>x.t==='text'||x.t==='node').map(x=>x.txt);
+  const preset={src:{p:rt.d.id}};
+  if(texts.length===items.length)preset.a=texts.join('\n');
+  else{const pad=14,b=s.box,rect={x:b.x-pad,y:b.y-pad,w:b.w+pad*2,h:b.h+pad*2};
+    const only={...rt.d,tpl:'blank',bg:null,strokes:rt.d.strokes.filter(x=>s.set.has(x)||x.t==='edge')};preset.ai=await renderCrop(only,rect,null,900)}
+  clearSelection();await editCard(null,S.nb,preset);
+}
+async function generateCards(nb){
+  toast('Procurando nas suas anotações…',0);
+  const pages=await orderedPages(nb),existing=new Set((await DB.cardsOf(nb.id)).map(c=>c.key).filter(Boolean)),cand=[];
+  const defRe=/^\s*([^:=\n]{2,60}?)\s*(?::|=|\s[–—-]\s)\s*(\S.{1,300})$/;
+  pages.forEach((d,pi)=>{
+    for(const st of d.strokes)if(st.t==='text')for(const line of st.txt.split('\n')){const m=line.match(defRe);if(m)cand.push({kind:'Definição',q:m[1].trim(),a:m[2].trim(),p:d.id,on:true})}
+    const nodes=nodeMap(d);
+    for(const n of nodes.values()){const kids=d.strokes.filter(e=>e.t==='edge'&&e.a===n.id).map(e=>nodes.get(e.b)).filter(Boolean);
+      if(kids.length)cand.push({kind:'Mapa mental',q:'Quais são os tópicos de “'+n.txt+'”?',a:kids.map(k=>'• '+k.txt).join('\n'),p:d.id,on:true})}
+    if(d.pt){let c=0;for(const it of d.pt){const m=it.s.match(defRe);if(m&&m[1].length<=40&&c<40){c++;cand.push({kind:'PDF',q:m[1].trim(),a:m[2].trim(),p:d.id,on:false})}}}
+    const hl=d.strokes.filter(st=>st.t==='hl');
+    for(const st of hl){const b=bbox(st);cand.push({kind:'Marca-texto',hl:{d,b},p:d.id,key:'h:'+d.id+':'+Math.round(b.x)+','+Math.round(b.y),page:pi+1,on:true})}
+  });
+  for(const c of cand)if(!c.key)c.key='t:'+c.q+'|'+c.a;
+  const list=cand.filter(c=>!existing.has(c.key)).slice(0,150);hideToast();
+  if(!list.length){await openDlg(`<h2>Gerar cartões</h2><p>Não achei nada novo para virar cartão. O Sinapse procura:</p>
+    <p>• Textos digitados no formato <b>termo: definição</b><br>• Ideias de mapas mentais que têm ideias ligadas<br>• Trechos com <b>marca-texto</b> (viram cartões de esconder e revelar)<br>• Linhas de PDFs no formato termo: definição</p>
+    <div class="actions"><button class="btn primary" data-x>Entendi</button></div>`,(d,done)=>$('[data-x]',d).onclick=()=>done(null));return}
+  const r=await openDlg(`<h2>Gerar cartões</h2><p>Escolha o que vira cartão. Os de marca-texto mostram o trecho da página com o destaque coberto.</p>
+    <div class="gen-list">${list.map((c,i)=>`<label><input type="checkbox" data-i="${i}" ${c.on?'checked':''}><small>${c.kind}${c.page?' · página '+c.page:''}</small>${c.hl?'<span>Trecho destacado vira pergunta e resposta</span>':`<b>${esc(c.q)}</b><span>${htmlT(c.a)}</span>`}</label>`).join('')}</div>
+    <div class="actions"><button class="btn" data-x>Cancelar</button><button class="btn primary" data-ok>Criar cartões</button></div>`,
+    (d,done)=>{const upd=()=>{const n=d.querySelectorAll('.gen-list input:checked').length;$('[data-ok]',d).textContent=n?`Criar ${n} cartões`:'Criar cartões'};
+      d.querySelectorAll('.gen-list input').forEach(x=>x.onchange=upd);upd();$('[data-x]',d).onclick=()=>done(null);
+      $('[data-ok]',d).onclick=()=>done([...d.querySelectorAll('.gen-list input:checked')].map(x=>list[+x.dataset.i]))},true);
+  if(!r||!r.length)return;
+  let n=0;for(const c of r){
+    toast('Criando cartões… '+(++n)+' de '+r.length,0);
+    const card={id:uid(),nb:nb.id,q:c.q||'',a:c.a||'',key:c.key,src:{p:c.p},created:Date.now(),due:Date.now(),reps:0,ivl:0,ease:2.5};
+    if(c.hl){const {d,b}=c.hl,rect={x:Math.max(0,b.x-160),y:Math.max(0,b.y-110),w:0,h:0};rect.w=Math.min(d.w,b.x+b.w+160)-rect.x;rect.h=Math.min(d.h,b.y+b.h+110)-rect.y;
+      card.q='O que está escondido?';card.qi=await renderCrop(d,rect,[b]);card.ai=await renderCrop(d,rect,null)}
+    await DB.put('cards',card);
+  }
+  hideToast();updateStudyBtn();toast(r.length+(r.length===1?' cartão criado ✦':' cartões criados ✦'));
+}
+/* ---------- Sessão de estudo e teste ---------- */
+let ST={on:false};
+const stEl=$('#study'),stWrap=$('.st-wrap',stEl);
+function startStudy(cards,title,nb){
+  if(!cards.length){toast('Nada para revisar agora ✦ Volte mais tarde.',4000);return}
+  const q=shuffle(cards.filter(c=>c.reps||c.last)).sort((a,b)=>a.due-b.due).concat(shuffle(cards.filter(c=>!c.reps&&!c.last)));
+  ST={on:true,mode:'srs',q:q.slice(0,200),title,total:Math.min(q.length,200),done:0,stats:[0,0,0,0],flip:false};stEl.hidden=false;renderStudy();
+}
+function closeStudy(){ST={on:false};stEl.hidden=true;stWrap.innerHTML='';imgUrls.forEach(u=>URL.revokeObjectURL(u));imgUrls.clear();updateStudyBtn()}
+async function cardFace(c,back){
+  const qu=await imgUrl(c.qi),au=back?await imgUrl(c.ai):null;
+  return `<div class="st-card"><small>Pergunta</small>${c.q?`<div class="st-q">${htmlT(c.q)}</div>`:''}${qu?`<img src="${qu}" alt="">`:''}
+    ${back?`<hr class="st-hr"><small>Resposta</small>${c.a?`<div class="st-a">${htmlT(c.a)}</div>`:''}${au?`<img src="${au}" alt="">`:''}`:''}</div>`;
+}
+async function renderStudy(){
+  const top=(p)=>`<div class="st-top"><button class="icon st-x" aria-label="Sair do estudo"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button><div class="st-title">${esc(ST.title)}</div><div class="st-prog">${p}</div></div>`;
+  if(ST.mode==='srs'){
+    if(!ST.q.length){const s=ST.stats;stWrap.innerHTML=top('')+`<div class="st-done"><div class="big">✦</div><h2>Revisão concluída</h2><p>${s[2]+s[3]} bons ou fáceis · ${s[1]} difíceis · ${s[0]} para rever</p><p style="color:var(--muted)">Os próximos cartões aparecem no dia certo para fixar na memória.</p><div class="st-actions"><button class="btn primary st-x">Fechar</button></div></div>`;wireStudy();return}
+    const c=ST.q[0],pct=Math.round(ST.done/ST.total*100);
+    stWrap.innerHTML=top(ST.done+' / '+ST.total)+`<div class="st-bar"><i style="width:${pct}%"></i></div>`+await cardFace(c,ST.flip)+
+      `<div class="st-actions">${ST.flip?['Errei','Difícil','Bom','Fácil'].map((l,g)=>`<button class="rate" data-g="${g}">${l}<small>${ivlLabel(c,g)}</small></button>`).join(''):'<button class="btn primary st-flip">Mostrar resposta</button>'}</div>`+
+      (c.src?'<button class="st-src">Ver na página do caderno</button>':'');
+  }else{
+    const Q=ST.qs;
+    if(ST.i>=Q.length){stWrap.innerHTML=top('')+`<div class="st-done"><div class="big">${ST.ok}/${Q.length}</div><h2>${ST.ok===Q.length?'Gabaritou! ✦':ST.ok>=Q.length*.7?'Mandou bem ✦':'Bora revisar ✦'}</h2>
+      ${ST.wrong.length?`<p>Você errou ${ST.wrong.length}. Que tal estudar esses agora?</p>`:''}<div class="st-actions">${ST.wrong.length?'<button class="btn primary st-wrong">Estudar os que errei</button>':''}<button class="btn st-x">Fechar</button></div></div>`;wireStudy();return}
+    const it=Q[ST.i];
+    stWrap.innerHTML=top((ST.i+1)+' / '+Q.length)+`<div class="st-bar"><i style="width:${Math.round(ST.i/Q.length*100)}%"></i></div>`+await cardFace(it.c,false)+
+      `<div style="display:flex;flex-direction:column;gap:10px">${it.opts.map((o,i)=>`<button class="opt" data-o="${i}">${htmlT(o)}</button>`).join('')}</div>`+
+      (ST.picked!=null?'<div class="st-actions"><button class="btn primary st-next">Próxima</button></div>':'');
+    if(ST.picked!=null)stWrap.querySelectorAll('.opt').forEach((b,i)=>{if(it.opts[i]===it.c.a.trim())b.classList.add('ok');else if(i===ST.picked)b.classList.add('bad')});
+  }
+  wireStudy();
+}
+function wireStudy(){
+  stWrap.querySelectorAll('.st-x').forEach(b=>b.onclick=closeStudy);
+  const f=$('.st-flip',stWrap);if(f)f.onclick=()=>{ST.flip=true;renderStudy()};
+  stWrap.querySelectorAll('.rate').forEach(b=>b.onclick=()=>rateCard(+b.dataset.g));
+  const sr=$('.st-src',stWrap);if(sr)sr.onclick=()=>gotoCardSource(ST.q[0]);
+  stWrap.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{if(ST.picked!=null)return;ST.picked=+b.dataset.o;const it=ST.qs[ST.i];if(it.opts[ST.picked]===it.c.a.trim())ST.ok++;else ST.wrong.push(it.c);renderStudy()});
+  const nx=$('.st-next',stWrap);if(nx)nx.onclick=()=>{ST.i++;ST.picked=null;renderStudy()};
+  const w=$('.st-wrong',stWrap);if(w)w.onclick=()=>{const cards=ST.wrong,t=ST.title;startStudy(cards,t+' · revisão')};
+}
+async function rateCard(g){
+  const c=srs(ST.q.shift(),g);await DB.put('cards',c);ST.stats[g]++;
+  if(c.due-Date.now()<3600e3)ST.q.splice(Math.min(g===0?3:6,ST.q.length),0,c);else ST.done++;
+  ST.flip=false;renderStudy();
+}
+function startQuiz(cards,title){
+  const pool=cards.filter(c=>c.a&&c.a.trim()),answers=[...new Set(pool.map(c=>c.a.trim()))];
+  if(answers.length<4){toast('Para o teste, crie pelo menos 4 cartões com respostas em texto diferentes.',5000);return}
+  const qs=shuffle(pool).slice(0,10).map(c=>({c,opts:shuffle([c.a.trim(),...shuffle(answers.filter(a=>a!==c.a.trim())).slice(0,3)])}));
+  ST={on:true,mode:'quiz',qs,i:0,ok:0,wrong:[],picked:null,title:'Teste · '+title};stEl.hidden=false;renderStudy();
+}
+async function gotoCardSource(c){
+  closeStudy();if(!c||!c.src)return;
+  if(!S.nb||S.nb.id!==c.nb){if(S.nb)await closeNotebook();$('#library').hidden=true;await openNotebook(c.nb,{pageId:c.src.p})}
+  else{const i=S.pages.findIndex(r=>r.d.id===c.src.p);if(i>=0)gotoPage(i)}
+}
+function studyKey(e){
+  const k=e.key;if(dlg.open)return;
+  if(k==='Escape'){e.preventDefault();closeStudy();return}
+  if(ST.mode==='srs'){if(!ST.flip&&(k===' '||k==='Enter')){e.preventDefault();ST.flip=true;renderStudy()}else if(ST.flip&&'1234'.includes(k)){e.preventDefault();rateCard(+k-1)}}
+  else{if(ST.picked==null&&'1234'.includes(k)){const b=stWrap.querySelectorAll('.opt')[+k-1];if(b)b.click()}else if(ST.picked!=null&&(k==='Enter'||k===' ')){e.preventDefault();const n=$('.st-next',stWrap);if(n)n.click()}}
+}
+/* ---------- Modo revisão: cobre o marca-texto no próprio caderno ---------- */
+function setReview(on){
+  S.review=!!on;S.revealed=new Set();$('#reviewPill').hidden=!S.review;S.pages.forEach(rt=>rt.canvas&&renderPage(rt));
+  if(on)toast('Tudo que está com marca-texto foi coberto. Toque para revelar ✦',4000);
+}
+$('#reviewPill button').onclick=()=>setReview(false);
+function drawCovers(c,rt){
+  const z=rt.el.clientWidth/VW(rt);c.save();
+  for(const st of rt.d.strokes){if(st.t!=='hl'||S.revealed.has(st))continue;const b=bbox(st);
+    rrect(c,b.x-2,b.y-2,b.w+4,b.h+4,Math.min(10,b.h/3));c.fillStyle='#CDB8F4';c.fill();c.lineWidth=1.5/z;c.strokeStyle='#8B5CF6';c.stroke();
+    c.fillStyle='#4A3570';c.font=`700 ${Math.min(b.h*.7,22/z)}px "DM Sans", sans-serif`;c.textAlign='center';c.textBaseline='middle';c.fillText('?',b.x+b.w/2,b.y+b.h/2)}
+  c.restore();
+}
+function revealAt(e){
+  const el=e.target.closest&&e.target.closest('.page');if(!el||!el._rt)return false;const rt=el._rt;
+  const pt=clientToPage(rt,el.getBoundingClientRect(),e.clientX,e.clientY);
+  for(let i=rt.d.strokes.length-1;i>=0;i--){const st=rt.d.strokes[i];if(st.t!=='hl')continue;const b=bbox(st);
+    if(pt.x>=b.x-4&&pt.x<=b.x+b.w+4&&pt.y>=b.y-4&&pt.y<=b.y+b.h+4){S.revealed.has(st)?S.revealed.delete(st):S.revealed.add(st);renderPage(rt);return true}}
+  return false;
+}
+
 /* ---------- Teclado ---------- */
 document.addEventListener('keydown',e=>{
   if(PV.on){presentKey(e);return}
+  if(ST.on){studyKey(e);return}
   if(!S.nb&&(e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='f'&&!dlg.open){e.preventDefault();$('#libSearch').focus();return}
   if(!S.nb||dlg.open||e.target.closest('input,textarea'))return;
   const mod=e.metaKey||e.ctrlKey,k=e.key.toLowerCase();
@@ -2403,10 +2691,10 @@ const blobToData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()
 async function makeBackup(){
   try{
     toast('Preparando o backup…',0);
-    const notebooks=await DB.all('notebooks'),pages=await DB.all('pages'),folders=await DB.all('folders'),blobs=[];
+    const notebooks=await DB.all('notebooks'),pages=await DB.all('pages'),folders=await DB.all('folders'),cards=await DB.all('cards'),blobs=[];
     for(const b of await DB.all('blobs'))blobs.push({id:b.id,data:await blobToData(b.blob)});
     const date=new Date().toISOString().slice(0,10);
-    const file=new File([JSON.stringify({app:'sinapse',versao:2,data:new Date().toISOString(),folders,notebooks,pages,blobs})],`Sinapse backup ${date}.json`,{type:'application/json'});
+    const file=new File([JSON.stringify({app:'sinapse',versao:3,data:new Date().toISOString(),folders,notebooks,pages,cards,blobs})],`Sinapse backup ${date}.json`,{type:'application/json'});
     hideToast();
     if(await offerFile(file,'Backup do Sinapse','Backup pronto','Guarde no iCloud Drive, Google Drive ou Arquivos')){P.lastBackup=Date.now();savePrefs();backupNote()}
   }catch(e){console.error(e);hideToast();toast('Não consegui criar o backup.',4000)}
@@ -2422,6 +2710,7 @@ async function restoreBackup(file){
     for(const b of data.blobs||[])await DB.put('blobs',{id:b.id,blob:await (await fetch(b.data)).blob()});
     for(const pg of data.pages||[])await DB.put('pages',pg);
     for(const f of data.folders||[])await DB.put('folders',f);
+    for(const c of data.cards||[])await DB.put('cards',c);
     for(const nb of data.notebooks)await DB.put('notebooks',nb);
     hideToast();await renderLibrary();toast(n+(n===1?' caderno restaurado ✦':' cadernos restaurados ✦'));
   }catch(e){console.error(e);hideToast();toast('Não consegui restaurar tudo. Tente de novo.',5000)}
@@ -2450,6 +2739,7 @@ const HELLO={0:['Boa madrugada, estrela ✦','A lua está do seu lado ☾'],1:['
 {const h=new Date().getHours(),l=HELLO[h<5?0:h<12?1:h<18?2:3];$('#hello').textContent=l[Math.floor(Math.random()*l.length)]}
 $('#btnNew').onclick=newNotebookDialog;
 $('#btnFolder').onclick=newFolder;
+$('#btnStudy').onclick=studyHome;
 document.querySelector('[data-act=new]').onclick=newNotebookDialog;
 $('#btnImport').onclick=()=>{pdfTarget=null;$('#pdfInput').click()};
 (async()=>{
@@ -2457,7 +2747,7 @@ $('#btnImport').onclick=()=>{pdfTarget=null;$('#pdfInput').click()};
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   const m=location.hash.match(/^#c=(.+)$/);
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{fontEpoch++;if(S.nb)S.pages.forEach(rt=>rt.canvas&&renderPage(rt))});
-  await renderLibrary();backupNote();
+  await renderLibrary();backupNote();updateStudyBtn();
   if(m)openNotebook(m[1]);
   if('serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();

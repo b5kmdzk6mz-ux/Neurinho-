@@ -20,8 +20,8 @@
 9. Gravar áudio da aula ligado às anotações (tocar o trecho de quando você escreveu) ✓
 10. Ferramentas de desenho: quadro branco infinito ✓, mapas mentais ✓, fluxogramas ◐ (com formas e setas)
 
-## Fase 2: estudo
-Flashcards, perguntas e respostas, repetição espaçada, testes de revisão, criar cartões a partir das anotações. O Neurinho já tem isso pronto e dá para reaproveitar. ○
+## Fase 2: estudo ✓
+Flashcards ✓, perguntas e respostas ✓, repetição espaçada (Errei, Difícil, Bom, Fácil) ✓, testes de múltipla escolha ✓, estudar pelas próprias anotações (modo revisão que cobre o marca-texto) ✓, transformar anotações em cartões (definições, mapas mentais, PDFs e marca-texto) ✓, cartão a partir de uma seleção do laço ✓
 
 ## Fase 3: nuvem (precisa de servidor, sugestão: Supabase)
 Login ○, sincronizar entre aparelhos ○, guardar na nuvem ○, compartilhar por link ○, comentários ○, colaboração em tempo real ○, planos pagos ○

@@ -355,6 +355,18 @@ mark{background:linear-gradient(transparent 35%,#FFD6EC 35%);color:inherit;borde
 .ai-ask .btn{min-height:44px;padding:0 14px}
 .ai-empty{color:var(--muted);font-size:14px;padding:4px 2px}
 .st-exp{margin-top:4px;padding:12px 14px;border-radius:16px;background:var(--glass);border:1px solid var(--line);font-size:15px;line-height:1.5}
+.cm-badge{position:absolute;top:-13px;left:60px;z-index:3;display:flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:#fff;color:#4A3570;
+  font-size:13px;font-weight:700;box-shadow:0 3px 10px rgba(120,70,200,.3);cursor:pointer}
+.cm-list{display:flex;flex-direction:column;gap:8px;max-height:44vh;overflow:auto;margin:0 -4px 12px;padding:2px 4px}
+.cm{padding:10px 12px;border-radius:14px;background:var(--surface-2)}
+.cm small{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:2px}
+.cm.res{opacity:.55}
+.cm button{font-size:12px;font-weight:700;color:var(--accent);margin-top:4px;margin-right:10px}
+.presence{display:flex;align-items:center;margin-right:4px}
+.presence i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800;color:#fff;margin-left:-6px;border:2px solid var(--bg)}
+.ro-pill{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 82px);transform:translateX(-50%);z-index:5;padding:7px 14px;border-radius:999px;background:var(--glass-strong);border:1px solid var(--line);font-size:13px;font-weight:700;color:var(--muted);box-shadow:var(--shadow)}
+.cloud-steps{margin:0 0 12px;padding-left:20px;color:var(--muted);font-size:14px;line-height:1.5}
+.dlg .cloud-in{width:100%;min-height:48px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 16px;font:inherit}
 .stk-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .stk-grid button{aspect-ratio:1;min-width:0;overflow:hidden;border-radius:18px;display:grid;place-items:center;padding:13px;background:var(--surface-2);transition:transform .15s}
 .stk-grid button:hover{transform:scale(1.06) rotate(-3deg)}
@@ -493,6 +505,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
       <button id="btnBackup" class="btn">Backup</button>
       <button id="btnFolder" class="btn">Nova pasta</button>
       <button id="btnStudy" class="btn">✦ Estudar</button>
+      <button id="btnCloud" class="btn">☁ Nuvem</button>
       <button id="btnNew" class="btn primary">Novo caderno</button>
     </div>
   </header>
@@ -534,6 +547,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
       <button id="eraserBtn" class="font-btn" hidden></button>
     </div>
     <div class="bar-right">
+      <span id="presence" class="presence" hidden></span>
       <button id="btnAI" class="icon" aria-label="Assistente de IA" title="Assistente de IA"><svg class="i" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7z"/><path d="M19 15.5c.3 1.6 1 2.3 2.5 2.5-1.5.2-2.2 1-2.5 2.5-.3-1.5-1-2.3-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5z"/></svg></button>
       <button id="btnMic" class="icon" aria-label="Gravar ou ouvir aula" title="Gravar e ouvir aulas"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6"/></svg></button>
       <button id="btnUndo" class="icon" aria-label="Desfazer" title="Desfazer"><svg class="i" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
@@ -546,6 +560,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
   <div id="pageInd" class="page-ind">1 / 1</div>
   <div id="zoomInd" class="page-ind zoom-ind" hidden>100%</div>
   <button id="backPill" class="page-ind back-pill" hidden></button>
+  <div id="roPill" class="ro-pill" hidden></div>
   <div id="reviewPill" class="review-pill" hidden>Modo revisão · toque no que está coberto <button>Sair</button></div>
   <div id="recPill" class="rec-pill" hidden title="Parar a gravação"><i></i><span>00:00</span> Gravando · toque para parar</div>
   <div id="player" class="player" hidden>
@@ -1079,7 +1094,7 @@ async function renderLibrary(){
   }
   for(const nb of list){
     const n=nb.order.length,card=document.createElement('div');card.className='card';
-    card.innerHTML=`<button class="cover" data-cover="${coverOf(nb)}" aria-label="Abrir ${esc(nb.title)}">${SPARKS}<span class="cover-title">${esc(nb.title)}</span>${nb.pdf?'<span class="cover-pdf">PDF</span>':nb.board?'<span class="cover-pdf">QUADRO</span>':''}</button>
+    card.innerHTML=`<button class="cover" data-cover="${coverOf(nb)}" aria-label="Abrir ${esc(nb.title)}">${SPARKS}<span class="cover-title">${esc(nb.title)}</span>${SY.roles[nb.id]?'<span class="cover-pdf">COMPARTILHADO</span>':nb.pdf?'<span class="cover-pdf">PDF</span>':nb.board?'<span class="cover-pdf">QUADRO</span>':''}</button>
       <div class="card-meta"><div><div class="card-name">${esc(nb.title)}</div><div class="card-date">${nb.board?'Quadro infinito':n+' '+(n===1?'página':'páginas')} · ${fmtDate(nb.updated)}</div></div>
       <button class="icon more" aria-label="Opções de ${esc(nb.title)}"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></button></div>`;
     $('.cover',card).onclick=()=>openNotebook(nb.id);
@@ -1095,14 +1110,17 @@ async function notebookMenu(nb){
     {id:'cover',label:'Mudar a capa'},
     {id:'move',label:'Mover para pasta'},
     {id:'cards',label:'Cartões e revisão',sub:'Flashcards, repetição espaçada e testes'},
+    ...(SY.roles[nb.id]?[{id:'leave',label:'Sair do caderno compartilhado',danger:true}]:[{id:'share',label:'Compartilhar',sub:'Link para ver, comentar ou editar junto'}]),
     {id:'dup',label:'Duplicar'},
     {id:'pdf',label:'Exportar em PDF',sub:'Para compartilhar, imprimir ou guardar uma cópia'},
-    {id:'del',label:'Apagar caderno',danger:true}
+    ...(SY.roles[nb.id]?[]:[{id:'del',label:'Apagar caderno',danger:true}])
   ]);
   if(a==='open')openNotebook(nb.id);
   else if(a==='rename'){const t=await ask('Renomear caderno',nb.title);if(t){nb.title=t;await DB.put('notebooks',nb);renderLibrary()}}
   else if(a==='cover'){const c=await pickCover(coverOf(nb));if(c){nb.cover=c;await DB.put('notebooks',nb);renderLibrary()}}
   else if(a==='cards')cardsDialog(nb);
+  else if(a==='share')shareDialog(nb);
+  else if(a==='leave')leaveShared(nb);
   else if(a==='move'){const t=await pickFolder('Mover “'+nb.title+'” para');if(t!==undefined){nb.folder=t;await DB.put('notebooks',nb);renderLibrary();toast('Caderno movido ✦')}}
   else if(a==='dup')duplicateNotebook(nb);
   else if(a==='pdf'){const pages=await orderedPages(nb);exportPDF(nb.title,pages)}
@@ -1265,12 +1283,14 @@ async function openNotebook(id,opt){
   updateToolbar();updateUndo();updateIndicator();
   $('#libSearch').value='';$('#results').hidden=true;$('#grid').hidden=false;
   renderTabs();
+  cloudOpened();
   if(opt&&opt.q)requestAnimationFrame(()=>gotoHit(opt.page||0,opt.q));
   else if(opt&&opt.pageId){const i=S.pages.findIndex(r=>r.d.id===opt.pageId);if(i>0)requestAnimationFrame(()=>{desk.scrollTop=S.pages[i].el.offsetTop-24;updateIndicator()})}
 }
-async function closeNotebook(){
-  setReview(false);aiClosePanel();
-  commitText();clearSelection();togglePanel(false);toggleRuler(false);closePlayer();if(REC.on)await stopRec();await flushSaves();
+async function closeNotebook(discard){
+  setReview(false);aiClosePanel();cloudClosed();
+  commitText();clearSelection();togglePanel(false);toggleRuler(false);closePlayer();if(REC.on)await stopRec();
+  if(discard){saveTimers.forEach(t=>clearTimeout(t));saveTimers.clear();clearTimeout(nbTimer)}else await flushSaves();
   io.disconnect();S.pages.forEach(detach);pagesEl.innerHTML='';desk.classList.remove('boardmode');$('#pageInd').hidden=false;BT=null;
   S.nb=null;S.pages=[];S.undo=[];S.redo=[];
   history.replaceState(null,'',location.pathname);
@@ -1413,7 +1433,7 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSaves(
 window.addEventListener('pagehide',()=>flushSaves());
 
 /* ---------- Desfazer / refazer ---------- */
-function pushUndo(a){if(REC.on&&a.t==='add'){const t=Date.now()-REC.t0;a.items.forEach(st=>{if(!st.au)st.au={r:REC.id,t}})}S.undo.push(a);if(S.undo.length>200)S.undo.shift();S.redo=[];updateUndo()}
+function pushUndo(a){if(a.t==='add')a.items.forEach(st=>{if(st.t!=='node')st.id=uid()});if(REC.on&&a.t==='add'){const t=Date.now()-REC.t0;a.items.forEach(st=>{if(!st.au)st.au={r:REC.id,t}})}S.undo.push(a);if(S.undo.length>200)S.undo.shift();S.redo=[];updateUndo()}
 function applyAction(a,dir){
   const s=a.rt.d.strokes;
   if(a.t==='add'){
@@ -1494,7 +1514,7 @@ $('#fontBtn').onclick=async()=>{
   if(keep&&TE===keep){TE.st.f=id;styleTbox();TE.ta.focus()}
 };
 $('#btnUndo').onclick=undo;$('#btnRedo').onclick=redo;
-$('#btnBack').onclick=closeNotebook;
+$('#btnBack').onclick=()=>closeNotebook();
 $('#nbTitle').onclick=renameCurrent;
 $('#btnMenu').onclick=editorMenu;
 async function renameCurrent(){const t=await ask('Renomear caderno',S.nb.title);if(t){S.nb.title=t;$('#nbTitle').textContent=t;touchNb()}}
@@ -1549,6 +1569,7 @@ pagesEl.addEventListener('pointerdown',e=>{
   if(e.target.closest('.tbox'))return;
   if(act||pinch)return;
   if(S.review&&!(e.pointerType==='touch'&&P.penOnly)&&revealAt(e)){e.preventDefault();return}
+  if(S.ro&&!(P.tool==='lasso')){if(!(e.pointerType==='touch'&&P.penOnly))toast('Este caderno foi compartilhado só para '+(roleOf(S.nb.id)==='comment'?'ver e comentar.':'ver.'));return}
   if(e.pointerType==='touch'&&P.penOnly)return;
   if(e.pointerType==='mouse'&&e.button!==0)return;
   const el=e.target.closest('.page');
@@ -1739,7 +1760,7 @@ function eraseParts(pt){
   const a=act,s=a.rt.d.strokes,r=SIZES.eraser[P.size.eraser]/2;let hit=false;
   for(let i=s.length-1;i>=0;i--){const st=s[i];if(st.t!=='pen'&&st.t!=='hl')continue;if(!hitStroke(st,pt.x,pt.y,r))continue;
     const pieces=splitStroke(st,pt.x,pt.y,r);s.splice(i,1);a.ops.push({type:'rm',st,i});
-    for(const pc of pieces){s.push(pc);a.ops.push({type:'push',st:pc})}hit=true}
+    for(const pc of pieces){pc.id=uid();s.push(pc);a.ops.push({type:'push',st:pc})}hit=true}
   if(hit)renderPage(a.rt);
 }
 function undoOps(s,ops){[...ops].reverse().forEach(o=>{if(o.type==='push'){const i=s.indexOf(o.st);if(i>=0)s.splice(i,1)}else s.splice(o.i,0,o.st)})}
@@ -2254,6 +2275,8 @@ function decoratePage(rt){
   rt.el.querySelectorAll('.sec-tab,.fav-mark').forEach(x=>x.remove());
   if(rt.d.sec){const t=document.createElement('div');t.className='sec-tab';t.textContent=rt.d.sec;rt.el.append(t)}
   if(rt.d.fav){const f=document.createElement('div');f.className='fav-mark';f.innerHTML=STAR;rt.el.append(f)}
+  rt.el.querySelectorAll('.cm-badge').forEach(x=>x.remove());
+  const n=cmCount(rt.d.id);if(n){const b=document.createElement('button');b.className='cm-badge';b.innerHTML='💬 '+n;b.title='Comentários';b.onclick=()=>openComments(rt.d.id);rt.el.append(b)}
 }
 function togglePanel(force){
   const open=force!==undefined?force:panel.hidden;panel.hidden=!open;if(!open)$('#pageSearch').value='';$('#btnPages').setAttribute('aria-pressed',open);
@@ -2326,6 +2349,8 @@ async function editorMenu(){
     {id:'sec',label:rt.d.sec?'Renomear a divisória “'+rt.d.sec+'”':'Criar divisória nesta página',sub:'Marca o começo de uma seção, como as abas de um fichário'},
     ...(rt.d.sec?[{id:'secDel',label:'Remover a divisória'}]:[]),
     ...(isPdf||isBoard()?[]:[{id:'tpl',label:'Mudar o modelo desta página',sub:'Liso, pautado, quadriculado, pontilhado ou Cornell'}]),
+    {id:'comments',label:'Comentários desta página'+(cmCount(rt.d.id)?' ('+cmCount(rt.d.id)+')':''),sub:CU?'Conversa com quem tem acesso ao caderno':'Precisa entrar na nuvem'},
+    ...(SY.roles[S.nb.id]?[]:[{id:'share',label:'Compartilhar este caderno'}]),
     {id:'cards',label:'Cartões e revisão',sub:'Flashcards, repetição espaçada e testes'},
     {id:'review',label:S.review?'Sair do modo revisão':'Modo revisão',sub:'Cobre o que está com marca-texto; toque para revelar'},
     {id:'present',label:'Apresentar',sub:'Tela cheia com ponteiro laser. Espelhe o iPad na TV ou no projetor'},
@@ -2346,6 +2371,8 @@ async function editorMenu(){
   else if(a==='tpl'){const r=await templateForm(rt.d);if(r){rt.d.tpl=r.tpl;rt.d.paper=r.paper;layout();renderPage(rt);save(rt)}}
   else if(a==='present')startPresent(i);
   else if(a==='cards'){await flushSaves();cardsDialog(S.nb)}
+  else if(a==='comments')openComments(rt.d.id);
+  else if(a==='share'){await flushSaves();shareDialog(S.nb)}
   else if(a==='review')setReview(!S.review);
   else if(a==='search'){togglePanel(true);setTimeout(()=>$('#pageSearch').focus(),50)}
   else if(a==='img')$('#imgInput').click();
@@ -2955,6 +2982,329 @@ async function aiLecture(rec){
   aiRun('Resumir a aula','Faça o resumo desta aula para eu estudar: tópicos principais na ordem em que apareceram (com o minuto entre colchetes), conceitos-chave, o que o professor enfatizou e possíveis perguntas de prova.',{context:{blocks,skipped:0}});
 }
 
+/* =====================================================================
+   Nuvem (Supabase): conta, sincronização, compartilhamento, comentários
+   e colaboração. O app continua funcionando offline: tudo vive no aparelho
+   e a nuvem sincroniza quando há internet e a pessoa entrou na conta.
+   ===================================================================== */
+const CLOUD_URL='',CLOUD_KEY='';   // endereço e chave pública do projeto Supabase do Sinapse
+const LSJ=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
+const LSS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const cloudCfg=()=>{const o=LSJ('sinapse-cloud',null);return o&&o.url?o:{url:CLOUD_URL,key:CLOUD_KEY}};
+let SB=null,CU=null;
+const SY={applying:0,out:LSJ('sinapse-out',{}),up:new Set(LSJ('sinapse-up',[])),last:LSJ('sinapse-last',{}),roles:LSJ('sinapse-roles',{}),owner:LSJ('sinapse-owner',null),
+  lastOk:LSJ('sinapse-lastok',0),state:'off',t:0,busy:false,again:false,blobDirty:true};
+const saveSY=()=>{LSS('sinapse-out',SY.out);LSS('sinapse-up',[...SY.up]);LSS('sinapse-last',SY.last);LSS('sinapse-roles',SY.roles);LSS('sinapse-owner',SY.owner);LSS('sinapse-lastok',SY.lastOk)};
+const SYNCED={folders:1,notebooks:1,pages:1,cards:1},ORDER=['folders','notebooks','pages','cards'];
+const roleOf=id=>SY.roles[id]||'owner',canEdit=id=>['owner','edit'].includes(roleOf(id));
+{const put=DB.put,del=DB.del;DB._put=put;DB._del=del;
+  DB.put=async(st,v)=>{if(SYNCED[st]&&!SY.applying){v.u=Date.now();markOut(st,v.id,v.nb)}if(st==='blobs')SY.blobDirty=true;return put(st,v)};
+  DB.del=async(st,id)=>{if(SYNCED[st]&&!SY.applying){const o=await DB.get(st,id);markOut(st,id,o&&o.nb,true)}return del(st,id)}}
+function markOut(st,id,nb,del){
+  if(!CU)return;const nbid=st==='notebooks'?id:nb;
+  if(st!=='cards'&&st!=='folders'&&nbid&&!canEdit(nbid))return;
+  SY.out[st+':'+id]={s:st,id,nb:nb||null,del:!!del};saveSY();schedSync(1500,true);
+}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.append(s)})}
+async function cloudInit(){
+  const c=cloudCfg();updateCloudBtn();if(!c.url||!c.key)return;
+  try{if(!window.supabase)await loadScript('../vendor/supabase.js')}catch(e){console.warn('supabase',e);return}
+  SB=window.supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'sinapse-auth'}});
+  const {data}=await SB.auth.getSession();CU=data.session?data.session.user:null;
+  SB.auth.onAuthStateChange((ev,ses)=>{const was=CU&&CU.id;CU=ses?ses.user:null;updateCloudBtn();if(CU&&CU.id!==was)afterLogin()});
+  updateCloudBtn();if(CU)afterLogin();
+  const m=location.hash.match(/^#join=([\w-]+)/);if(m){LSS('sinapse-join',m[1]);history.replaceState(null,'',location.pathname);if(!CU)cloudDialog()}
+  addEventListener('online',()=>schedSync(300));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedSync(500)});
+  setInterval(()=>schedSync(0),90e3);
+}
+async function afterLogin(){
+  if(SY.owner!==CU.id){ // primeira vez nesta conta neste aparelho: sobe tudo
+    SY.owner=CU.id;SY.last={};SY.up=new Set();SY.roles={};SY.out={};
+    for(const st of ORDER)for(const r of await DB.all(st))SY.out[st+':'+r.id]={s:st,id:r.id,nb:r.nb||null,del:false};
+    saveSY();
+  }
+  realtime();
+  const tk=LSJ('sinapse-join',null);if(tk){localStorage.removeItem('sinapse-join');joinShare(tk)}
+  schedSync(200);
+}
+function schedSync(ms=800,pushOnly=false){if(!SB||!CU)return;clearTimeout(SY.t);SY.t=setTimeout(()=>cloudSync(pushOnly),ms)}
+async function cloudSync(pushOnly){
+  if(!SB||!CU)return;if(SY.busy){SY.again=true;return}
+  if(!navigator.onLine){setCloudState('offline');return}
+  SY.busy=true;setCloudState('sync');
+  try{if(S.nb)await flushSaves();await pull();await push();SY.lastOk=Date.now();setCloudState('ok')}
+  catch(e){console.error('sync',e);setCloudState('erro',e)}
+  finally{SY.busy=false;saveSY();if(SY.again){SY.again=false;schedSync(600)}}
+}
+const clean=o=>JSON.parse(JSON.stringify(o));
+function prepPage(d){
+  const ids=[];for(const st of d.strokes){if(!st.id)st.id=uid();ids.push(st.id)}
+  const now=new Set(ids),gone=new Set(d.gone||[]);for(const i of d._ids||[])if(!now.has(i))gone.add(i);
+  d.gone=[...gone].slice(-800);d._ids=ids;
+}
+async function push(){
+  const keys=Object.keys(SY.out);let pushed=false;
+  for(const st of ORDER){
+    const items=keys.filter(k=>k.startsWith(st+':')).map(k=>[k,SY.out[k]]);
+    for(let i=0;i<items.length;i+=40){
+      const chunk=items.slice(i,i+40),rows=[],hasNb=st==='pages'||st==='cards';
+      for(const [k,x] of chunk){
+        let rec=null;
+        if(!x.del){const rt=st==='pages'&&S.nb?S.pages.find(r=>r.d.id===x.id):null;rec=rt?rt.d:await DB.get(st,x.id)}
+        if(!rec){if(hasNb&&!x.nb)continue;rows.push({id:x.id,...(hasNb?{nb:x.nb}:{}),data:{},deleted:true});continue}
+        if(st==='pages'){prepPage(rec);SY.applying++;try{await DB._put('pages',rec)}finally{SY.applying--}}
+        rows.push({id:rec.id,...(hasNb?{nb:rec.nb}:{}),data:clean(rec),deleted:false});
+      }
+      if(rows.length){
+        const {error}=await SB.from(st).upsert(rows,{onConflict:'id'});
+        if(error){ // tenta um por um: o que a nuvem recusar por permissão sai da fila em vez de travar tudo
+          for(const row of rows){const {error:e1}=await SB.from(st).upsert([row],{onConflict:'id'});
+            if(e1){if(e1.code==='42501'||/row-level security|permission/i.test(e1.message||''))console.warn('recusado pela nuvem',st,row.id,e1.message);else throw e1}}
+        }
+        pushed=true;
+      }
+      for(const [k,x] of chunk)if(SY.out[k]===x)delete SY.out[k];
+      saveSY();
+    }
+  }
+  if(pushed||SY.blobDirty)await pushBlobs();
+}
+async function blobPaths(){
+  const m=new Map();
+  for(const p of await DB.all('pages'))for(const b of blobIdsOf(p))m.set(b,p.nb+'/'+b);
+  for(const nb of await DB.all('notebooks'))for(const r of nb.recs||[])m.set(r.bid,nb.id+'/'+r.bid);
+  for(const c of await DB.all('cards'))for(const b of [c.qi,c.ai])if(b)m.set(b,'u/'+CU.id+'/'+b);
+  return m;
+}
+async function pushBlobs(){
+  SY.blobDirty=false;const m=await blobPaths();
+  for(const [bid,path] of m){
+    if(SY.up.has(bid))continue;const nbid=path.split('/')[0];if(nbid!=='u'&&!canEdit(nbid))continue;
+    const rec=await DB.get('blobs',bid);if(!rec)continue;
+    const {error}=await SB.storage.from('sinapse').upload(path,rec.blob,{upsert:true,contentType:rec.blob.type||'application/octet-stream'});
+    if(error&&!/exist|duplicate/i.test(error.message||''))throw error;
+    SY.up.add(bid);saveSY();
+  }
+}
+function mergePage(L,Rm){
+  const rNew=(Rm.u||0)>(L.u||0),base=rNew?Rm:L,other=rNew?L:Rm;
+  const curL=new Set(L.strokes.map(s=>s.id).filter(Boolean)),gone=new Set([...(L.gone||[]),...(Rm.gone||[])]);
+  for(const i of L._ids||[])if(!curL.has(i))gone.add(i);
+  const seen=new Set(),out=[];
+  for(const st of base.strokes){if(st.id&&gone.has(st.id))continue;out.push(st);if(st.id)seen.add(st.id)}
+  for(const st of other.strokes){if(!st.id||gone.has(st.id)||seen.has(st.id))continue;out.push(st)}
+  return {...base,strokes:out,gone:[...gone].slice(-800),_ids:Rm.strokes.map(s=>s.id).filter(Boolean),u:Math.max(L.u||0,Rm.u||0)};
+}
+async function applyRow(st,row,need){
+  const key=st+':'+row.id,pend=SY.out[key],d=row.data,openRt=st==='pages'&&S.nb?S.pages.find(r=>r.d.id===row.id):null;
+  const local=openRt?openRt.d:await DB.get(st,row.id);
+  SY.applying++;
+  try{
+    if(row.deleted){
+      if(!local||pend)return;await DB._del(st,row.id);SY.changed=true;
+      if(st==='notebooks'&&S.nb&&S.nb.id===row.id)SY.closeOpen=true;
+      if(st==='pages'&&S.nb&&local.nb===S.nb.id)SY.reorder=true;
+      return;
+    }
+    if(st==='pages'){
+      let nd;
+      if(local&&pend)nd=mergePage(local,d);
+      else if(local&&(local.u||0)>(d.u||0))return;
+      else{nd=d;nd._ids=nd.strokes.map(s=>s.id).filter(Boolean)}
+      await DB._put('pages',nd);for(const b of blobIdsOf(nd))need.set(b,nd.nb+'/'+b);
+      if(S.nb&&nd.nb===S.nb.id)liveUpdate(nd);SY.changed=true;return;
+    }
+    if(local&&(pend||(local.u||0)>(d.u||0))){
+      if(st==='notebooks'&&pend&&(d.u||0)>(local.u||0)){const ord=[...d.order];for(const id of local.order)if(!ord.includes(id))ord.push(id);local.order=ord;await DB._put('notebooks',local);if(S.nb&&S.nb.id===local.id)SY.reorder=true}
+      return;
+    }
+    if(st==='notebooks'){for(const r of d.recs||[])need.set(r.bid,d.id+'/'+r.bid);if(S.nb&&S.nb.id===d.id){Object.assign(S.nb,d);$('#nbTitle').textContent=d.title;SY.reorder=true}}
+    if(st==='cards')for(const b of [d.qi,d.ai])if(b)need.set(b,'u/'+row.owner+'/'+b);
+    await DB._put(st,d);SY.changed=true;
+  }finally{SY.applying--}
+}
+function liveUpdate(nd){
+  const rt=S.pages.find(r=>r.d.id===nd.id);if(!rt){SY.reorder=true;return}
+  const old=new Map(rt.d.strokes.filter(x=>x.id).map(x=>[x.id,x]));
+  nd.strokes=nd.strokes.map(x=>{const o=old.get(x.id);return o&&JSON.stringify(o)===JSON.stringify(x)?o:x});
+  if(S.sel&&S.sel.rt===rt)clearSelection();
+  for(const k of Object.keys(rt.d))if(!(k in nd))delete rt.d[k];Object.assign(rt.d,nd);
+  if(rt.canvas)renderPage(rt);if(rt.el&&!rt.board)decoratePage(rt);
+}
+async function fetchNotebook(id,need){
+  for(const [st,col] of [['notebooks','id'],['pages','nb']]){
+    const {data,error}=await SB.from(st).select('*').eq(col,id);if(error)throw error;
+    for(const row of data||[])await applyRow(st,row,need);
+  }
+}
+async function pull(){
+  const {data:mem,error:me}=await SB.from('members').select('nb,role').eq('user_id',CU.id);if(me)throw me;
+  const roles={};for(const m of mem||[])roles[m.nb]=m.role;
+  const need=new Map();SY.changed=false;
+  for(const id of Object.keys(SY.roles))if(!roles[id]){ // perdeu o acesso: tira a cópia local
+    SY.applying++;try{for(const p of await DB.pagesOf(id))await DB._del('pages',p.id);await DB._del('notebooks',id)}finally{SY.applying--}
+    SY.changed=true;if(S.nb&&S.nb.id===id)SY.closeOpen=true;
+    for(const k of Object.keys(SY.out)){const x=SY.out[k];if(x.id===id||x.nb===id)delete SY.out[k]}
+  }
+  const fresh=Object.keys(roles).filter(id=>!SY.roles[id]);SY.roles=roles;saveSY();
+  for(const id of fresh)await fetchNotebook(id,need);
+  for(const st of ORDER){
+    let since=SY.last[st]||'1970-01-01T00:00:00Z';
+    for(;;){
+      const {data,error}=await SB.from(st).select('*').gt('updated_at',since).order('updated_at',{ascending:true}).limit(500);if(error)throw error;
+      if(!data||!data.length)break;
+      for(const row of data)await applyRow(st,row,need);
+      since=data[data.length-1].updated_at;SY.last[st]=since;saveSY();if(data.length<500)break;
+    }
+  }
+  for(const [bid,path] of need){
+    if(await DB.get('blobs',bid))continue;
+    const {data,error}=await SB.storage.from('sinapse').download(path);if(error){console.warn('baixar',path,error);continue}
+    await DB._put('blobs',{id:bid,blob:data});SY.up.add(bid);if(S.nb)S.pages.forEach(rt=>{if(rt.d.bg===bid&&rt.canvas){rt.bgImg=null;rt.bgLoading=false;detach(rt);attach(rt)}});IMG.delete(bid);
+  }
+  if(SY.closeOpen){SY.closeOpen=false;SY.reorder=false;if(S.nb){await closeNotebook(true);toast('Esse caderno não está mais disponível para você.',5000)}}
+  if(SY.reorder&&S.nb){SY.reorder=false;await reloadOpenPages()}
+  if(SY.changed&&!$('#library').hidden)renderLibrary();
+  if(S.nb)loadComments();
+}
+async function reloadOpenPages(){
+  const nb=await DB.get('notebooks',S.nb.id);if(!nb)return;Object.assign(S.nb,nb);
+  const pages=await orderedPages(nb),keep=new Map(S.pages.map(r=>[r.d.id,r]));
+  const same=pages.length===S.pages.length&&pages.every((d,i)=>S.pages[i].d.id===d.id);if(same)return;
+  S.pages=pages.map(d=>keep.get(d.id)||{d});const top=desk.scrollTop;buildPages();desk.scrollTop=top;updateIndicator();
+}
+/* ---------- tempo real ---------- */
+let RT=null,PR=null;
+function realtime(){
+  if(RT||!SB)return;
+  try{RT=SB.channel('sinapse-db');
+    for(const t of ['notebooks','pages','members'])RT.on('postgres_changes',{event:'*',schema:'public',table:t},()=>schedSync(400));
+    RT.on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>loadComments());
+    RT.subscribe();
+  }catch(e){console.warn('realtime',e)}
+}
+const PCOL=['#8B5CF6','#E2549C','#F08A4B','#3B8BD9','#22A06B','#C9A000'];
+function cloudOpened(){
+  S.ro=!canEdit(S.nb.id);const ro=$('#roPill');ro.hidden=!S.ro;ro.textContent=S.ro?(roleOf(S.nb.id)==='comment'?'Você pode ver e comentar':'Somente leitura'):'';
+  CM.list=[];loadComments();
+  if(!SB||!CU)return;
+  try{if(PR)SB.removeChannel(PR);
+    PR=SB.channel('nb:'+S.nb.id,{config:{presence:{key:CU.id}}});
+    PR.on('presence',{event:'sync'},()=>{const st=PR.presenceState(),ppl=Object.entries(st).filter(([k])=>k!==CU.id).map(([,v])=>v[0]);
+      const el=$('#presence');el.hidden=!ppl.length;el.title=ppl.map(x=>x.name).join(', ')+(ppl.length?' também '+(ppl.length>1?'estão':'está')+' aqui':'');
+      el.innerHTML=ppl.slice(0,4).map((x,i)=>`<i style="background:${PCOL[i%PCOL.length]}">${esc((x.name||'?')[0].toUpperCase())}</i>`).join('')});
+    PR.subscribe(async status=>{if(status==='SUBSCRIBED')await PR.track({name:(CU.email||'').split('@')[0]})});
+  }catch(e){console.warn('presença',e)}
+}
+function cloudClosed(){S.ro=false;$('#roPill').hidden=true;$('#presence').hidden=true;if(PR&&SB){try{SB.removeChannel(PR)}catch(e){}PR=null}}
+/* ---------- comentários ---------- */
+const CM={list:[]};
+const cmCount=pid=>CM.list.filter(c=>c.page===pid&&!c.resolved&&!c.deleted).length;
+async function loadComments(){
+  if(!SB||!CU||!S.nb)return;const id=S.nb.id;
+  const {data,error}=await SB.from('comments').select('*').eq('nb',id).eq('deleted',false).order('created_at',{ascending:true});
+  if(error||!S.nb||S.nb.id!==id)return;CM.list=data||[];if(!isBoard())S.pages.forEach(rt=>rt.el&&decoratePage(rt));
+  if(dlg.open&&dlg._cmPage)openComments(dlg._cmPage,true);
+}
+async function openComments(pid,refresh){
+  if(!CU){toast('Entre na nuvem para comentar e ver comentários.',4000);cloudDialog();return}
+  const i=S.pages.findIndex(r=>r.d.id===pid),list=CM.list.filter(c=>c.page===pid),can=roleOf(S.nb.id)!=='view';
+  const html=`<h2>Comentários · página ${i+1}</h2><div class="cm-list">${list.length?list.map(c=>`<div class="cm ${c.resolved?'res':''}"><small>${esc(c.author_name||'alguém')} · ${new Date(c.created_at).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}${c.resolved?' · resolvido':''}</small>${htmlT(c.body)}
+      <div>${!c.resolved&&(c.author===CU.id||roleOf(S.nb.id)==='owner')?`<button data-r="${c.id}">Marcar como resolvido</button>`:''}${c.author===CU.id?`<button data-d="${c.id}">Apagar</button>`:''}</div></div>`).join(''):'<p>Nenhum comentário nesta página ainda.</p>'}</div>
+    ${can?'<form><textarea placeholder="Escreva um comentário…"></textarea><div class="actions"><button type="button" class="btn" data-x>Fechar</button><button class="btn primary">Comentar</button></div></form>':'<div class="actions"><button class="btn" data-x>Fechar</button></div>'}`;
+  if(refresh&&dlg.open){$('.cm-list',dlg).outerHTML=$('.cm-list',new DOMParser().parseFromString('<div>'+html+'</div>','text/html')).outerHTML;wireCm(pid);return}
+  dlg._cmPage=pid;
+  await openDlg(html,(d,done)=>{wireCm(pid);$('[data-x]',d).onclick=()=>done(null);const f=$('form',d);
+    if(f)f.onsubmit=async e=>{e.preventDefault();const t=$('textarea',d).value.trim();if(!t)return;$('textarea',d).value='';
+      const {error}=await SB.from('comments').insert({id:uid(),nb:S.nb.id,page:pid,body:t,author_name:(CU.email||'').split('@')[0]});
+      if(error){toast('Não consegui comentar: '+error.message,5000);return}loadComments()}});
+  dlg._cmPage=null;
+}
+function wireCm(pid){
+  dlg.querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{await SB.from('comments').update({resolved:true}).eq('id',b.dataset.r);loadComments()});
+  dlg.querySelectorAll('[data-d]').forEach(b=>b.onclick=async()=>{await SB.from('comments').update({deleted:true}).eq('id',b.dataset.d);loadComments()});
+}
+/* ---------- compartilhar ---------- */
+const ROLE_TXT={view:'Pode ver',comment:'Pode comentar',edit:'Pode editar'};
+async function shareDialog(nb){
+  if(!CU){toast('Entre na nuvem para compartilhar.',4000);cloudDialog();return}
+  toast('Preparando…',0);await cloudSync();hideToast();
+  const [{data:links},{data:mem}]=await Promise.all([SB.from('shares').select('*').eq('nb',nb.id).eq('revoked',false),SB.from('members').select('*').eq('nb',nb.id)]);
+  const r=await openDlg(`<h2>Compartilhar “${esc(nb.title)}”</h2><p>Quem abrir o link entra com a própria conta do Sinapse e vê o caderno ao vivo.</p>
+    <label class="f">Novo link</label><div class="seg" role="group"><button type="button" data-role="view" aria-pressed="true">Pode ver</button><button type="button" data-role="comment" aria-pressed="false">Pode comentar</button><button type="button" data-role="edit" aria-pressed="false">Pode editar</button></div>
+    <p style="margin-top:12px"><button class="btn primary" data-new>Criar link</button></p>
+    ${(links||[]).length?`<label class="f">Links ativos</label><div class="menu">${links.map(l=>`<button data-l="${l.token}"><span><span>${ROLE_TXT[l.role]}</span><span class="sub">Toque para copiar · criado ${new Date(l.created_at).toLocaleDateString('pt-BR')}</span></span></button><button data-rv="${l.token}" class="danger"><span>Desativar este link</span></button>`).join('')}</div>`:''}
+    ${(mem||[]).length?`<label class="f">Pessoas com acesso</label><div class="menu">${mem.map(m=>`<button data-m="${m.user_id}"><span><span>${esc(m.name||'alguém')}</span><span class="sub">${ROLE_TXT[m.role]} · toque para remover</span></span></button>`).join('')}</div>`:''}
+    <div class="actions"><button class="btn" data-x>Fechar</button></div>`,
+    (d,done)=>{let role='view';d.querySelectorAll('[data-role]').forEach(b=>b.onclick=()=>{role=b.dataset.role;d.querySelectorAll('[data-role]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+      $('[data-new]',d).onclick=()=>done({new:role});d.querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>done({copy:b.dataset.l}));
+      d.querySelectorAll('[data-rv]').forEach(b=>b.onclick=()=>done({revoke:b.dataset.rv}));d.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>done({rm:b.dataset.m}));
+      $('[data-x]',d).onclick=()=>done(null)},true);
+  if(!r)return;
+  const linkOf=t=>location.origin+location.pathname+'#join='+t;
+  if(r.new){const {data,error}=await SB.from('shares').insert({nb:nb.id,role:r.new}).select('token').single();if(error){toast('Não consegui criar o link: '+error.message,5000);return}await giveLink(linkOf(data.token),nb.title,r.new)}
+  else if(r.copy)await giveLink(linkOf(r.copy),nb.title);
+  else if(r.revoke){await SB.from('shares').update({revoked:true}).eq('token',r.revoke);toast('Link desativado.')}
+  else if(r.rm){if(await confirmDlg('Remover esta pessoa?','Ela deixa de ver o caderno na hora.','Remover')){await SB.from('members').delete().eq('nb',nb.id).eq('user_id',r.rm);toast('Pessoa removida.')}}
+  if(r.revoke||r.rm)shareDialog(nb);
+}
+async function giveLink(url,title,role){
+  const txt=role?'Link criado ('+ROLE_TXT[role].toLowerCase()+'). ':'';
+  if(navigator.share){try{await navigator.share({title:'Caderno “'+title+'” no Sinapse',url});return}catch(e){if(e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(url);toast(txt+'Copiado ✦ É só colar na conversa.',5000)}catch(e){await ask('Copie o link',url,'Pronto')}
+}
+async function joinShare(token){
+  toast('Entrando no caderno compartilhado…',0);
+  const {data,error}=await SB.rpc('join_share',{p_token:token});
+  if(error){hideToast();toast('Não consegui abrir esse link: '+(error.message||'link inválido'),6000);return}
+  hideToast();if(data.role!=='owner')SY.roles[data.nb]=data.role;saveSY();
+  const need=new Map();await fetchNotebook(data.nb,need);await cloudSync();
+  if(await DB.get('notebooks',data.nb)){if(S.nb)await closeNotebook();openNotebook(data.nb);toast('Pronto ✦ Você entrou no caderno ('+ROLE_TXT[data.role]?.toLowerCase()+').',5000)}
+}
+async function leaveShared(nb){
+  if(!(await confirmDlg('Sair de “'+nb.title+'”?','O caderno some do seu aparelho. A dona continua com ele.','Sair')))return;
+  await SB.from('members').delete().eq('nb',nb.id).eq('user_id',CU.id);
+  SY.applying++;try{for(const p of await DB.pagesOf(nb.id))await DB._del('pages',p.id);await DB._del('notebooks',nb.id)}finally{SY.applying--}
+  delete SY.roles[nb.id];saveSY();P.tabs=(P.tabs||[]).filter(t=>t!==nb.id);savePrefs();renderLibrary();
+}
+/* ---------- conta ---------- */
+function setCloudState(st,err){SY.state=st;SY.err=err;updateCloudBtn()}
+function updateCloudBtn(){
+  const b=$('#btnCloud');if(!b)return;const c=cloudCfg();
+  b.textContent=!c.url?'☁ Nuvem':!CU?'☁ Entrar':{sync:'☁ Sincronizando…',offline:'☁ Sem internet',erro:'☁ Erro ao sincronizar'}[SY.state]||'☁ Sincronizado';
+}
+$('#btnCloud').onclick=()=>cloudDialog();
+async function cloudDialog(){
+  const c=cloudCfg();
+  if(!c.url){
+    const r=await openDlg(`<h2>Nuvem do Sinapse ☁</h2><p>Com a nuvem, seus cadernos ficam guardados na sua conta, aparecem em todos os seus aparelhos e podem ser compartilhados.</p>
+      <p>Cole os dados do projeto Supabase do Sinapse (Project Settings › API):</p><form><label class="f">Endereço do projeto (Project URL)</label><input class="cloud-in" id="cUrl" placeholder="https://xxxx.supabase.co">
+      <label class="f">Chave pública (anon / publishable key)</label><input class="cloud-in" id="cKey" placeholder="eyJ… ou sb_publishable_…">
+      <div class="actions"><button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Salvar</button></div></form>`,
+      (d,done)=>{$('[data-x]',d).onclick=()=>done(null);$('form',d).onsubmit=e=>{e.preventDefault();done({url:$('#cUrl',d).value.trim().replace(/\/+$/,''),key:$('#cKey',d).value.trim()})}});
+    if(!r||!/^https:\/\/.+/.test(r.url)||!r.key)return;LSS('sinapse-cloud',r);await cloudInit();return cloudDialog();
+  }
+  if(!SB){await cloudInit();if(!SB){toast('Não consegui carregar a nuvem. Confira a internet.',5000);return}}
+  if(!CU){
+    const email=await ask('Entrar na nuvem','', 'Enviar código');if(!email)return;
+    const {error}=await SB.auth.signInWithOtp({email,options:{shouldCreateUser:true}});
+    if(error){toast('Não consegui enviar o código: '+error.message,6000);return}
+    const code=await ask('Digite o código que chegou em '+email,'','Entrar');if(!code)return;
+    const {error:e2}=await SB.auth.verifyOtp({email,token:code.trim(),type:'email'});
+    if(e2){toast('Código inválido ou vencido. Tente de novo.',5000);return}
+    toast('Pronto ✦ Sincronizando seus cadernos…',4000);return;
+  }
+  const pend=Object.keys(SY.out).length;
+  const a=await menu('☁ '+(CU.email||'Sua conta'),[
+    {id:'sync',label:'Sincronizar agora',sub:SY.lastOk?'Última vez: '+new Date(SY.lastOk).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+(pend?' · '+pend+' alterações para enviar':''):'Ainda não sincronizou'},
+    ...(SY.state==='erro'?[{id:'err',label:'Ver o erro',sub:String(SY.err&&SY.err.message||SY.err||'')}]:[]),
+    {id:'out',label:'Sair da conta',sub:'Os cadernos continuam neste aparelho'}
+  ]);
+  if(a==='sync')cloudSync();
+  else if(a==='out'){await SB.auth.signOut();CU=null;if(RT){try{SB.removeChannel(RT)}catch(e){}RT=null}updateCloudBtn();toast('Você saiu da conta.')}
+}
+
 /* ---------- Teclado ---------- */
 document.addEventListener('keydown',e=>{
   if(PV.on){presentKey(e);return}
@@ -3125,6 +3475,7 @@ $('#btnImport').onclick=()=>{pdfTarget=null;$('#pdfInput').click()};
   await DB.open();
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
   const m=location.hash.match(/^#c=(.+)$/);
+  cloudInit();
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{fontEpoch++;if(S.nb)S.pages.forEach(rt=>rt.canvas&&renderPage(rt))});
   await renderLibrary();backupNote();updateStudyBtn();
   if(m)openNotebook(m[1]);

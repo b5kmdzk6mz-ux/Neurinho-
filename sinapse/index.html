@@ -323,6 +323,38 @@ mark{background:linear-gradient(transparent 35%,#FFD6EC 35%);color:inherit;borde
 .review-pill{position:fixed;left:50%;top:calc(env(safe-area-inset-top) + 82px);transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;
   border-radius:999px;background:var(--holo);color:#2A1B3D;font-weight:700;font-size:14px;box-shadow:var(--shadow)}
 .review-pill button{padding:6px 14px;border-radius:999px;background:rgba(255,255,255,.75);font-weight:700}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px max(10px,env(safe-area-inset-right)) 0 max(10px,env(safe-area-inset-left))}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;display:flex;align-items:center;gap:8px;max-width:220px;height:36px;padding:0 6px 0 12px;border-radius:999px;background:var(--glass);border:1px solid var(--line);
+  font-size:13px;font-weight:600;color:var(--muted);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.tab span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tab i{width:12px;height:12px;border-radius:4px;flex:none;background-size:cover;background-position:center}
+.tab b{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:700;opacity:.6}
+.tab b:hover{background:var(--surface-2);opacity:1}
+.tab.on{background:var(--glass-strong);color:var(--ink);box-shadow:inset 0 0 0 2px var(--accent)}
+.has-tabs .panel{top:calc(env(safe-area-inset-top) + 120px)}
+@media (max-width:1024px){.has-tabs .panel{top:calc(env(safe-area-inset-top) + 168px)}}
+.ai-panel{left:auto;right:max(10px,env(safe-area-inset-right));width:min(400px,calc(100vw - 20px))}
+.ai-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 8px}
+.ai-chips button{padding:7px 12px;border-radius:999px;background:var(--surface-2);font-size:13px;font-weight:600}
+.ai-chips button:hover{background:var(--accent-soft);color:var(--accent)}
+.ai-log{flex:1;overflow:auto;padding:4px 14px 10px;display:flex;flex-direction:column;gap:10px}
+.ai-msg{border-radius:18px;padding:10px 14px;font-size:15px;line-height:1.5;word-break:break-word}
+.ai-msg.user{align-self:flex-end;max-width:85%;background:var(--cta);color:#fff;font-weight:600;font-size:14px}
+.ai-msg.ai{background:var(--glass);border:1px solid var(--line)}
+.ai-msg.ai h3,.ai-msg.ai h4{margin:8px 0 4px;font:700 16px/1.3 var(--f-serif)}
+.ai-msg.ai ul,.ai-msg.ai ol{margin:4px 0;padding-left:20px}
+.ai-msg.ai p{margin:4px 0}
+.ai-msg.ai code{background:var(--surface-2);padding:1px 5px;border-radius:6px}
+.ai-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ai-acts button{padding:6px 10px;border-radius:999px;background:var(--surface-2);font-size:12px;font-weight:700;color:var(--accent)}
+.ai-wait{color:var(--muted);font-style:italic}
+.ai-meta{font-size:11px;color:var(--muted);margin-top:6px}
+.ai-ask{display:flex;gap:8px;padding:8px 12px 12px;align-items:flex-end}
+.ai-ask textarea{flex:1;min-height:44px;max-height:120px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:10px 12px;font:inherit;font-size:14px;resize:none}
+.ai-ask .btn{min-height:44px;padding:0 14px}
+.ai-empty{color:var(--muted);font-size:14px;padding:4px 2px}
+.st-exp{margin-top:4px;padding:12px 14px;border-radius:16px;background:var(--glass);border:1px solid var(--line);font-size:15px;line-height:1.5}
 .stk-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .stk-grid button{aspect-ratio:1;min-width:0;overflow:hidden;border-radius:18px;display:grid;place-items:center;padding:13px;background:var(--surface-2);transition:transform .15s}
 .stk-grid button:hover{transform:scale(1.06) rotate(-3deg)}
@@ -368,7 +400,7 @@ mark{background:linear-gradient(transparent 35%,#FFD6EC 35%);color:inherit;borde
 .size[aria-pressed="true"]{background:var(--accent-soft)}
 .size[aria-pressed="true"] span{background:var(--accent)}
 .bar-right{display:flex;align-items:center}
-@media (max-width:1280px){
+@media (max-width:1440px){
   .bar{gap:3px}
   .tools{gap:2px}
   .bar .icon{width:38px;height:40px}
@@ -401,7 +433,8 @@ mark{background:linear-gradient(transparent 35%,#FFD6EC 35%);color:inherit;borde
 .sel-bar{position:fixed;z-index:6;display:flex;align-items:center;gap:2px;padding:5px;border-radius:999px;
   background:var(--glass-strong);border:1px solid var(--line);box-shadow:var(--shadow);transform:translateX(-50%);
   -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
-.sel-bar .btn{min-height:36px;padding:0 12px;border:0;background:none;font-size:14px;box-shadow:none}
+.sel-bar .btn{min-height:36px;padding:0 10px;border:0;background:none;font-size:14px;box-shadow:none;white-space:nowrap}
+.sel-bar{flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100vw - 24px);border-radius:22px;z-index:8}
 .sel-bar .swatch{width:32px;height:32px}
 .sel-bar .swatch span{width:20px;height:20px}
 
@@ -501,12 +534,14 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
       <button id="eraserBtn" class="font-btn" hidden></button>
     </div>
     <div class="bar-right">
+      <button id="btnAI" class="icon" aria-label="Assistente de IA" title="Assistente de IA"><svg class="i" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7z"/><path d="M19 15.5c.3 1.6 1 2.3 2.5 2.5-1.5.2-2.2 1-2.5 2.5-.3-1.5-1-2.3-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5z"/></svg></button>
       <button id="btnMic" class="icon" aria-label="Gravar ou ouvir aula" title="Gravar e ouvir aulas"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6"/></svg></button>
       <button id="btnUndo" class="icon" aria-label="Desfazer" title="Desfazer"><svg class="i" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
       <button id="btnRedo" class="icon" aria-label="Refazer" title="Refazer"><svg class="i" viewBox="0 0 24 24"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
       <button id="btnMenu" class="icon" aria-label="Mais opções" title="Mais opções"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></button>
     </div>
   </header>
+  <nav id="tabs" class="tabs" hidden aria-label="Cadernos abertos"></nav>
   <div id="desk" class="desk"><div id="pages" class="pages"></div></div>
   <div id="pageInd" class="page-ind">1 / 1</div>
   <div id="zoomInd" class="page-ind zoom-ind" hidden>100%</div>
@@ -522,6 +557,13 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
   </div>
   <div id="selBar" class="sel-bar" hidden></div>
   <div id="ruler" class="ruler" hidden><span class="rl-angle">0°</span></div>
+  <aside id="aiPanel" class="panel ai-panel" hidden aria-label="Assistente de IA">
+    <div class="panel-head"><h3>Assistente ✦</h3><button class="icon" id="aiCfg" aria-label="Configurar a IA" title="Configurar"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 6.2l2.1 2.1M17.7 15.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 17.8l2.1-2.1M17.7 8.3l2.1-2.1"/></svg></button><button class="icon" id="aiClose" aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="seg ai-scope" role="group" aria-label="Sobre o quê"><button data-s="page" aria-pressed="true">Esta página</button><button data-s="nb" aria-pressed="false">Este caderno</button></div>
+    <div class="ai-chips"></div>
+    <div class="ai-log" id="aiLog"><p class="ai-empty">Peça um resumo, uma explicação, cartões, um questionário… ou pergunte qualquer coisa sobre suas anotações. A IA lê o texto, a sua letra e as transcrições das aulas.</p></div>
+    <form class="ai-ask"><textarea rows="1" placeholder="Pergunte sobre suas anotações…" aria-label="Pergunta para a IA"></textarea><button class="btn primary">Enviar</button></form>
+  </aside>
   <aside id="panel" class="panel" hidden aria-label="Páginas">
     <div class="panel-head"><h3>Páginas</h3><button class="icon" id="panelClose" aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <input id="pageSearch" class="psearch" type="search" placeholder="Buscar neste caderno" aria-label="Buscar neste caderno" autocomplete="off">
@@ -599,7 +641,10 @@ const SHAPES=[['auto','Automática','<path d="M4 15c2-6 5-9 8-9s5 4 3 7-6 3-7 0 
   ['line','Linha','<path d="M4 20L20 4"/>'],['arrow','Seta','<path d="M4 20L20 4"/><path d="M11 4h9v9"/>'],
   ['rect','Retângulo','<rect x="3.5" y="6" width="17" height="12" rx="1"/>'],['ellipse','Círculo','<ellipse cx="12" cy="12" rx="8.5" ry="7.5"/>'],
   ['tri','Triângulo','<path d="M12 4l8.5 15h-17z"/>'],
-  ['mind','Mapa mental','<rect x="8" y="9.5" width="8" height="5" rx="2.5"/><rect x="2" y="3" width="6" height="4" rx="2"/><rect x="16" y="17" width="6" height="4" rx="2"/><path d="M8 12C6 12 5 9 5 7M16 12c2 0 3 3 3 5"/>']];
+  ['mind','Mapa mental','<rect x="8" y="9.5" width="8" height="5" rx="2.5"/><rect x="2" y="3" width="6" height="4" rx="2"/><rect x="16" y="17" width="6" height="4" rx="2"/><path d="M8 12C6 12 5 9 5 7M16 12c2 0 3 3 3 5"/>'],
+  ['flow-start','Fluxo: início/fim','<rect x="3" y="8" width="18" height="8" rx="4"/>'],['flow-step','Fluxo: etapa','<rect x="3.5" y="7" width="17" height="10" rx="1.5"/>'],
+  ['flow-dec','Fluxo: decisão','<path d="M12 3.5l8.5 8.5-8.5 8.5L3.5 12z"/>'],['flow-data','Fluxo: dado','<path d="M7 6.5h14l-4 11H3z"/>']];
+const FLOW={'flow-start':['pill',1],'flow-step':['rect',0],'flow-dec':['dia',2],'flow-data':['para',3]};
 const PEN_KINDS=[['ball','Caneta','Traço firme que engrossa com a pressão'],['fountain','Tinteiro','Fino e grosso conforme a direção, como caligrafia'],['pencil','Lápis','Granulado e mais suave'],['brush','Pincel','Bem sensível à pressão, com pontas finas']];
 const ERASER_MODES=[['stroke','Traço inteiro','Toca e apaga o traço todo'],['part','Só um pedaço','Apaga apenas onde passar']];
 const STAR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/></svg>';
@@ -815,11 +860,19 @@ function nodeLines(n){
 function sizeNode(n){
   const c=measureCtx;c.font=nodeFont(n);const L=nodeLines(n),mw=Math.max(...L.map(l=>c.measureText(l).width));
   const cx=n.x+(n.w||0)/2,cy=n.y+(n.h||0)/2;n.w=r1(Math.max(n.s*5,mw+n.s*1.9));n.h=r1(L.length*n.s*1.25+n.s*1.15);
+  if(n.sh==='dia'){n.w=r1(n.w*1.45);n.h=r1(n.h*1.7)}else if(n.sh==='para')n.w=r1(n.w+n.h*.7);
   if(n.placed){n.x=r1(cx-n.w/2);n.y=r1(cy-n.h/2)}
+}
+function nodePath(c,n,x,y){
+  const w=n.w,h=n.h;c.beginPath();
+  if(n.sh==='dia'){c.moveTo(x+w/2,y);c.lineTo(x+w,y+h/2);c.lineTo(x+w/2,y+h);c.lineTo(x,y+h/2);c.closePath()}
+  else if(n.sh==='para'){const k=h*.35;c.moveTo(x+k,y);c.lineTo(x+w,y);c.lineTo(x+w-k,y+h);c.lineTo(x,y+h);c.closePath()}
+  else if(n.sh==='rect')rrect(c,x,y,w,h,Math.min(10,n.s*.4));
+  else rrect(c,x,y,w,h,Math.min(h/2,n.s*.9));
 }
 function drawNode(c,n,dx,dy){
   const [f,sc]=MIND[(n.ci||0)%MIND.length],x=n.x+dx,y=n.y+dy,L=nodeLines(n);
-  c.save();rrect(c,x,y,n.w,n.h,Math.min(n.h/2,n.s*.9));c.fillStyle=f;c.fill();c.lineWidth=n.root?3.2:2.2;c.strokeStyle=sc;c.stroke();
+  c.save();nodePath(c,n,x,y);c.fillStyle=f;c.fill();c.lineWidth=n.root?3.2:2.2;c.strokeStyle=sc;c.stroke();
   c.fillStyle='#2A1B3D';c.font=nodeFont(n);c.textAlign='center';c.textBaseline='middle';
   L.forEach((ln,i)=>c.fillText(ln,x+n.w/2,y+n.h/2+(i-(L.length-1)/2)*n.s*1.25+n.s*.05));c.restore();
 }
@@ -827,15 +880,24 @@ const nodeMap=d=>{const m=new Map();for(const st of d.strokes)if(st.t==='node')m
 function drawEdge(c,e,map){
   const a=map.get(e.a),b=map.get(e.b);if(!a||!b)return;
   const ax=a.x+a.w/2,ay=a.y+a.h/2,bx=b.x+b.w/2,by=b.y+b.h/2,mx=(ax+bx)/2;
-  c.save();c.strokeStyle=MIND[(b.ci||0)%MIND.length][1];c.globalAlpha=.85;c.lineWidth=3;c.lineCap='round';
-  c.beginPath();c.moveTo(ax,ay);c.bezierCurveTo(mx,ay,mx,by,bx,by);c.stroke();c.restore();
+  c.save();c.strokeStyle=e.flow?'#6B5A8E':MIND[(b.ci||0)%MIND.length][1];c.globalAlpha=.85;c.lineWidth=e.flow?2.6:3;c.lineCap='round';c.lineJoin='round';
+  if(e.flow){
+    // seta reta até a borda da caixa de destino
+    const dx=bx-ax,dy=by-ay,len=Math.hypot(dx,dy)||1,ux=dx/len,uy=dy/len;
+    const t=Math.min(Math.abs(b.w/2/(ux||1e-9)),Math.abs(b.h/2/(uy||1e-9)))*(b.sh==='dia'?.72:1),ex=bx-ux*(t+3),ey=by-uy*(t+3),hs=14;
+    c.beginPath();c.moveTo(ax,ay);c.lineTo(ex,ey);c.stroke();
+    c.globalAlpha=1;c.fillStyle=c.strokeStyle;c.beginPath();c.moveTo(ex,ey);c.lineTo(ex-ux*hs-uy*hs*.55,ey-uy*hs+ux*hs*.55);c.lineTo(ex-ux*hs+uy*hs*.55,ey-uy*hs-ux*hs*.55);c.closePath();c.fill();
+  }else{c.beginPath();c.moveTo(ax,ay);c.bezierCurveTo(mx,ay,mx,by,bx,by);c.stroke()}
+  c.restore();
 }
 function nodeAt(d,pt){for(let i=d.strokes.length-1;i>=0;i--){const n=d.strokes[i];if(n.t==='node'&&pt.x>=n.x-4&&pt.x<=n.x+n.w+4&&pt.y>=n.y-4&&pt.y<=n.y+n.h+4)return n}return null}
 function newNode(d,pt,parent){
   const nodes=d.strokes.filter(x=>x.t==='node'),root=!parent&&!nodes.length;
   let ci=0;if(parent){if(parent.root){const kids=d.strokes.filter(e=>e.t==='edge'&&e.a===parent.id).length;ci=1+kids%(MIND.length-1)}else ci=parent.ci||0}
   else if(!root)ci=1+nodes.length%(MIND.length-1);
-  const n={t:'node',id:uid(),txt:root?'Tema central':'Nova ideia',s:root?28:22,ci,x:pt.x,y:pt.y};if(root)n.root=true;
+  const fl=FLOW[P.shape];
+  const n={t:'node',id:uid(),txt:fl?({pill:'Início',rect:'Etapa',dia:'Decisão?',para:'Dado'}[fl[0]]):root?'Tema central':'Nova ideia',s:fl?22:root?28:22,ci:fl?fl[1]:ci,x:pt.x,y:pt.y};
+  if(fl)n.sh=fl[0];else if(root)n.root=true;
   sizeNode(n);n.x=r1(pt.x-n.w/2);n.y=r1(pt.y-n.h/2);n.placed=true;return n;
 }
 async function editNode(rt,n,isNew){
@@ -1049,7 +1111,7 @@ async function notebookMenu(nb){
       for(const r of nb.recs||[])await DB.del('blobs',r.bid);
       for(const c of await DB.cardsOf(nb.id)){for(const b of [c.qi,c.ai])if(b)await DB.del('blobs',b);await DB.del('cards',c.id)}
       for(const p of await DB.pagesOf(nb.id)){for(const b of blobIdsOf(p))await DB.del('blobs',b);await DB.del('pages',p.id)}
-      await DB.del('notebooks',nb.id);renderLibrary();toast('Caderno apagado');
+      P.tabs=(P.tabs||[]).filter(t=>t!==nb.id);savePrefs();await DB.del('notebooks',nb.id);renderLibrary();toast('Caderno apagado');
     }
   }
 }
@@ -1192,7 +1254,8 @@ const live=document.createElement('canvas');live.className='live';
 const lctx=live.getContext('2d',{desynchronized:true});
 
 async function openNotebook(id,opt){
-  const nb=await DB.get('notebooks',id);if(!nb){history.replaceState(null,'',location.pathname);return}
+  const nb=await DB.get('notebooks',id);if(!nb){history.replaceState(null,'',location.pathname);P.tabs=(P.tabs||[]).filter(t=>t!==id);savePrefs();return}
+  P.tabs=(P.tabs||[]).filter(t=>t!==id);P.tabs.push(id);if(P.tabs.length>8)P.tabs.shift();savePrefs();
   const pages=await orderedPages(nb);
   S.nb=nb;S.pages=pages.map(d=>({d}));S.undo=[];S.redo=[];S.zoom=1;S.sel=null;S.cur=0;
   $('#library').hidden=true;$('#editor').hidden=false;document.body.classList.add('editing');
@@ -1201,11 +1264,12 @@ async function openNotebook(id,opt){
   buildPages();desk.scrollTop=0;desk.scrollLeft=0;
   updateToolbar();updateUndo();updateIndicator();
   $('#libSearch').value='';$('#results').hidden=true;$('#grid').hidden=false;
+  renderTabs();
   if(opt&&opt.q)requestAnimationFrame(()=>gotoHit(opt.page||0,opt.q));
   else if(opt&&opt.pageId){const i=S.pages.findIndex(r=>r.d.id===opt.pageId);if(i>0)requestAnimationFrame(()=>{desk.scrollTop=S.pages[i].el.offsetTop-24;updateIndicator()})}
 }
 async function closeNotebook(){
-  setReview(false);
+  setReview(false);aiClosePanel();
   commitText();clearSelection();togglePanel(false);toggleRuler(false);closePlayer();if(REC.on)await stopRec();await flushSaves();
   io.disconnect();S.pages.forEach(detach);pagesEl.innerHTML='';desk.classList.remove('boardmode');$('#pageInd').hidden=false;BT=null;
   S.nb=null;S.pages=[];S.undo=[];S.redo=[];
@@ -1361,6 +1425,7 @@ function applyAction(a,dir){
   else if(a.t==='color')a.items.forEach((st,j)=>st.c=dir<0?a.from[j]:a.to);
   else if(a.t==='link')a.items.forEach((st,j)=>{const v=dir<0?a.from[j]:a.to;if(v)st.link=v;else delete st.link});
   else if(a.t==='rot')rotateStrokes(a.items,a.ang*dir,a.cx,a.cy);
+  else if(a.t==='batch'){(dir<0?[...a.acts].reverse():a.acts).forEach(x=>Object.assign(x.st,dir<0?x.from:x.to))}
   else if(a.t==='ops')dir<0?undoOps(s,a.ops):redoOps(s,a.ops);
   else if(a.t==='props')Object.assign(a.st,dir<0?a.from:a.to);
   else if(a.t==='scale')scaleStrokes(a.items,dir<0?1/a.f:a.f,a.cx,a.cy);
@@ -1519,7 +1584,7 @@ pagesEl.addEventListener('pointerdown',e=>{
     if(t==='pen'&&P.penKind&&P.penKind!=='ball')a.st.k=P.penKind;
     act=a;addPoint(pt);a.anchor=pt;armHold();schedule();
   }else if(t==='shape'){
-    if(P.shape==='mind'){Object.assign(a,{kind:'mind',from:nodeAt(rt.d,pt),start:pt,cur:pt});act=a;
+    if(P.shape==='mind'||FLOW[P.shape]){Object.assign(a,{kind:'mind',from:nodeAt(rt.d,pt),start:pt,cur:pt});act=a;
       if(!P.mindTip){P.mindTip=true;savePrefs();toast('Toque para criar uma ideia. Arraste de uma ideia para criar outra ligada a ela. Toque numa ideia para editar.',7000)}
       return}
     a.st={t:'pen',c:P.penColor,s:SIZES.shape[P.size.shape],p:[]};act=a;
@@ -1609,8 +1674,8 @@ function finish(){
     clearLive();const d=rt.d,moved=Math.hypot(a.cur.x-a.start.x,a.cur.y-a.start.y)>14;
     if(!moved){if(a.from)editNode(rt,a.from,false);else{const n=newNode(d,a.start,null);d.strokes.push(n);pushUndo({t:'add',rt,items:[n]});renderPage(rt);save(rt);editNode(rt,n,true)}}
     else if(a.from){const tg=nodeAt(d,a.cur);
-      if(tg&&tg!==a.from){if(!d.strokes.some(e=>e.t==='edge'&&(e.a===a.from.id&&e.b===tg.id||e.a===tg.id&&e.b===a.from.id))){const e={t:'edge',a:a.from.id,b:tg.id};d.strokes.push(e);pushUndo({t:'add',rt,items:[e]});renderPage(rt);save(rt)}}
-      else{const n=newNode(d,a.cur,a.from),e={t:'edge',a:a.from.id,b:n.id};d.strokes.push(e,n);pushUndo({t:'add',rt,items:[e,n]});renderPage(rt);save(rt);editNode(rt,n,true)}}
+      if(tg&&tg!==a.from){if(!d.strokes.some(e=>e.t==='edge'&&(e.a===a.from.id&&e.b===tg.id||e.a===tg.id&&e.b===a.from.id))){const e={t:'edge',a:a.from.id,b:tg.id};if(FLOW[P.shape]||a.from.sh||tg.sh)e.flow=true;d.strokes.push(e);pushUndo({t:'add',rt,items:[e]});renderPage(rt);save(rt)}}
+      else{const n=newNode(d,a.cur,a.from),e={t:'edge',a:a.from.id,b:n.id};if(n.sh||a.from.sh)e.flow=true;d.strokes.push(e,n);pushUndo({t:'add',rt,items:[e,n]});renderPage(rt);save(rt);editNode(rt,n,true)}}
     updateIndicator();return;
   }
   if(a.kind==='shape'){const b=bbox(a.st);if(a.st.p.length&&Math.max(b.w,b.h)>a.st.s*3)a.kind='ink';else{clearLive();updateIndicator();return}}
@@ -1718,11 +1783,12 @@ function drawSelection(){
 function clearSelection(){if(!S.sel)return;const rt=S.sel.rt;S.sel=null;$('#selBar').hidden=true;if(live.parentNode===rt.el)clearLive();renderPage(rt)}
 function showSelBar(){
   const s=S.sel,bar=$('#selBar');if(!s)return;
-  bar.innerHTML=`<button class="btn" data-a="minus" aria-label="Diminuir" title="Diminuir">−</button><button class="btn" data-a="plus" aria-label="Aumentar" title="Aumentar">+</button><button class="btn" data-a="rot" aria-label="Girar 90 graus" title="Girar 90°">↻ 90°</button><button class="btn" data-a="link" title="Criar link">🔗 Link</button><button class="btn" data-a="card" title="Criar cartão de estudo">🃏 Cartão</button><span class="sep"></span><button class="btn" data-a="dup">Duplicar</button><button class="btn" data-a="del" style="color:var(--danger)">Apagar</button><span class="sep"></span>`+
+  bar.innerHTML=`<button class="btn" data-a="minus" aria-label="Diminuir" title="Diminuir">−</button><button class="btn" data-a="plus" aria-label="Aumentar" title="Aumentar">+</button><button class="btn" data-a="rot" aria-label="Girar 90 graus" title="Girar 90°">↻ 90°</button><button class="btn" data-a="link" title="Criar link">🔗 Link</button><button class="btn" data-a="card" title="Criar cartão de estudo">🃏 Cartão</button><button class="btn" data-a="ai" title="Inteligência artificial" style="color:var(--accent)">✦ IA</button><span class="sep"></span><button class="btn" data-a="dup">Duplicar</button><button class="btn" data-a="del" style="color:var(--danger)">Apagar</button><span class="sep"></span>`+
     PEN_COLORS.map(c=>`<button class="swatch" data-c="${c}" style="--sw:${c}" aria-label="Pintar de ${c}"><span></span></button>`).join('');
   bar.querySelector('[data-a=del]').onclick=deleteSelection;
   bar.querySelector('[data-a=dup]').onclick=duplicateSelection;
   bar.querySelector('[data-a=card]').onclick=cardFromSelection;
+  bar.querySelector('[data-a=ai]').onclick=aiSelectionMenu;
   bar.querySelector('[data-a=minus]').onclick=()=>scaleSelection(1/1.2);
   bar.querySelector('[data-a=plus]').onclick=()=>scaleSelection(1.2);
   bar.querySelector('[data-a=link]').onclick=linkDialog;
@@ -1749,7 +1815,7 @@ function deleteSelection(){
 function duplicateSelection(){
   const s=S.sel;if(!s)return;const rt=s.rt;
   const idm=new Map();const copies=s.items.map(st=>{const c=st.p?{...st,p:st.p.slice()}:{...st};if(st.t==='node'){c.id=uid();delete c.root;idm.set(st.id,c.id)}return c});
-  for(const e of rt.d.strokes)if(e.t==='edge'&&idm.has(e.a)&&idm.has(e.b))copies.unshift({t:'edge',a:idm.get(e.a),b:idm.get(e.b)});
+  for(const e of rt.d.strokes)if(e.t==='edge'&&idm.has(e.a)&&idm.has(e.b))copies.unshift({...e,a:idm.get(e.a),b:idm.get(e.b)});
   translateStrokes(copies,24,24);
   rt.d.strokes.push(...copies);pushUndo({t:'add',rt,items:copies});save(rt);
   S.sel={rt,items:copies,set:new Set(copies),box:unionBox(copies),dragging:false};
@@ -1772,15 +1838,19 @@ async function startRec(){
   mr.ondataavailable=e=>{if(e.data&&e.data.size)chunks.push(e.data)};
   closePlayer();Object.assign(REC,{on:true,id:uid(),t0:Date.now(),mr,stream,chunks,mime:mr.mimeType||mime,nb:S.nb});
   mr.start(1000);recUI();
+  REC.tr=[];const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(SR){try{const sr=new SR();sr.lang='pt-BR';sr.continuous=true;sr.interimResults=false;
+    sr.onresult=e=>{for(let i=e.resultIndex;i<e.results.length;i++){const r=e.results[i];if(r.isFinal){const txt=r[0].transcript.trim();if(txt)REC.tr.push({t:Math.max(0,Date.now()-REC.t0-2000),txt})}}};
+    sr.onend=()=>{if(REC.on&&REC.sr===sr)setTimeout(()=>{try{if(REC.on&&REC.sr===sr)sr.start()}catch(x){}},250)};sr.onerror=()=>{};sr.start();REC.sr=sr}catch(e){REC.sr=null}}
   if(!P.recTip){P.recTip=true;savePrefs();toast('Gravando ✦ Tudo o que você escrever agora fica ligado a este momento da aula.',6000)}
 }
 function stopRec(){
   return new Promise(res=>{
-    if(!REC.on)return res(null);const r={...REC};REC.on=false;clearInterval(REC.timer);
+    if(!REC.on)return res(null);const r={...REC};REC.on=false;clearInterval(REC.timer);const sr=REC.sr;REC.sr=null;if(sr)try{sr.stop()}catch(x){}
     r.mr.onstop=async()=>{
       r.stream.getTracks().forEach(t=>t.stop());
       const blob=new Blob(r.chunks,{type:(r.mime||'audio/mp4').split(';')[0]}),bid=uid();await DB.put('blobs',{id:bid,blob});
-      const d=new Date(r.t0),rec={id:r.id,bid,start:r.t0,dur:Date.now()-r.t0,title:'Aula de '+d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})};
+      const d=new Date(r.t0),rec={id:r.id,bid,start:r.t0,dur:Date.now()-r.t0,title:'Aula de '+d.toLocaleDateString('pt-BR')+' às '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),tr:r.tr||[]};
       r.nb.recs=(r.nb.recs||[]).concat(rec);await DB.put('notebooks',r.nb);recUI();
       toast('Gravação salva ✦ Toque no microfone para ouvir.',4000);res(rec);
     };
@@ -1829,8 +1899,10 @@ $('.pl-sp',player).onclick=e=>{if(!PLAY)return;const sp=[1,1.5,2,.75],i=(sp.inde
 $('.pl-close',player).onclick=closePlayer;
 $('.pl-more',player).onclick=async()=>{
   if(!PLAY)return;const rec=PLAY.rec,nb=PLAY.nb;
-  const a=await menu(rec.title,[{id:'ren',label:'Renomear'},{id:'share',label:'Compartilhar o áudio'},{id:'del',label:'Apagar gravação',sub:'As anotações continuam; só o áudio sai',danger:true}]);
-  if(a==='ren'){const t=await ask('Renomear gravação',rec.title);if(t){rec.title=t;await DB.put('notebooks',nb)}}
+  const a=await menu(rec.title,[{id:'tr',label:'Ver a transcrição',sub:(rec.tr&&rec.tr.length)?rec.tr.length+' trechos · toque num trecho para ouvir':'Sem transcrição nesta gravação'},{id:'sum',label:'Resumir esta aula com IA ✦'},{id:'ren',label:'Renomear'},{id:'share',label:'Compartilhar o áudio'},{id:'del',label:'Apagar gravação',sub:'As anotações continuam; só o áudio sai',danger:true}]);
+  if(a==='tr')showTranscript(rec);
+  else if(a==='sum'){openAI();aiLecture(rec)}
+  else if(a==='ren'){const t=await ask('Renomear gravação',rec.title);if(t){rec.title=t;await DB.put('notebooks',nb)}}
   else if(a==='share'){const b=await DB.get('blobs',rec.bid);if(b){const ext=/mp4|m4a|aac/.test(b.blob.type)?'m4a':'webm';await offerFile(new File([b.blob],rec.title.replace(/[\\/:*?"<>|]+/g,' ')+'.'+ext,{type:b.blob.type}),rec.title,'Áudio da aula','Salvar em Arquivos ou enviar')}}
   else if(a==='del'){if(await confirmDlg('Apagar esta gravação?','O áudio some, mas tudo o que você escreveu continua no caderno.','Apagar')){closePlayer();nb.recs=(nb.recs||[]).filter(r=>r.id!==rec.id);await DB.del('blobs',rec.bid);await DB.put('notebooks',nb);toast('Gravação apagada')}}
 };
@@ -2114,6 +2186,7 @@ function pageSources(d){
   for(const st of d.strokes)if(st.t==='node')out.push({t:st.txt,box:bbox(st),kind:'Mapa mental'});
   for(const st of d.strokes)if(st.t==='text'&&st.txt)out.push({t:st.txt,box:bbox(st),kind:'Texto'});
   if(d.pt)out.push({t:d.pt.map(i=>i.s).join(' '),box:null,kind:'PDF',pt:true});
+  if(d.ocr)out.push({t:d.ocr,box:null,kind:'Escrita à mão'});
   return out;
 }
 function snippet(t,q){
@@ -2162,13 +2235,14 @@ async function runLibSearch(){
     if(norm(nb.title).includes(q))out.push({nb,i:0,html:`<span>Caderno: ${snippet(nb.title,q)}</span>`,label:'Nome do caderno'});
     const pages=await orderedPages(nb);
     for(const r of searchPages(pages,q))out.push({nb,i:r.i,html:`<span>${r.sn}</span>`,label:`Página ${r.i+1} · ${r.kind}`});
+    for(const rec of nb.recs||[])for(const sg of rec.tr||[]){const sn=snippet(sg.txt,q);if(sn){out.push({nb,rec,sg,html:`<span>${sn}</span>`,label:'Gravação · '+fmtT(sg.t)});break}}
   }
   if(norm($('#libSearch').value.trim())!==q)return;
   box.innerHTML=out.length?'':`<p class="res-empty">Nada encontrado. A busca procura em textos digitados, divisórias, nomes de cadernos e PDFs.</p>`;
   for(const r of out.slice(0,80)){
     const el=document.createElement('button');el.className='res';
     el.innerHTML=`<span class="cover" data-cover="${coverOf(r.nb)}" style="aspect-ratio:3/4"></span><div><b>${esc(r.nb.title)}</b><small>${r.label}</small>${r.html}</div>`;
-    el.onclick=()=>openNotebook(r.nb.id,{page:r.i,q});box.append(el);
+    el.onclick=r.rec?async()=>{await openNotebook(r.nb.id);openPlayer(r.rec).then(()=>seekTo(r.sg.t))}:()=>openNotebook(r.nb.id,{page:r.i,q});box.append(el);
   }
 }
 let pageT;
@@ -2194,6 +2268,7 @@ function renderPanel(){
     const res=searchPages(S.pages.map(r=>r.d),q);
     if(!res.length)box.innerHTML='<p class="panel-empty">Nada encontrado neste caderno. A busca procura em textos digitados, divisórias e PDFs.</p>';
     for(const r of res){const el=document.createElement('button');el.className='res';el.innerHTML=`<div><small>Página ${r.i+1} · ${r.kind}</small><span>${r.sn}</span></div>`;el.onclick=()=>gotoHit(r.i,q);box.append(el)}
+    for(const rec of S.nb.recs||[])for(const sg of rec.tr||[]){const sn=snippet(sg.txt,q);if(!sn)continue;const el=document.createElement('button');el.className='res';el.innerHTML=`<div><small>${esc(rec.title)} · ${fmtT(sg.t)}</small><span>${sn}</span></div>`;el.onclick=()=>openPlayer(rec).then(()=>seekTo(sg.t));if(box.querySelector('.panel-empty'))box.innerHTML='';box.append(el)}
     return;
   }
   thumbIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){thumbIO.unobserve(e.target);drawThumb(e.target)}}),{root:box,rootMargin:'300px'});
@@ -2522,6 +2597,7 @@ async function renderStudy(){
       `<div style="display:flex;flex-direction:column;gap:10px">${it.opts.map((o,i)=>`<button class="opt" data-o="${i}">${htmlT(o)}</button>`).join('')}</div>`+
       (ST.picked!=null?'<div class="st-actions"><button class="btn primary st-next">Próxima</button></div>':'');
     if(ST.picked!=null)stWrap.querySelectorAll('.opt').forEach((b,i)=>{if(it.opts[i]===it.c.a.trim())b.classList.add('ok');else if(i===ST.picked)b.classList.add('bad')});
+    if(ST.picked!=null&&it.exp){const ex=document.createElement('div');ex.className='st-exp';ex.innerHTML='<b>Por quê:</b> '+htmlT(it.exp);stWrap.querySelector('.st-actions').before(ex)}
   }
   wireStudy();
 }
@@ -2577,10 +2653,313 @@ function revealAt(e){
   return false;
 }
 
+/* =====================================================================
+   Abas de cadernos abertos
+   ===================================================================== */
+async function renderTabs(){
+  const nav=$('#tabs'),ids=(P.tabs||[]);
+  const nbs=(await Promise.all(ids.map(id=>DB.get('notebooks',id)))).filter(Boolean);
+  const show=S.nb&&nbs.length>1;nav.hidden=!show;$('#editor').classList.toggle('has-tabs',!!show);if(!show)return;
+  nav.innerHTML=nbs.map(nb=>`<button class="tab ${nb.id===S.nb.id?'on':''}" data-id="${nb.id}" title="${esc(nb.title)}"><i class="cover" data-cover="${coverOf(nb)}"></i><span>${esc(nb.title)}</span><b data-x aria-label="Fechar aba">×</b></button>`).join('');
+  nav.querySelectorAll('.tab').forEach(b=>b.onclick=async e=>{
+    const id=b.dataset.id;
+    if(e.target.closest('[data-x]')){P.tabs=P.tabs.filter(t=>t!==id);savePrefs();
+      if(id===S.nb.id){const next=P.tabs[P.tabs.length-1];await closeNotebook();if(next)openNotebook(next)}else renderTabs();return}
+    if(id===S.nb.id)return;await closeNotebook();openNotebook(id);
+  });
+  const on=nav.querySelector('.tab.on');if(on)on.scrollIntoView({inline:'nearest',block:'nearest'});
+}
+
+/* =====================================================================
+   Transcrição das aulas
+   ===================================================================== */
+function showTranscript(rec){
+  const tr=rec.tr||[];
+  openDlg(`<h2>Transcrição</h2>${tr.length?`<p>Toque num trecho para ouvir aquele momento.</p><div class="link-list">${tr.map((s,i)=>`<button data-i="${i}"><small>${fmtT(s.t)}</small>${esc(s.txt)}</button>`).join('')}</div>`
+    :'<p>Esta gravação não tem transcrição. A transcrição acontece ao vivo, enquanto grava, usando o reconhecimento de fala do aparelho. No iPad, deixe o Ditado ligado em Ajustes › Geral › Teclado.</p>'}
+    <div class="actions"><button class="btn" data-x>Fechar</button></div>`,
+    (d,done)=>{d.querySelectorAll('.link-list button').forEach(b=>b.onclick=()=>{done(null);if(PLAY&&PLAY.rec.id===rec.id)seekTo(tr[+b.dataset.i].t);else openPlayer(rec).then(()=>seekTo(tr[+b.dataset.i].t))});$('[data-x]',d).onclick=()=>done(null)},true);
+}
+
+/* =====================================================================
+   Inteligência artificial (Claude, com a chave da própria pessoa)
+   A chave é a mesma do Neurinho e fica só neste aparelho.
+   ===================================================================== */
+const IAKEY='neurinho.ia',IAMODEL='claude-opus-5-5';
+const iaKey=()=>{try{return localStorage.getItem(IAKEY)||''}catch(e){return ''}};
+const iaSet=k=>{try{k?localStorage.setItem(IAKEY,k):localStorage.removeItem(IAKEY)}catch(e){}};
+let AIM=null,aiBusy=false,aiScope='page';
+const AIC={msgs:[]};
+const AI_SYS=`Você é o assistente de estudos do Sinapse, um app de cadernos à mão usado sobretudo por estudantes. Responda sempre em português do Brasil, com clareza e no tom de uma colega que explica bem.
+Use as anotações enviadas (texto digitado, imagens das páginas com a letra da pessoa, PDFs e transcrições de aulas) como fonte principal. Se algo não estiver nas anotações, diga isso; se for útil, complemente com conhecimento geral deixando claro que veio de fora.
+Formate para estudar: títulos curtos, listas e **negrito** nos conceitos-chave. Não use LaTeX: escreva matemática em texto simples (x², √, a/b, ×, ÷, ≤).`;
+const BASEP={model:IAMODEL,betas:['server-side-fallback-2026-07-01'],fallbacks:'default'};
+async function aiSettings(required){
+  const cur=iaKey();
+  const r=await openDlg(`<h2>Inteligência artificial ✦</h2>
+    <p>O Sinapse usa o Claude, da Anthropic, com a <b>sua própria chave de API</b>. Cada pedido é cobrado na sua conta da Anthropic (console.anthropic.com). A chave fica salva só neste aparelho e é a mesma do Neurinho.</p>
+    ${required?'<p>Para usar a IA, cole sua chave abaixo.</p>':''}
+    <form><label class="f" for="aiKey">Chave da API</label><input id="aiKey" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(cur)}" style="width:100%;min-height:48px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 16px;font:inherit">
+    <div class="actions">${cur?'<button type="button" class="btn" data-rm style="color:var(--danger);margin-right:auto">Remover chave</button>':''}<button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Salvar</button></div></form>`,
+    (d,done)=>{$('[data-x]',d).onclick=()=>done(null);const rm=$('[data-rm]',d);if(rm)rm.onclick=()=>done({rm:true});
+      $('form',d).onsubmit=e=>{e.preventDefault();done({k:$('#aiKey',d).value.trim()})};setTimeout(()=>$('#aiKey',d).focus(),60)});
+  if(!r)return !!iaKey();
+  if(r.rm){iaSet('');toast('Chave removida deste aparelho.');return false}
+  if(!/^sk-ant-/.test(r.k)){toast('Essa não parece uma chave da Anthropic (começa com sk-ant-).',5000);return false}
+  iaSet(r.k);toast('Chave salva ✦');return true;
+}
+async function aiClient(){
+  if(!iaKey()&&!(await aiSettings(true)))return null;
+  if(!AIM)AIM=await import('../vendor/anthropic-sdk.mjs');
+  return new AIM.Anthropic({apiKey:iaKey(),dangerouslyAllowBrowser:true});
+}
+function aiErr(e){
+  const A=AIM&&AIM.Anthropic;
+  if(e&&e.refusal)return 'O Claude preferiu não responder a esse pedido. Tente reformular.';
+  if(A){
+    if(e instanceof A.AuthenticationError)return 'A chave da API não foi aceita. Confira em ✦ › Configurar.';
+    if(e instanceof A.PermissionDeniedError)return 'Sua chave não tem permissão para usar este modelo.';
+    if(e instanceof A.RateLimitError)return 'Muitos pedidos seguidos ou sem créditos na conta. Espere um pouco e tente de novo.';
+    if(e instanceof A.BadRequestError)return 'O pedido não foi aceito: '+(e.message||'');
+    if(e instanceof A.APIConnectionError)return 'Sem conexão com a Anthropic. Confira a internet.';
+    if(e instanceof A.APIError)return 'Erro da API ('+e.status+'). Tente de novo.';
+  }
+  return 'Algo deu errado: '+(e&&e.message||e);
+}
+async function aiStream(messages,{effort='medium',onText}={}){
+  const c=await aiClient();if(!c)return null;
+  const st=c.beta.messages.stream({...BASEP,max_tokens:64000,system:AI_SYS,output_config:{effort},messages});
+  let txt='';
+  for await(const ev of st){if(ev.type==='content_block_delta'&&ev.delta.type==='text_delta'){txt+=ev.delta.text;onText&&onText(txt)}}
+  const msg=await st.finalMessage();
+  if(msg.stop_reason==='refusal')throw Object.assign(new Error('refusal'),{refusal:true});
+  return {text:txt||msg.content.filter(b=>b.type==='text').map(b=>b.text).join(''),content:msg.content,usage:msg.usage};
+}
+async function aiJSON(content,schema,{effort='medium'}={}){
+  const c=await aiClient();if(!c)return null;
+  const msg=await c.beta.messages.create({...BASEP,max_tokens:16000,system:AI_SYS,output_config:{effort,format:{type:'json_schema',schema}},messages:[{role:'user',content}]});
+  if(msg.stop_reason==='refusal')throw Object.assign(new Error('refusal'),{refusal:true});
+  return JSON.parse(msg.content.filter(b=>b.type==='text').map(b=>b.text).join(''));
+}
+const obj=(props,req)=>({type:'object',properties:props,required:req||Object.keys(props),additionalProperties:false});
+/* ---------- contexto: texto, imagens das páginas e transcrições ---------- */
+const b64Of=async blob=>(await blobToData(blob)).split(',')[1];
+async function pageJPEG(d,maxW=1100){
+  const pd=boardAsPage(d),k=Math.min(maxW/pd.w,1.3),cv=document.createElement('canvas');cv.width=Math.round(pd.w*k);cv.height=Math.round(pd.h*k);
+  const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);x.setTransform(k,0,0,k,0,0);
+  const bg=pd.bg?await loadBg(pd.bg):null;await ensureImgs([pd]);paint(x,pd,bg);if(bg&&bg.close)bg.close();
+  const blob=await toBlob(cv,'image/jpeg',.82);cv.width=cv.height=0;return b64Of(blob);
+}
+function pageText(d){
+  const parts=[];if(d.sec)parts.push('Divisória: '+d.sec);
+  for(const st of d.strokes)if(st.t==='text'&&st.txt)parts.push(st.txt);
+  const nodes=nodeMap(d);if(nodes.size){parts.push('Mapa/fluxograma: '+[...nodes.values()].map(n=>n.txt).join(' | '));
+    const ed=d.strokes.filter(e=>e.t==='edge').map(e=>nodes.get(e.a)&&nodes.get(e.b)?nodes.get(e.a).txt+' → '+nodes.get(e.b).txt:null).filter(Boolean);if(ed.length)parts.push('Ligações: '+ed.join('; '))}
+  if(d.pt)parts.push(d.pt.map(i=>i.s).join(' '));
+  if(d.ocr)parts.push('Escrita à mão (lida): '+d.ocr);
+  return parts.join('\n');
+}
+const hasInk=d=>d.strokes.some(st=>st.t==='pen'||st.t==='hl'||st.t==='img')||(!!d.bg&&!d.pt);
+async function buildContext(scope){
+  const blocks=[{type:'text',text:`Caderno: “${S.nb.title}”.`}],idx=scope==='page'?[S.cur]:S.pages.map((_,i)=>i);let imgs=0,skipped=0;
+  for(const i of idx){const d=S.pages[i].d,t=pageText(d),needImg=hasInk(d);
+    blocks.push({type:'text',text:`--- Página ${i+1} ---\n`+(t||(needImg?'(conteúdo escrito à mão na imagem a seguir)':'(página em branco)'))});
+    if(needImg){if(imgs<(scope==='page'?1:8)){imgs++;blocks.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:await pageJPEG(d)}})}else skipped++}}
+  if(scope!=='page')for(const rec of S.nb.recs||[])if(rec.tr&&rec.tr.length)blocks.push({type:'text',text:`--- Transcrição: ${rec.title} ---\n`+rec.tr.map(s=>`[${fmtT(s.t)}] ${s.txt}`).join('\n')});
+  return {blocks,skipped};
+}
+async function selectionImage(s){
+  const pad=14,b=s.box,rect={x:b.x-pad,y:b.y-pad,w:b.w+pad*2,h:b.h+pad*2},k=Math.min(2,1400/rect.w),cv=document.createElement('canvas');
+  cv.width=Math.round(rect.w*k);cv.height=Math.round(rect.h*k);const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,cv.width,cv.height);
+  x.setTransform(k,0,0,k,-rect.x*k,-rect.y*k);const only={...s.rt.d,tpl:'blank',bg:null,strokes:s.rt.d.strokes.filter(st=>s.set.has(st)||st.t==='edge')};
+  await ensureImgs([only]);paint(x,only,null);const blob=await toBlob(cv,'image/png');cv.width=cv.height=0;return b64Of(blob);
+}
+/* ---------- painel ---------- */
+const aiPanel=$('#aiPanel'),aiLog=$('#aiLog');
+function openAI(){commitText();aiPanel.hidden=false;$('#btnAI').setAttribute('aria-pressed','true');if(innerWidth<900)togglePanel(false);renderChips()}
+function aiClosePanel(){aiPanel.hidden=true;$('#btnAI').setAttribute('aria-pressed','false');AIC.msgs=[];aiLog.innerHTML='<p class="ai-empty">Peça um resumo, uma explicação, cartões, um questionário… ou pergunte qualquer coisa sobre suas anotações. A IA lê o texto, a sua letra e as transcrições das aulas.</p>'}
+$('#btnAI').onclick=()=>aiPanel.hidden?openAI():aiClosePanel();
+$('#aiClose').onclick=aiClosePanel;
+$('#aiCfg').onclick=()=>aiSettings(false);
+aiPanel.querySelectorAll('.ai-scope button').forEach(b=>b.onclick=()=>{aiScope=b.dataset.s;AIC.msgs=[];aiPanel.querySelectorAll('.ai-scope button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+function renderChips(){
+  const hasRec=(S.nb.recs||[]).length>0;
+  const chips=[['sum','Resumir'],['explain','Explicar'],['cards','Criar cartões'],['quiz','Questionário'],['tidy','Reorganizar'],['ocr','Ler minha letra'],['spell','Corrigir ortografia'],['img','Ilustração'],...(hasRec?[['lecture','Resumir a aula']]:[])];
+  const box=$('.ai-chips',aiPanel);box.innerHTML=chips.map(([id,l])=>`<button data-c="${id}">${l}</button>`).join('');
+  box.querySelectorAll('button').forEach(b=>b.onclick=()=>aiChip(b.dataset.c));
+}
+const where=()=>aiScope==='page'?'esta página':'este caderno';
+function aiChip(id){
+  if(aiBusy)return;
+  if(id==='sum')aiRun('Resumir '+where(),`Faça um resumo de estudo de ${where()}: os conceitos principais, como se ligam e o que vale decorar. Termine com 3 perguntas para eu testar se entendi.`);
+  else if(id==='explain')aiRun('Explicar '+where(),`Explique o conteúdo de ${where()} de um jeito simples, com exemplos do dia a dia. Aponte o que costuma confundir.`);
+  else if(id==='tidy')aiRun('Reorganizar '+where(),`Reescreva o conteúdo de ${where()} de forma organizada e limpa, como anotações passadas a limpo: títulos, tópicos e definições. Não invente conteúdo novo.`);
+  else if(id==='cards')aiCards();
+  else if(id==='quiz')aiQuiz();
+  else if(id==='ocr')aiReadHandwriting();
+  else if(id==='spell')aiSpell(null);
+  else if(id==='img')aiIllustration();
+  else if(id==='lecture'){const recs=S.nb.recs||[];aiLecture(recs[recs.length-1])}
+}
+function md(t){
+  const lines=esc(t).split('\n'),out=[];let list=null;
+  const inl=x=>x.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/(^|[^*])\*(?!\s)(.+?)\*/g,'$1<i>$2</i>').replace(/`([^`]+)`/g,'<code>$1</code>');
+  const close=()=>{if(list){out.push(`</${list}>`);list=null}};
+  for(const l of lines){let m;
+    if(m=l.match(/^#{1,2}\s+(.*)/)){close();out.push('<h3>'+inl(m[1])+'</h3>')}
+    else if(m=l.match(/^#{3,6}\s+(.*)/)){close();out.push('<h4>'+inl(m[1])+'</h4>')}
+    else if(m=l.match(/^\s*[-*•]\s+(.*)/)){if(list!=='ul'){close();out.push('<ul>');list='ul'}out.push('<li>'+inl(m[1])+'</li>')}
+    else if(m=l.match(/^\s*\d+[.)]\s+(.*)/)){if(list!=='ol'){close();out.push('<ol>');list='ol'}out.push('<li>'+inl(m[1])+'</li>')}
+    else if(!l.trim())close();
+    else{close();out.push('<p>'+inl(l)+'</p>')}}
+  close();return out.join('');
+}
+const plain=t=>t.replace(/^#{1,6}\s+/gm,'').replace(/\*\*(.+?)\*\*/g,'$1').replace(/^\s*[-*]\s+/gm,'• ').replace(/`([^`]+)`/g,'$1').trim();
+function addLog(role,html){
+  const e=aiLog.querySelector('.ai-empty');if(e)e.remove();
+  const el=document.createElement('div');el.className='ai-msg '+role;el.innerHTML=html;aiLog.append(el);aiLog.scrollTop=aiLog.scrollHeight;return el;
+}
+async function aiRun(label,instruction,opt={}){
+  if(aiBusy)return;aiBusy=true;openAI();
+  addLog('user',esc(label));const el=addLog('ai','<span class="ai-wait">Lendo suas anotações…</span>');
+  const fresh=opt.fresh!==false||!AIC.msgs.length,saved=AIC.msgs.slice();
+  try{
+    if(fresh){const ctx=opt.context||await buildContext(aiScope);AIC.msgs=[{role:'user',content:[...ctx.blocks,...(opt.extra||[]),{type:'text',text:instruction}]}];
+      if(ctx.skipped)el.dataset.note=`(${ctx.skipped} páginas escritas à mão ficaram de fora deste pedido para não ficar grande demais.)`}
+    else AIC.msgs.push({role:'user',content:[...(opt.extra||[]),{type:'text',text:instruction}]});
+    el.innerHTML='<span class="ai-wait">Pensando…</span>';
+    const r=await aiStream(AIC.msgs,{effort:opt.effort||'medium',onText:t=>{el.innerHTML=md(t);aiLog.scrollTop=aiLog.scrollHeight}});
+    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API. Toque em ⚙ para configurar.</span>';AIC.msgs=saved;return}
+    AIC.msgs.push({role:'assistant',content:r.content});
+    el.innerHTML=md(r.text)+(el.dataset.note?`<div class="ai-meta">${el.dataset.note}</div>`:'')+`<div class="ai-acts"><button data-a="ins">Inserir na página</button><button data-a="page">Nova página</button><button data-a="cp">Copiar</button></div>`;
+    $('[data-a=ins]',el).onclick=()=>aiInsert(plain(r.text));
+    $('[data-a=page]',el).onclick=()=>aiNewPage(plain(r.text));
+    $('[data-a=cp]',el).onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(plain(r.text)).then(()=>toast('Copiado ✦'),()=>{})};
+    aiLog.scrollTop=aiLog.scrollHeight;
+  }catch(e){console.error(e);el.innerHTML=`<span class="ai-wait">${esc(aiErr(e))}</span>`;AIC.msgs=saved}
+  finally{aiBusy=false}
+}
+$('.ai-ask',aiPanel).onsubmit=e=>{
+  e.preventDefault();const ta=$('textarea',aiPanel),q=ta.value.trim();if(!q||aiBusy)return;ta.value='';
+  aiRun(q,q,{fresh:!AIC.msgs.length});
+};
+$('textarea',aiPanel).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('.ai-ask',aiPanel).requestSubmit()}});
+function textItem(txt,w){return {t:'text',x:0,y:0,w,txt,f:P.textFont,s:SIZES.text[0],c:P.textColor}}
+function aiInsert(txt){
+  const rt=S.pages[S.cur];if(!rt)return;const st=textItem(txt,rt.board?600:Math.min(760,rt.d.w-120));st.h=textLayout(st).h;
+  placeItem(st);delete st.h;renderPage(rt);toast('Texto inserido ✦ Use o laço para mover.');
+}
+async function aiNewPage(txt){
+  const i=S.cur;if(isBoard()){aiInsert(txt);return}
+  await addPage(i);const rt=S.pages[i+1];const st=textItem(txt,rt.d.w-200);st.x=100;st.y=110;
+  rt.d.strokes.push(st);pushUndo({t:'add',rt,items:[st]});renderPage(rt);save(rt);toast('Nova página criada ✦');
+}
+/* ---------- ações específicas ---------- */
+async function aiCards(){
+  if(aiBusy)return;aiBusy=true;openAI();addLog('user','Criar cartões de '+where());const el=addLog('ai','<span class="ai-wait">Criando cartões das suas anotações…</span>');
+  try{const ctx=await buildContext(aiScope);
+    const r=await aiJSON([...ctx.blocks,{type:'text',text:'Crie de 5 a 15 cartões de estudo (flashcards) com o que é mais importante nessas anotações. Pergunta curta e direta; resposta objetiva, de até 3 linhas.'}],
+      obj({cartoes:{type:'array',items:obj({pergunta:{type:'string'},resposta:{type:'string'}})}}));
+    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+    const list=r.cartoes||[];el.innerHTML=`<p>Criei <b>${list.length}</b> cartões.</p><ul>${list.slice(0,6).map(c=>`<li><b>${esc(c.pergunta)}</b><br>${esc(c.resposta)}</li>`).join('')}</ul>${list.length>6?'<p>…</p>':''}<div class="ai-acts"><button data-a="save">Guardar ${list.length} cartões</button></div>`;
+    $('[data-a=save]',el).onclick=async()=>{const pid=S.pages[S.cur].d.id;for(const c of list)await DB.put('cards',{id:uid(),nb:S.nb.id,q:c.pergunta,a:c.resposta,src:aiScope==='page'?{p:pid}:null,key:'t:'+c.pergunta+'|'+c.resposta,created:Date.now(),due:Date.now(),reps:0,ivl:0,ease:2.5});
+      updateStudyBtn();el.querySelector('.ai-acts').innerHTML='<button data-a="study">Estudar agora</button>';toast(list.length+' cartões guardados ✦');
+      $('[data-a=study]',el).onclick=async()=>startStudy((await DB.cardsOf(S.nb.id)).filter(c=>c.due<=Date.now()),S.nb.title)};
+  }catch(e){console.error(e);el.innerHTML=`<span class="ai-wait">${esc(aiErr(e))}</span>`}finally{aiBusy=false}
+}
+async function aiQuiz(){
+  if(aiBusy)return;aiBusy=true;openAI();addLog('user','Questionário de '+where());const el=addLog('ai','<span class="ai-wait">Montando as questões…</span>');
+  try{const ctx=await buildContext(aiScope);
+    const r=await aiJSON([...ctx.blocks,{type:'text',text:'Crie um questionário de 6 a 10 questões de múltipla escolha sobre essas anotações, no estilo de prova. Cada questão com 4 alternativas plausíveis e só uma correta, e uma explicação curta de por que ela é a certa.'}],
+      obj({questoes:{type:'array',items:obj({pergunta:{type:'string'},alternativas:{type:'array',items:{type:'string'}},correta:{type:'integer'},explicacao:{type:'string'}})}}),{effort:'medium'});
+    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+    const qs=(r.questoes||[]).filter(q=>q.alternativas&&q.alternativas.length>=2&&q.correta>=0&&q.correta<q.alternativas.length)
+      .map(q=>({c:{q:q.pergunta,a:q.alternativas[q.correta]},opts:q.alternativas,exp:q.explicacao}));
+    el.innerHTML=`<p>Questionário pronto: <b>${qs.length}</b> questões.</p><div class="ai-acts"><button data-a="go">Começar</button></div>`;
+    $('[data-a=go]',el).onclick=()=>{ST={on:true,mode:'quiz',qs,i:0,ok:0,wrong:[],picked:null,title:'Questionário · '+S.nb.title};stEl.hidden=false;renderStudy()};
+  }catch(e){console.error(e);el.innerHTML=`<span class="ai-wait">${esc(aiErr(e))}</span>`}finally{aiBusy=false}
+}
+async function aiReadHandwriting(){
+  if(aiBusy)return;const idx=(aiScope==='page'?[S.cur]:S.pages.map((_,i)=>i)).filter(i=>hasInk(S.pages[i].d));
+  if(!idx.length){toast('Não há escrita à mão para ler aqui.');return}
+  aiBusy=true;openAI();addLog('user','Ler minha letra ('+where()+')');const el=addLog('ai','<span class="ai-wait">Lendo sua letra…</span>');
+  try{let n=0;
+    for(const i of idx){const rt=S.pages[i];el.innerHTML=`<span class="ai-wait">Lendo a página ${i+1}… (${++n} de ${idx.length})</span>`;
+      const r=await aiJSON([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:await pageJPEG(rt.d,1400)}},{type:'text',text:'Transcreva fielmente todo o texto escrito à mão nesta página de caderno, na ordem de leitura, mantendo quebras de linha. Inclua fórmulas em texto simples. Não resuma nem corrija.'}],obj({texto:{type:'string'}}));
+      if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+      rt.d.ocr=r.texto||'';save(rt);}
+    const last=S.pages[idx[idx.length-1]].d.ocr||'';
+    el.innerHTML=`<p>Pronto ✦ Li ${idx.length} ${idx.length===1?'página':'páginas'}. Agora a <b>busca encontra o que você escreveu à mão</b>, e a IA entende melhor suas anotações.</p>${aiScope==='page'?`<p style="white-space:pre-wrap">${esc(last.slice(0,1200))}</p><div class="ai-acts"><button data-a="ins">Inserir como texto</button></div>`:''}`;
+    const ins=$('[data-a=ins]',el);if(ins)ins.onclick=()=>aiInsert(last);
+  }catch(e){console.error(e);el.innerHTML=`<span class="ai-wait">${esc(aiErr(e))}</span>`}finally{aiBusy=false}
+}
+async function aiSpell(sel){
+  const rt=sel?sel.rt:S.pages[S.cur];const items=(sel?sel.items:rt.d.strokes).filter(st=>st.t==='text'||st.t==='node');
+  if(!items.length){toast('A correção funciona nos textos digitados. Para escrita à mão, use “Converter em texto” antes.',5000);return}
+  if(aiBusy)return;aiBusy=true;openAI();addLog('user','Corrigir ortografia');const el=addLog('ai','<span class="ai-wait">Revisando…</span>');
+  try{const r=await aiJSON([{type:'text',text:'Corrija ortografia, acentuação e gramática destes textos em português, sem mudar o sentido nem o estilo. Devolva cada um com o mesmo número.\n'+JSON.stringify(items.map((st,i)=>({n:i,texto:st.txt})))}],
+      obj({itens:{type:'array',items:obj({n:{type:'integer'},texto:{type:'string'}})}}),{effort:'low'});
+    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+    const acts=[];for(const it of r.itens||[]){const st=items[it.n];if(!st||!it.texto||it.texto===st.txt)continue;
+      const from={txt:st.txt,x:st.x,y:st.y,w:st.w,h:st.h};st.txt=it.texto;if(st.t==='node')sizeNode(st);acts.push({t:'props',rt,st,from,to:{txt:st.txt,x:st.x,y:st.y,w:st.w,h:st.h}})}
+    if(acts.length){pushUndo({t:'batch',rt,acts});renderPage(rt);save(rt)}
+    el.innerHTML=acts.length?`<p>Corrigi <b>${acts.length}</b> ${acts.length===1?'texto':'textos'} ✦ Dá para desfazer com ↶.</p>`:'<p>Não achei nada para corrigir ✦</p>';
+  }catch(e){console.error(e);el.innerHTML=`<span class="ai-wait">${esc(aiErr(e))}</span>`}finally{aiBusy=false}
+}
+async function aiConvert(s){
+  if(aiBusy)return;aiBusy=true;toast('Lendo sua letra…',0);
+  try{const img=await selectionImage(s);
+    const r=await aiJSON([{type:'image',source:{type:'base64',media_type:'image/png',data:img}},{type:'text',text:'Transcreva fielmente o texto escrito à mão nesta imagem, mantendo as quebras de linha. Se houver fórmulas, escreva em texto simples. Responda só com a transcrição.'}],obj({texto:{type:'string'}}));
+    hideToast();if(!r)return;const txt=(r.texto||'').trim();if(!txt){toast('Não consegui ler texto nessa seleção.');return}
+    const rt=s.rt,arr=rt.d.strokes,ops=[],b=s.box,size=clamp(Math.round(b.h/Math.max(1,txt.split('\n').length)/1.6),16,48);
+    for(let i=arr.length-1;i>=0;i--)if(s.set.has(arr[i])&&(arr[i].t==='pen'||arr[i].t==='hl')){ops.push({type:'rm',st:arr[i],i});arr.splice(i,1)}
+    const st={t:'text',x:r1(b.x),y:r1(b.y),w:r1(Math.max(b.w+40,200)),txt,f:P.textFont,s:size,c:P.textColor};arr.push(st);ops.push({type:'push',st});
+    clearSelection();pushUndo({t:'ops',rt,ops});renderPage(rt);save(rt);loadFont(st.f);toast('Pronto ✦ Sua letra virou texto na fonte '+fontOf(P.textFont)[2]+'. Dá para desfazer com ↶.',5000);
+  }catch(e){console.error(e);hideToast();toast(aiErr(e),6000)}finally{aiBusy=false}
+}
+async function aiSelectionMenu(){
+  const s=S.sel;if(!s)return;const hasText=s.items.some(st=>st.t==='text'||st.t==='node'),hasInkSel=s.items.some(st=>st.t==='pen'||st.t==='hl');
+  const a=await menu('IA ✦ com a seleção',[
+    ...(hasInkSel?[{id:'conv',label:'Converter em texto digitado',sub:'Sua letra vira texto na fonte '+fontOf(P.textFont)[2]}]:[]),
+    {id:'exp',label:'Explicar isto'},{id:'math',label:'Resolver passo a passo',sub:'Contas, equações e problemas'},
+    {id:'tidy',label:'Reescrever organizado'},...(hasText?[{id:'spell',label:'Corrigir ortografia'}]:[]),{id:'cards',label:'Criar cartões disto'},
+  ]);if(!a)return;
+  if(a==='conv'){aiConvert(s);return}
+  if(a==='spell'){aiSpell(s);return}
+  const img=await selectionImage(s),texts=s.items.filter(st=>st.t==='text'||st.t==='node').map(st=>st.txt).join('\n');
+  const ctx={blocks:[{type:'text',text:`Trecho selecionado do caderno “${S.nb.title}”${texts?' (texto: '+texts+')':''}:`},{type:'image',source:{type:'base64',media_type:'image/png',data:img}}],skipped:0};
+  if(a==='exp')aiRun('Explicar a seleção','Explique este trecho de um jeito simples, com um exemplo.',{context:ctx});
+  else if(a==='math')aiRun('Resolver passo a passo','Resolva passo a passo, mostrando cada etapa e o porquê. Se houver erro no que eu escrevi, aponte onde. No fim, destaque a resposta.',{context:ctx,effort:'high'});
+  else if(a==='tidy')aiRun('Reescrever a seleção','Reescreva este trecho de forma organizada e clara, como anotação passada a limpo. Não invente conteúdo.',{context:ctx});
+  else if(a==='cards'){aiScope='page';const save=buildContext;buildContext=async()=>ctx;try{await aiCards()}finally{buildContext=save}}
+}
+async function aiIllustration(){
+  const q=await ask('O que desenhar?','','Criar');if(!q)return;if(aiBusy)return;aiBusy=true;openAI();
+  addLog('user','Ilustração: '+esc(q));const el=addLog('ai','<span class="ai-wait">Desenhando…</span>');
+  try{const r=await aiJSON([{type:'text',text:`Crie uma ilustração ou diagrama didático em SVG para um caderno de estudos: “${q}”. Estilo limpo e fofo, traço ameixa (#2A1B3D) e cores pastel (lilás #D9C6FF, rosa #FFC2DD, pêssego #FFD9BD, azul #C7D6FF). Use viewBox="0 0 800 600", sem scripts, sem imagens externas, com rótulos em português em fonte sans-serif.`}],obj({svg:{type:'string'}}),{effort:'medium'});
+    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+    let svg=(r.svg||'').replace(/<script[\s\S]*?<\/script>/gi,'');if(!/xmlns=/.test(svg))svg=svg.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');
+    const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'})),im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const W=1200,H=Math.round(W*(im.naturalHeight||600)/(im.naturalWidth||800)),cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(im,0,0,W,H);URL.revokeObjectURL(url);
+    const blob=await toBlob(cv,'image/png'),bid=uid();await DB.put('blobs',{id:bid,blob});IMG.set(bid,cv);
+    el.innerHTML='<p>Ilustração pronta ✦ Coloquei na página.</p>';placeItem({t:'img',bid,x:0,y:0,w:560,h:r1(560*H/W)});
+  }catch(e){console.error(e);el.innerHTML=`<span class="ai-wait">${esc(aiErr(e))}</span>`}finally{aiBusy=false}
+}
+async function aiLecture(rec){
+  if(!rec)return;const tr=rec.tr||[],notes=[];
+  for(const rt of S.pages)for(const st of rt.d.strokes)if(st.au&&st.au.r===rec.id&&(st.t==='text'||st.t==='node'))notes.push(`[${fmtT(st.au.t)}] ${st.txt}`);
+  const pagesWith=S.pages.filter(rt=>rt.d.strokes.some(st=>st.au&&st.au.r===rec.id)).slice(0,4),blocks=[{type:'text',text:`Aula gravada: “${rec.title}” (${fmtT(rec.dur)}), no caderno “${S.nb.title}”.`}];
+  blocks.push({type:'text',text:tr.length?'Transcrição:\n'+tr.map(s=>`[${fmtT(s.t)}] ${s.txt}`).join('\n'):'(Esta gravação não tem transcrição; use as anotações feitas durante a aula.)'});
+  if(notes.length)blocks.push({type:'text',text:'Anotações digitadas durante a aula:\n'+notes.join('\n')});
+  for(const rt of pagesWith)blocks.push({type:'image',source:{type:'base64',media_type:'image/jpeg',data:await pageJPEG(rt.d)}});
+  aiRun('Resumir a aula','Faça o resumo desta aula para eu estudar: tópicos principais na ordem em que apareceram (com o minuto entre colchetes), conceitos-chave, o que o professor enfatizou e possíveis perguntas de prova.',{context:{blocks,skipped:0}});
+}
+
 /* ---------- Teclado ---------- */
 document.addEventListener('keydown',e=>{
   if(PV.on){presentKey(e);return}
   if(ST.on){studyKey(e);return}
+  if(e.target.closest&&e.target.closest('.ai-ask'))return;
   if(!S.nb&&(e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='f'&&!dlg.open){e.preventDefault();$('#libSearch').focus();return}
   if(!S.nb||dlg.open||e.target.closest('input,textarea'))return;
   const mod=e.metaKey||e.ctrlKey,k=e.key.toLowerCase();

@@ -87,7 +87,7 @@ Versão escura:
 
 Coloque o que gerar em `sinapse/arte/` com estes nomes, e eu encaixo no app:
 
-- `icone.png` e `icone-maskable.png` (ícone)
+- `icone.png` e `icone-maskable.png` (ícone) ✓ já no app
 - `marca.png` (logo com o nome)
 - `capa-aura.png`, `capa-holo.png`, `capa-pessego.png`, `capa-ondas.png`, `capa-morango.png`, `capa-mistico.png`, `capa-universo.png`, `capa-cosmico.png`
 - `adesivos.png` (eu recorto cada adesivo)

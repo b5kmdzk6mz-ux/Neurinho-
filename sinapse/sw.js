@@ -1,5 +1,5 @@
 /* Sinapse: service worker. Troque a versão quando mudar os arquivos. */
-var VER='sinapse-2';
+var VER='sinapse-3';
 var CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','../vendor/pdf.min.mjs','../vendor/pdf.worker.min.mjs'];
 self.addEventListener('install',function(e){
   e.waitUntil(caches.open(VER).then(function(c){return c.addAll(CORE)}).then(function(){return self.skipWaiting()}));

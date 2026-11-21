@@ -9,11 +9,11 @@
 - Exportar PDF ✓, backup e restauração ✓, offline ✓
 
 ## Fase 1: sem servidor (só o app)
-1. Formas: reconhecer círculo, retângulo, triângulo e seta desenhados à mão ○; inserir linhas, setas e figuras ○; régua ○
+1. Formas: reconhecer círculo, retângulo e triângulo desenhados à mão ✓; inserir linhas, setas e figuras ✓; régua ○
 2. Mais canetas: lápis, caneta-tinteiro, pincel ○; borracha que apaga só um pedaço ○; girar seleção ○
 3. Inserir imagens e fotos ○; importar Word ○ (o Neurinho já lê .docx); assinatura salva para assinar PDFs ○
-4. Navegação: miniaturas das páginas ○, favoritos e marcadores ○, sumário ○, links entre páginas ○, abas de cadernos abertos ○
-5. Organização: pastas e subpastas ○, divisórias e seções ○, duplicar caderno ○
+4. Navegação: miniaturas das páginas ✓, favoritos ✓, divisórias como sumário ✓, links entre páginas ○, abas de cadernos abertos ○
+5. Organização: pastas e subpastas ✓, divisórias e seções ✓, duplicar caderno ✓
 6. Modelos prontos: planner diário, semanal, agenda, diário, Cornell ✓ ○
 7. Busca no texto digitado e nos PDFs ○
 8. Modo apresentação para tela externa, com ponteiro laser ○; imprimir ◐ (pelo PDF)

@@ -162,6 +162,49 @@ body.editing .aura i{animation-play-state:paused}
 .fonts button[aria-pressed="true"]{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
 .fonts small{font:600 11px/1 var(--f-sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
 .fonts span{font-size:24px;line-height:1.2}
+.crumbs{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 20px}
+.crumbs button{min-height:38px;padding:0 14px;border-radius:999px;background:var(--glass);border:1px solid var(--line);font-weight:600;font-size:14px}
+.crumbs .here{font:italic 700 24px/1.1 var(--f-serif)}
+.crumbs .sepc{color:var(--muted)}
+.folder{display:block;width:100%;aspect-ratio:3/4;position:relative;transition:transform .2s}
+.folder:active{transform:scale(.97)}
+.f-back{position:absolute;left:0;right:0;top:16%;bottom:4%;border-radius:16px;background:#CDB4F4;box-shadow:var(--shadow)}
+.f-back::before{content:"";position:absolute;left:0;top:-9%;width:46%;height:14%;border-radius:12px 12px 0 0;background:#CDB4F4}
+.f-front{position:absolute;left:0;right:0;top:27%;bottom:4%;border-radius:16px;background:var(--holo);box-shadow:0 -2px 0 rgba(255,255,255,.6) inset,0 8px 20px rgba(110,60,180,.2);overflow:hidden}
+.f-front::after{content:"";position:absolute;inset:0;background:var(--noise);opacity:.4;mix-blend-mode:soft-light}
+.f-front .spark{right:14%;top:14%}
+.f-count{position:absolute;left:14px;bottom:12px;font-size:12px;font-weight:700;color:#4A3570;background:rgba(255,255,255,.55);padding:3px 9px;border-radius:999px}
+.folder-empty{grid-column:1/-1;color:var(--muted);text-align:center;padding:40px 16px}
+.panel{position:fixed;z-index:7;top:calc(env(safe-area-inset-top) + 76px);left:max(10px,env(safe-area-inset-left));bottom:calc(env(safe-area-inset-bottom) + 14px);
+  width:min(320px,calc(100vw - 20px));display:flex;flex-direction:column;border-radius:24px;background:var(--glass-strong);border:1px solid var(--line);
+  box-shadow:var(--shadow);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%)}
+.panel-head{display:flex;align-items:center;gap:6px;padding:12px 10px 6px 16px}
+.panel-head h3{margin:0;flex:1;font:italic 700 20px/1 var(--f-serif)}
+.panel .seg{margin:4px 12px 10px;align-self:flex-start}
+.panel .seg button{min-height:34px;padding:0 12px;font-size:13px}
+.thumbs{flex:1;overflow:auto;padding:4px 14px 18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;align-content:start}
+.sec-h{grid-column:1/-1;font:italic 700 16px/1.2 var(--f-serif);color:var(--accent);margin-top:4px;display:flex;align-items:center;gap:8px}
+.sec-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.thumb{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:700;color:var(--muted)}
+.thumb .tgo{width:100%;display:block}
+.thumb canvas{width:100%;height:auto;display:block;border-radius:4px;background:#fff;box-shadow:0 1px 5px rgba(60,20,100,.2)}
+.thumb.cur canvas{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent)}
+.thumb.cur{color:var(--accent)}
+.thumb .star{position:absolute;top:5px;right:5px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.85);color:#B9A9D6;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.thumb .star svg{width:17px;height:17px}
+.thumb .star.on{color:#F0A500}
+.thumb .star.on svg{fill:currentColor}
+.panel-empty{grid-column:1/-1;color:var(--muted);text-align:center;padding:24px 8px;font-size:14px}
+.sec-tab,.fav-mark{position:absolute;top:-13px;z-index:2;pointer-events:none;box-shadow:0 3px 10px rgba(120,70,200,.3)}
+.sec-tab{right:28px;max-width:60%;padding:5px 14px;border-radius:999px;background:var(--holo);color:#2A1B3D;font:italic 700 14px/1.2 var(--f-serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fav-mark{left:22px;width:28px;height:28px;border-radius:50%;background:#FFF6D6;color:#F0A500;display:grid;place-items:center}
+.fav-mark svg{width:16px;height:16px;fill:currentColor}
+.shapes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.shapes button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 6px;border-radius:16px;background:var(--surface-2);font-size:13px;font-weight:600}
+.shapes button svg{width:34px;height:34px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.shapes button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
+.shapes button.wide{grid-column:1/-1;flex-direction:row;justify-content:center;gap:10px}
+.icon[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
 .stk-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
 .stk-grid button{aspect-ratio:1;min-width:0;overflow:hidden;border-radius:18px;display:grid;place-items:center;padding:13px;background:var(--surface-2);transition:transform .15s}
 .stk-grid button:hover{transform:scale(1.06) rotate(-3deg)}
@@ -282,11 +325,13 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
     <div class="lib-actions">
       <button id="btnImport" class="btn">Importar PDF</button>
       <button id="btnBackup" class="btn">Backup</button>
+      <button id="btnFolder" class="btn">Nova pasta</button>
       <button id="btnNew" class="btn primary">Novo caderno</button>
     </div>
   </header>
   <p class="hello" id="hello">Olá ✦</p>
   <p class="lib-sub" id="libSub">Seus cadernos ficam salvos neste aparelho.</p>
+  <nav id="crumbs" class="crumbs" hidden aria-label="Pastas"></nav>
   <div id="grid" class="grid"></div>
   <div id="empty" class="empty" hidden>
     <div class="empty-art"><img src="icon-192.png" alt=""><svg class="spark" aria-hidden="true"><use href="#spark"/></svg><svg class="spark" aria-hidden="true"><use href="#spark"/></svg><svg class="spark" aria-hidden="true"><use href="#spark"/></svg></div>
@@ -299,12 +344,14 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
 <section id="editor" hidden>
   <header class="bar">
     <button id="btnBack" class="icon" aria-label="Voltar aos cadernos" title="Cadernos"><svg class="i" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+    <button id="btnPages" class="icon" aria-label="Páginas, favoritas e divisórias" title="Páginas"><svg class="i" viewBox="0 0 24 24"><rect x="4" y="4" width="6.5" height="7.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="7.5" rx="1.5"/><rect x="4" y="14.5" width="6.5" height="5.5" rx="1.5"/><rect x="13.5" y="14.5" width="6.5" height="5.5" rx="1.5"/></svg></button>
     <button id="nbTitle" class="title" title="Renomear caderno"></button>
     <div class="tools" role="toolbar" aria-label="Ferramentas">
       <button class="icon tool" data-tool="pen" aria-label="Caneta" title="Caneta (P)"><svg class="i" viewBox="0 0 24 24"><path d="M4 20l1-4.5L16 4.5l3.5 3.5L8.5 19z"/><path d="M14 7l3 3"/></svg></button>
       <button class="icon tool" data-tool="hl" aria-label="Marca-texto" title="Marca-texto (H)"><svg class="i" viewBox="0 0 24 24"><path d="M10 14l-5 5h6l2-2"/><path d="M9 13.5l4.5 4.5 7-7-4.5-4.5z"/></svg></button>
       <button class="icon tool" data-tool="eraser" aria-label="Borracha" title="Borracha (E)"><svg class="i" viewBox="0 0 24 24"><path d="M9 20h11"/><path d="M4.6 14.6l9.2-9.2a2 2 0 0 1 2.8 0l3 3a2 2 0 0 1 0 2.8L12.4 18.4a2 2 0 0 1-1.4.6H8.8a2 2 0 0 1-1.4-.6l-2.8-2.8a1 1 0 0 1 0-1z"/><path d="M9.5 9.7l4.8 4.8"/></svg></button>
       <button class="icon tool" data-tool="lasso" aria-label="Laço: selecionar e mover" title="Laço (L)"><svg class="i" viewBox="0 0 24 24"><path d="M7.5 15C5 14 3.5 12.2 3.5 10c0-3.3 3.8-6 8.5-6s8.5 2.7 8.5 6-3.8 6-8.5 6c-1 0-2-.1-2.9-.4" stroke-dasharray="2.5 2.6"/><path d="M8.5 14.5c-1.2 1.4-1 3.6 1 5"/></svg></button>
+      <button class="icon tool" data-tool="shape" aria-label="Formas" title="Formas (F)"><svg class="i" viewBox="0 0 24 24"><circle cx="8" cy="8" r="4.5"/><path d="M14 20l4.2-7.5L22.4 20z" transform="translate(-2 0)"/><rect x="3.5" y="14.5" width="6" height="6" rx="1"/></svg></button>
       <button class="icon tool" data-tool="text" aria-label="Texto: escreva à mão e vira fonte" title="Texto (T)"><svg class="i" viewBox="0 0 24 24"><path d="M5 6V4.5h14V6"/><path d="M12 4.5v15"/><path d="M9 19.5h6"/></svg></button>
       <button class="icon tool" id="btnSticker" aria-label="Adesivos" title="Adesivos"><svg class="i" viewBox="0 0 24 24"><path d="M20 12.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6.5z"/><path d="M12.5 20v-5.5a2 2 0 0 1 2-2H20"/><path d="M9 9.5h.01M14.5 9.5h.01M9 13.5c.8.9 1.8 1.3 3 1"/></svg></button>
       <span class="sep"></span>
@@ -312,6 +359,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
       <span class="sep" id="sepSizes"></span>
       <div id="sizes" class="sizes"></div>
       <button id="fontBtn" class="font-btn" hidden></button>
+      <button id="shapeBtn" class="font-btn" hidden></button>
     </div>
     <div class="bar-right">
       <button id="btnUndo" class="icon" aria-label="Desfazer" title="Desfazer"><svg class="i" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
@@ -323,6 +371,11 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
   <div id="pageInd" class="page-ind">1 / 1</div>
   <div id="zoomInd" class="page-ind zoom-ind" hidden>100%</div>
   <div id="selBar" class="sel-bar" hidden></div>
+  <aside id="panel" class="panel" hidden aria-label="Páginas">
+    <div class="panel-head"><h3>Páginas</h3><button class="icon" id="panelClose" aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="seg" role="group" aria-label="Mostrar"><button data-m="all">Todas</button><button data-m="fav">Favoritas</button><button data-m="sec">Divisórias</button></div>
+    <div id="thumbs" class="thumbs"></div>
+  </aside>
 </section>
 
 <dialog id="dlg"></dialog>
@@ -348,11 +401,12 @@ const PAGE_W=1000, A4_H=1414;
 const DB={
   db:null,
   open(){return new Promise((res,rej)=>{
-    const r=indexedDB.open('sinapse',1);
-    r.onupgradeneeded=()=>{const d=r.result;
-      d.createObjectStore('notebooks',{keyPath:'id'});
-      d.createObjectStore('pages',{keyPath:'id'}).createIndex('nb','nb');
-      d.createObjectStore('blobs',{keyPath:'id'});};
+    const r=indexedDB.open('sinapse',2);
+    r.onupgradeneeded=()=>{const d=r.result,has=n=>d.objectStoreNames.contains(n);
+      if(!has('notebooks'))d.createObjectStore('notebooks',{keyPath:'id'});
+      if(!has('pages'))d.createObjectStore('pages',{keyPath:'id'}).createIndex('nb','nb');
+      if(!has('blobs'))d.createObjectStore('blobs',{keyPath:'id'});
+      if(!has('folders'))d.createObjectStore('folders',{keyPath:'id'});};
     r.onsuccess=()=>{DB.db=r.result;res()};r.onerror=()=>rej(r.error);
   })},
   tx(store,mode,fn){return new Promise((res,rej)=>{
@@ -374,7 +428,13 @@ const coverOf=nb=>COVERS.some(c=>c[0]===nb.cover)?nb.cover:(LEGACY_COVER[nb.colo
 const SPARKS='<svg class="spark s1" aria-hidden="true"><use href="#spark"/></svg><svg class="spark s2" aria-hidden="true"><use href="#spark"/></svg>';
 const PEN_COLORS=['#2A1B3D','#6B3FD4','#E0457B','#2F6FD6','#14937F'];
 const HL_COLORS=['#FFE27A','#FFB3D9','#D6B8FF','#B5E6FF','#FFC9A3'];
-const SIZES={pen:[1.6,2.8,4.6],hl:[12,20,32],eraser:[14,30,64],text:[20,30,48]};
+const SIZES={pen:[1.6,2.8,4.6],hl:[12,20,32],eraser:[14,30,64],text:[20,30,48],shape:[1.6,2.8,4.6]};
+const SHAPES=[['auto','Automática','<path d="M4 15c2-6 5-9 8-9s5 4 3 7-6 3-7 0 3-7 8-6"/><path d="M19 3.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/>'],
+  ['line','Linha','<path d="M4 20L20 4"/>'],['arrow','Seta','<path d="M4 20L20 4"/><path d="M11 4h9v9"/>'],
+  ['rect','Retângulo','<rect x="3.5" y="6" width="17" height="12" rx="1"/>'],['ellipse','Círculo','<ellipse cx="12" cy="12" rx="8.5" ry="7.5"/>'],
+  ['tri','Triângulo','<path d="M12 4l8.5 15h-17z"/>']];
+const STAR='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3.5l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/></svg>';
+const FOLDER_ICON='<svg class="i" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg>';
 const FONTS=[['sans','DM Sans','Simples',500],['round','Quicksand','Arredondada',600],['serif','Fraunces','Elegante',500],['classic','Playfair Display','Clássica',500],
   ['groovy','Shrikhand','Anos 70',400],['title','Bebas Neue','Títulos',400],['hand','Caveat','Manuscrita',600],['note','Patrick Hand','Caderno',400],
   ['cursive','Dancing Script','Cursiva',600],['retro','Pacifico','Retrô',400],['mono','Courier Prime','Máquina de escrever',400],['easy','OpenDyslexic','Leitura fácil',400]];
@@ -391,13 +451,14 @@ const PAPER={white:'#FFFFFF',cream:'#FDF7EE',lilac:'#F8F2FF',rose:'#FFF3F6'};
 const PAPER_NAMES=[['white','Branco'],['cream','Creme'],['lilac','Lilás'],['rose','Rosé']];
 const TEMPLATES=[['blank','Liso'],['lined','Pautado'],['grid','Quadriculado'],['dots','Pontilhado'],['cornell','Cornell']];
 const PREF_KEY='sinapse-prefs';
-const P=Object.assign({tool:'pen',penColor:PEN_COLORS[0],hlColor:HL_COLORS[0],size:{pen:1,hl:1,eraser:1,text:1},textFont:'note',textColor:PEN_COLORS[0],penOnly:false,penSeen:false},
+const P=Object.assign({tool:'pen',penColor:PEN_COLORS[0],hlColor:HL_COLORS[0],size:{pen:1,hl:1,eraser:1,text:1,shape:1},shape:'auto',textFont:'note',textColor:PEN_COLORS[0],penOnly:false,penSeen:false},
   (()=>{try{return JSON.parse(localStorage.getItem(PREF_KEY))||{}}catch(e){return{}}})());
 const STICKERS=[['brilho','Brilho'],['lua','Lua'],['olho','Olho místico'],['cristal','Cristal'],['borboleta','Borboleta'],['laco','Laço'],['morango','Morango'],['coracao','Coração'],['estrela-cadente','Estrela cadente'],['nuvem','Nuvem'],['bolha','Bolha'],['neuronios','Neurônios']];
 const STK={};
 const stickersReady=Promise.all(STICKERS.map(([id])=>new Promise(res=>{const im=new Image();im.onload=im.onerror=()=>res();im.src='arte/adesivos/'+id+'.webp';STK[id]=im})))
   .then(()=>{if(S.nb)S.pages.forEach(rt=>rt.canvas&&renderPage(rt))});
 if(P.size.text==null)P.size.text=1;
+if(P.size.shape==null)P.size.shape=1;if(!P.shape)P.shape='auto';
 const savePrefs=()=>{try{localStorage.setItem(PREF_KEY,JSON.stringify(P))}catch(e){}};
 
 /* ---------- Estado do caderno aberto ---------- */
@@ -453,6 +514,9 @@ function drawStroke(c,st,dx=0,dy=0){
   if(st.t==='hl'){
     c.globalAlpha=.4;c.globalCompositeOperation='multiply';
     c.strokeStyle=st.c;c.lineWidth=st.s;c.beginPath();tracePath(c,p,n);c.stroke();
+  }else if(st.g&&n>1){
+    c.strokeStyle=st.c;c.lineWidth=st.s;c.beginPath();c.moveTo(p[0],p[1]);
+    for(let i=3;i<p.length;i+=3)c.lineTo(p[i],p[i+1]);c.stroke();
   }else if(n<3){
     c.strokeStyle=c.fillStyle=st.c;
     if(n===1){c.beginPath();c.arc(p[0],p[1],widthAt(st,p[2])/2,0,6.2832);c.fill()}
@@ -545,6 +609,63 @@ function scaleStrokes(list,f,cx,cy){
     const p=st.p;for(let i=0;i<p.length;i+=3){p[i]=r1(cx+(p[i]-cx)*f);p[i+1]=r1(cy+(p[i+1]-cy)*f)}
     st.s=Math.round(st.s*f*100)/100;bboxCache.delete(st)}
 }
+/* ---------- Formas: gerar e reconhecer ---------- */
+const toFlat=L=>L.flatMap(([x,y])=>[r1(x),r1(y),.5]);
+function ellipsePts(cx,cy,rx,ry){const L=[];for(let i=0;i<=72;i++){const a=i/72*Math.PI*2;L.push([cx+rx*Math.cos(a),cy+ry*Math.sin(a)])}return L}
+function arrowPts(ax,ay,bx,by,s){
+  const len=Math.hypot(bx-ax,by-ay)||1,h=clamp(len*.28,12,42)+s*2,ang=Math.atan2(by-ay,bx-ax),t=.5;
+  const l=[bx-h*Math.cos(ang-t),by-h*Math.sin(ang-t)],r=[bx-h*Math.cos(ang+t),by-h*Math.sin(ang+t)];
+  return [[ax,ay],[bx,by],l,[bx,by],r];
+}
+function shapePts(kind,a,b,s){
+  const x0=Math.min(a.x,b.x),y0=Math.min(a.y,b.y),x1=Math.max(a.x,b.x),y1=Math.max(a.y,b.y);
+  if(kind==='line')return toFlat([[a.x,a.y],[b.x,b.y]]);
+  if(kind==='arrow')return toFlat(arrowPts(a.x,a.y,b.x,b.y,s));
+  if(kind==='rect')return toFlat([[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]]);
+  if(kind==='ellipse')return toFlat(ellipsePts((x0+x1)/2,(y0+y1)/2,(x1-x0)/2,(y1-y0)/2));
+  return toFlat([[(x0+x1)/2,y0],[x1,y1],[x0,y1],[(x0+x1)/2,y0]]);
+}
+function rdp(pts,eps){
+  if(pts.length<3)return pts.slice();const a=pts[0],b=pts[pts.length-1];let md=0,ix=0;
+  for(let i=1;i<pts.length-1;i++){const d=segDist(pts[i][0],pts[i][1],a[0],a[1],b[0],b[1]);if(d>md){md=d;ix=i}}
+  if(md>eps){const l=rdp(pts.slice(0,ix+1),eps),r=rdp(pts.slice(ix),eps);return l.slice(0,-1).concat(r)}
+  return [a,b];
+}
+function closedCorners(pts,eps){
+  let far=0,fd=0;pts.forEach((q,i)=>{const d=Math.hypot(q[0]-pts[0][0],q[1]-pts[0][1]);if(d>fd){fd=d;far=i}});
+  let v=rdp(pts.slice(0,far+1),eps).slice(0,-1).concat(rdp(pts.slice(far).concat([pts[0]]),eps).slice(0,-1));
+  let changed=true;
+  while(changed&&v.length>3){changed=false;
+    for(let i=0;i<v.length;i++){const a=v[(i+v.length-1)%v.length],c=v[i],b=v[(i+1)%v.length];
+      const u=[a[0]-c[0],a[1]-c[1]],w=[b[0]-c[0],b[1]-c[1]],lu=Math.hypot(...u),lw=Math.hypot(...w);
+      const ang=Math.acos(clamp((u[0]*w[0]+u[1]*w[1])/((lu*lw)||1),-1,1))*180/Math.PI;
+      if(ang>148||lu<eps*.9){v.splice(i,1);changed=true;break}}}
+  return v;
+}
+function recognize(p){
+  const n=p.length/3;if(n<5)return null;
+  const pts=[];for(let i=0;i<p.length;i+=3)pts.push([p[i],p[i+1]]);
+  let len=0;for(let i=1;i<n;i++)len+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);
+  const xs=pts.map(q=>q[0]),ys=pts.map(q=>q[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const w=x1-x0,h=y1-y0,diag=Math.hypot(w,h);if(diag<24)return null;
+  const s=pts[0],e=pts[n-1],gap=Math.hypot(e[0]-s[0],e[1]-s[1]);
+  let maxd=0;for(const q of pts)maxd=Math.max(maxd,segDist(q[0],q[1],s[0],s[1],e[0],e[1]));
+  if(gap>.6*len&&maxd<Math.max(6,.07*len))return {kind:'line',p:toFlat([s,e])};
+  if(gap>Math.max(34,.28*diag))return null;
+  const cx=x0+w/2,cy=y0+h/2,rx=Math.max(w/2,1),ry=Math.max(h/2,1);
+  let err=0;for(const q of pts)err+=Math.abs(Math.hypot((q[0]-cx)/rx,(q[1]-cy)/ry)-1);err/=n;
+  const v=closedCorners(pts,.075*diag);
+  if(err<.075&&v.length>=5)return ellipseShape(cx,cy,rx,ry);
+  if(v.length===3)return {kind:'tri',p:toFlat(v.concat([v[0]]))};
+  if(v.length===4){
+    const axis=v.every((q,i)=>{const r=v[(i+1)%4],a=Math.abs(Math.atan2(r[1]-q[1],r[0]-q[0])*180/Math.PI)%90;return a<16||a>74});
+    if(axis)return {kind:'rect',p:toFlat([[x0,y0],[x1,y0],[x1,y1],[x0,y1],[x0,y0]])};
+    return {kind:'quad',p:toFlat(v.concat([v[0]]))};
+  }
+  if(err<.16)return ellipseShape(cx,cy,rx,ry);
+  return null;
+}
+function ellipseShape(cx,cy,rx,ry){if(Math.abs(rx-ry)/Math.max(rx,ry)<.14){const r=(rx+ry)/2;rx=ry=r}return {kind:'ellipse',p:toFlat(ellipsePts(cx,cy,rx,ry))}}
 function unionBox(list){
   let x0=Infinity,y0=Infinity,x1=-Infinity,y1=-Infinity;
   for(const st of list){const b=bbox(st);x0=Math.min(x0,b.x);y0=Math.min(y0,b.y);x1=Math.max(x1,b.x+b.w);y1=Math.max(y1,b.y+b.h)}
@@ -558,10 +679,31 @@ const fmtDate=t=>{const d=new Date(t),now=new Date();
   if(d.toDateString()===now.toDateString())return 'hoje, '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   return d.toLocaleDateString('pt-BR',{day:'numeric',month:'short',year:d.getFullYear()===now.getFullYear()?undefined:'numeric'})};
 
+const LIB={folder:null};
 async function renderLibrary(){
-  const list=(await DB.all('notebooks')).sort((a,b)=>b.updated-a.updated);
+  const [all,folders]=await Promise.all([DB.all('notebooks'),DB.all('folders')]);
+  if(LIB.folder&&!folders.some(f=>f.id===LIB.folder))LIB.folder=null;
+  const here=LIB.folder,byId=new Map(folders.map(f=>[f.id,f]));
+  const fl=folders.filter(f=>(f.parent||null)===here).sort((a,b)=>a.name.localeCompare(b.name,'pt'));
+  const list=all.filter(nb=>(nb.folder||null)===here).sort((a,b)=>b.updated-a.updated);
+  const crumbs=$('#crumbs');crumbs.hidden=!here;
+  if(here){
+    const chain=[];for(let f=byId.get(here);f;f=byId.get(f.parent))chain.unshift(f);
+    crumbs.innerHTML=`<button data-f="">← Início</button>`+chain.slice(0,-1).map(f=>`<span class="sepc">›</span><button data-f="${f.id}">${esc(f.name)}</button>`).join('')+`<span class="sepc">›</span><span class="here">${esc(chain[chain.length-1].name)}</span>`;
+    crumbs.querySelectorAll('button').forEach(b=>b.onclick=()=>{LIB.folder=b.dataset.f||null;renderLibrary()});
+  }
   const grid=$('#grid');grid.innerHTML='';
-  $('#empty').hidden=list.length>0;
+  $('#empty').hidden=!!here||all.length+folders.length>0;
+  if(here&&!fl.length&&!list.length)grid.innerHTML='<p class="folder-empty">Pasta vazia. Crie um caderno aqui ou traga um pelo menu ⋯ › Mover para pasta.</p>';
+  for(const f of fl){
+    const n=all.filter(nb=>nb.folder===f.id).length+folders.filter(x=>x.parent===f.id).length,card=document.createElement('div');card.className='card';
+    card.innerHTML=`<button class="folder" aria-label="Abrir a pasta ${esc(f.name)}"><span class="f-back"></span><span class="f-front">${SPARKS}<span class="f-count">${n} ${n===1?'item':'itens'}</span></span></button>
+      <div class="card-meta"><div><div class="card-name">${esc(f.name)}</div><div class="card-date">Pasta</div></div>
+      <button class="icon more" aria-label="Opções da pasta ${esc(f.name)}"><svg class="i" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></svg></button></div>`;
+    $('.folder',card).onclick=()=>{LIB.folder=f.id;renderLibrary();scrollTo(0,0)};
+    $('.more',card).onclick=()=>folderMenu(f);
+    grid.append(card);
+  }
   for(const nb of list){
     const n=nb.order.length,card=document.createElement('div');card.className='card';
     card.innerHTML=`<button class="cover" data-cover="${coverOf(nb)}" aria-label="Abrir ${esc(nb.title)}">${SPARKS}<span class="cover-title">${esc(nb.title)}</span>${nb.pdf?'<span class="cover-pdf">PDF</span>':''}</button>
@@ -578,12 +720,16 @@ async function notebookMenu(nb){
     {id:'open',label:'Abrir'},
     {id:'rename',label:'Renomear'},
     {id:'cover',label:'Mudar a capa'},
+    {id:'move',label:'Mover para pasta'},
+    {id:'dup',label:'Duplicar'},
     {id:'pdf',label:'Exportar em PDF',sub:'Para compartilhar, imprimir ou guardar uma cópia'},
     {id:'del',label:'Apagar caderno',danger:true}
   ]);
   if(a==='open')openNotebook(nb.id);
   else if(a==='rename'){const t=await ask('Renomear caderno',nb.title);if(t){nb.title=t;await DB.put('notebooks',nb);renderLibrary()}}
   else if(a==='cover'){const c=await pickCover(coverOf(nb));if(c){nb.cover=c;await DB.put('notebooks',nb);renderLibrary()}}
+  else if(a==='move'){const t=await pickFolder('Mover “'+nb.title+'” para');if(t!==undefined){nb.folder=t;await DB.put('notebooks',nb);renderLibrary();toast('Caderno movido ✦')}}
+  else if(a==='dup')duplicateNotebook(nb);
   else if(a==='pdf'){const pages=await orderedPages(nb);exportPDF(nb.title,pages)}
   else if(a==='del'){
     if(await confirmDlg('Apagar “'+nb.title+'”?','O caderno e todas as páginas somem deste aparelho. Isso não pode ser desfeito.','Apagar')){
@@ -592,12 +738,50 @@ async function notebookMenu(nb){
     }
   }
 }
+async function folderMenu(f){
+  const a=await menu(f.name,[{id:'open',label:'Abrir'},{id:'rename',label:'Renomear'},{id:'move',label:'Mover para outra pasta'},{id:'del',label:'Apagar pasta',sub:'Os cadernos de dentro voltam para a pasta de cima',danger:true}]);
+  if(a==='open'){LIB.folder=f.id;renderLibrary()}
+  else if(a==='rename'){const t=await ask('Renomear pasta',f.name);if(t){f.name=t;await DB.put('folders',f);renderLibrary()}}
+  else if(a==='move'){const t=await pickFolder('Mover a pasta “'+f.name+'” para',f.id);if(t!==undefined){f.parent=t;await DB.put('folders',f);renderLibrary()}}
+  else if(a==='del'){
+    if(!(await confirmDlg('Apagar a pasta “'+f.name+'”?','Nenhum caderno é apagado: o que estiver dentro vai para a pasta de cima.','Apagar pasta')))return;
+    const up=f.parent||null;
+    for(const nb of await DB.all('notebooks'))if(nb.folder===f.id){nb.folder=up;await DB.put('notebooks',nb)}
+    for(const x of await DB.all('folders'))if(x.parent===f.id){x.parent=up;await DB.put('folders',x)}
+    await DB.del('folders',f.id);renderLibrary();toast('Pasta apagada');
+  }
+}
+async function newFolder(){
+  const name=await ask('Nova pasta','','Criar');if(!name)return;
+  await DB.put('folders',{id:uid(),name,parent:LIB.folder,created:Date.now()});renderLibrary();
+}
+async function pickFolder(title,exclude){
+  const folders=await DB.all('folders'),kids=id=>folders.filter(f=>(f.parent||null)===id).sort((a,b)=>a.name.localeCompare(b.name,'pt'));
+  const banned=new Set();if(exclude){const walk=id=>{banned.add(id);kids(id).forEach(k=>walk(k.id))};walk(exclude)}
+  const rows=[{id:null,label:'Início',depth:0}];
+  const add=(id,dp)=>kids(id).forEach(f=>{if(banned.has(f.id))return;rows.push({id:f.id,label:f.name,depth:dp});add(f.id,dp+1)});add(null,1);
+  if(rows.length===1){toast('Crie uma pasta primeiro, no botão “Nova pasta”.',4000);return undefined}
+  return openDlg(`<h2>${esc(title)}</h2><div class="menu">${rows.map((r,i)=>`<button data-i="${i}" style="padding-left:${12+r.depth*20}px">${r.depth?FOLDER_ICON:'<svg class="i" viewBox="0 0 24 24"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19h12V9.5"/></svg>'}<span>${esc(r.label)}</span></button>`).join('')}</div>`,
+    (d,done)=>d.querySelectorAll('.menu button').forEach(b=>b.onclick=()=>done(rows[+b.dataset.i].id)));
+}
+async function duplicateNotebook(nb){
+  try{
+    toast('Duplicando…',0);
+    const pages=await orderedPages(nb),copy={...structuredClone(nb),id:uid(),title:nb.title+' (cópia)',created:Date.now(),updated:Date.now(),order:[]};
+    for(const pg of pages){
+      const np=structuredClone(pg);np.id=uid();np.nb=copy.id;
+      if(pg.bg){const b=await DB.get('blobs',pg.bg);if(b){np.bg=uid();await DB.put('blobs',{id:np.bg,blob:b.blob})}}
+      await DB.put('pages',np);copy.order.push(np.id);
+    }
+    await DB.put('notebooks',copy);hideToast();renderLibrary();toast('Caderno duplicado ✦');
+  }catch(e){console.error(e);hideToast();toast('Não consegui duplicar.',4000)}
+}
 async function orderedPages(nb){const m=new Map((await DB.pagesOf(nb.id)).map(p=>[p.id,p]));return nb.order.map(id=>m.get(id)).filter(Boolean)}
 const newPage=(nbId,tpl,paper)=>({id:uid(),nb:nbId,tpl,paper,w:PAGE_W,h:A4_H,strokes:[],bg:null});
 
 async function newNotebookDialog(){
   const r=await notebookForm();if(!r)return;
-  const nb={id:uid(),title:r.title,cover:r.cover,tpl:r.tpl,paper:r.paper,created:Date.now(),updated:Date.now(),order:[]};
+  const nb={id:uid(),title:r.title,cover:r.cover,tpl:r.tpl,paper:r.paper,folder:LIB.folder,created:Date.now(),updated:Date.now(),order:[]};
   const pg=newPage(nb.id,r.tpl,r.paper);nb.order.push(pg.id);
   await DB.put('pages',pg);await DB.put('notebooks',nb);
   openNotebook(nb.id);
@@ -692,7 +876,7 @@ async function openNotebook(id){
   updateToolbar();updateUndo();updateIndicator();
 }
 async function closeNotebook(){
-  commitText();clearSelection();await flushSaves();
+  commitText();clearSelection();togglePanel(false);await flushSaves();
   io.disconnect();S.pages.forEach(detach);pagesEl.innerHTML='';
   S.nb=null;S.pages=[];S.undo=[];S.redo=[];
   history.replaceState(null,'',location.pathname);
@@ -703,13 +887,14 @@ async function closeNotebook(){
 const io=new IntersectionObserver(es=>{for(const e of es){const rt=e.target._rt;if(!rt)continue;e.isIntersecting?attach(rt):detach(rt)}},{root:desk,rootMargin:'120% 60%'});
 function buildPages(){
   io.disconnect();S.pages.forEach(detach);pagesEl.innerHTML='';
-  for(const rt of S.pages){const el=document.createElement('div');el.className='page';el._rt=rt;rt.el=el;pagesEl.append(el)}
+  for(const rt of S.pages){const el=document.createElement('div');el.className='page';el._rt=rt;rt.el=el;pagesEl.append(el);decoratePage(rt)}
   const add=document.createElement('button');add.className='add-page';add.id='addPage';
   add.innerHTML='<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova página';
   add.onclick=()=>addPage(S.pages.length-1);
   pagesEl.append(add);
   layout();
   for(const rt of S.pages)io.observe(rt.el);
+  renderPanel();
 }
 function baseWidth(){return Math.min(desk.clientWidth-32,880)}
 function layout(){
@@ -801,7 +986,9 @@ function setTool(t){commitText();P.tool=t;savePrefs();clearSelection();updateToo
 function updateToolbar(){
   document.querySelectorAll('.tool[data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===P.tool));
   const colors=$('#colors'),sizes=$('#sizes'),t=P.tool;
-  const hasColor=t==='pen'||t==='hl'||t==='text',hasSize=t!=='lasso';
+  const hasColor=t==='pen'||t==='hl'||t==='text'||t==='shape',hasSize=t!=='lasso';
+  const sb=$('#shapeBtn');sb.hidden=t!=='shape';
+  if(t==='shape'){const sh=SHAPES.find(x=>x[0]===P.shape)||SHAPES[0];sb.innerHTML=`<svg class="i" viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:-4px;margin-right:6px">${sh[2]}</svg>${sh[1]}`;sb.title='Escolher a forma'}
   const fb=$('#fontBtn');fb.hidden=t!=='text';
   if(t==='text'){const f=fontOf(P.textFont);fb.style.font=`${f[3]} 17px "${f[1]}", sans-serif`;fb.textContent='Aa  '+f[2];fb.title='Escolher a fonte'}
   colors.hidden=!hasColor;$('#sepSizes').hidden=!hasColor||!hasSize;sizes.hidden=!hasSize;
@@ -825,6 +1012,10 @@ function setColor(c,keepOpen){
 }
 document.querySelectorAll('.tool[data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
 $('#btnSticker').onclick=stickerPicker;
+$('#shapeBtn').onclick=async()=>{
+  const id=await openDlg(`<h2>Formas</h2><p>Na Automática, desenhe à mão e o Sinapse deixa a forma perfeita. Nas outras, arraste para desenhar.</p><div class="shapes">${SHAPES.map(([id,n,svg],i)=>`<button data-s="${id}" class="${i===0?'wide':''}" aria-pressed="${id===P.shape}"><svg viewBox="0 0 24 24">${svg}</svg>${n}</button>`).join('')}</div>`,
+    (d,done)=>d.querySelectorAll('.shapes button').forEach(b=>b.onclick=()=>{P.shape=b.dataset.s;savePrefs();updateToolbar();done(b.dataset.s)}));
+};
 $('#fontBtn').onclick=async()=>{
   const keep=TE;
   const id=await openDlg(`<h2>Fonte</h2><p>Escreva com a sua letra dentro da caixa de texto: ela vira esta fonte.</p><div class="fonts">${FONTS.map(([id,fam,name,w])=>`<button data-f="${id}" aria-pressed="${id===P.textFont}"><small>${name}</small><span style="font-family:'${fam}',sans-serif;font-weight:${w}">Minha letra vira esta fonte ✦</span></button>`).join('')}</div>`,
@@ -872,6 +1063,10 @@ pagesEl.addEventListener('pointerdown',e=>{
   if(t==='pen'||t==='hl'){
     a.kind='ink';a.st={t,c:t==='pen'?P.penColor:P.hlColor,s:SIZES[t][P.size[t]],p:[]};a.lp=pt.p;
     act=a;addPoint(pt);a.anchor=pt;armHold();schedule();
+  }else if(t==='shape'){
+    a.st={t:'pen',c:P.penColor,s:SIZES.shape[P.size.shape],p:[]};act=a;
+    if(P.shape==='auto'){a.kind='ink';a.auto=true;a.lp=pt.p;addPoint(pt);a.anchor=pt;schedule()}
+    else{a.kind='shape';a.st.g=1;a.start=pt}
   }else if(t==='eraser'){
     Object.assign(a,{kind:'erase',removed:[],last:pt});act=a;eraseAt(pt);drawEraser(pt);
   }else{
@@ -894,6 +1089,8 @@ pagesEl.addEventListener('pointermove',e=>{
     schedule();
   }else if(act.kind==='drag'){
     const pt=toPage(e,act);act.dx=pt.x-act.start.x;act.dy=pt.y-act.start.y;schedule();
+  }else if(act.kind==='shape'){
+    act.st.p=shapePts(P.shape,act.start,toPage(e,act),act.st.s);schedule();
   }
 });
 pagesEl.addEventListener('pointerup',e=>{if(act&&e.pointerId===act.id)finish()});
@@ -904,11 +1101,12 @@ window.addEventListener('pointercancel',e=>{if(e.pointerType==='pen')penDown=fal
 function addPoint(pt){
   const a=act,p=a.st.p,n=p.length;
   const pr=a.lp=a.lp*.6+pt.p*.4;   // suaviza a pressão
+  if(a.shaped)return;
   if(a.straight){p[n-3]=r1(pt.x);p[n-2]=r1(pt.y);return}
   if(n&&Math.hypot(pt.x-p[n-3],pt.y-p[n-2])<.5)return;
   p.push(r1(pt.x),r1(pt.y),Math.round(pr*100)/100);
 }
-/* Segurar a caneta parada no fim do traço transforma o rabisco em linha reta */
+/* Segurar a caneta parada no fim do traço: vira linha reta, círculo, retângulo ou triângulo */
 function armHold(){
   clearTimeout(act.hold);const a=act;
   a.hold=setTimeout(()=>{
@@ -916,6 +1114,8 @@ function armHold(){
     const p=a.st.p,n=p.length/3;if(n<4)return;
     let len=0;for(let i=3;i<p.length;i+=3)len+=Math.hypot(p[i]-p[i-3],p[i+1]-p[i-2]);
     if(len<40)return;
+    const shp=recognize(p);
+    if(shp&&shp.kind!=='line'){a.st.p=shp.p;a.st.g=1;a.shaped=true;schedule();return}
     let avg=0;for(let i=2;i<p.length;i+=3)avg+=p[i];avg=Math.round(avg/n*100)/100;
     a.st.p=[p[0],p[1],avg,p[p.length-3],p[p.length-2],avg];a.straight=true;schedule();
   },550);
@@ -925,7 +1125,7 @@ function schedule(){if(!raf)raf=requestAnimationFrame(frame)}
 function frame(){
   raf=0;if(!act)return;
   const k=act.rt.k;lctx.setTransform(1,0,0,1,0,0);lctx.clearRect(0,0,live.width,live.height);lctx.setTransform(k,0,0,k,0,0);
-  if(act.kind==='ink')drawStroke(lctx,act.st);
+  if(act.kind==='ink'||act.kind==='shape')drawStroke(lctx,act.st);
   else if(act.kind==='lasso'){
     const p=act.poly;lctx.save();lctx.lineWidth=1.5;lctx.setLineDash([6,5]);lctx.strokeStyle='#8B5CF6';lctx.fillStyle='rgba(139,92,246,.06)';
     lctx.beginPath();lctx.moveTo(p[0],p[1]);for(let i=2;i<p.length;i+=2)lctx.lineTo(p[i],p[i+1]);lctx.closePath();lctx.fill();lctx.stroke();lctx.restore();
@@ -935,6 +1135,8 @@ function finish(){
   const a=act;act=null;clearTimeout(a.hold);cancelAnimationFrame(raf);raf=0;
   if(a.type==='pen')penDown=false;
   const rt=a.rt;
+  if(a.kind==='shape'){const b=bbox(a.st);if(a.st.p.length&&Math.max(b.w,b.h)>a.st.s*3)a.kind='ink';else{clearLive();updateIndicator();return}}
+  if(a.kind==='ink'&&a.auto&&!a.shaped){const shp=recognize(a.st.p);if(shp){a.st.p=shp.p;a.st.g=1}}
   if(a.kind==='ink'){
     clearLive();
     if(a.st.p.length){rt.d.strokes.push(a.st);rt.ctx.setTransform(rt.k,0,0,rt.k,0,0);drawStroke(rt.ctx,a.st);pushUndo({t:'add',rt,items:[a.st]});save(rt)}
@@ -1164,10 +1366,50 @@ desk.addEventListener('scroll',()=>{if(!indRaf)indRaf=requestAnimationFrame(()=>
 function updateIndicator(){
   if(!S.pages.length)return;const mid=desk.scrollTop+desk.clientHeight/2;let cur=0;
   for(let i=0;i<S.pages.length;i++){const el=S.pages[i].el;if(!el)continue;if(el.offsetTop<=mid)cur=i;else break}
-  S.cur=cur;$('#pageInd').textContent=(cur+1)+' / '+S.pages.length;
+  S.cur=cur;$('#pageInd').textContent=(S.pages[cur].d.fav?'★ ':'')+(cur+1)+' / '+S.pages.length;
+  if(!panel.hidden)panel.querySelectorAll('.thumb').forEach(t=>t.classList.toggle('cur',t._i===cur));
 }
 let resizeT;
 window.addEventListener('resize',()=>{clearTimeout(resizeT);resizeT=setTimeout(()=>{if(S.nb){layout();updateIndicator();placeSelBar()}},120)});
+
+/* ---------- Painel: miniaturas, favoritas e divisórias ---------- */
+const panel=$('#panel');let panelMode='all',thumbIO=null;
+function decoratePage(rt){
+  rt.el.querySelectorAll('.sec-tab,.fav-mark').forEach(x=>x.remove());
+  if(rt.d.sec){const t=document.createElement('div');t.className='sec-tab';t.textContent=rt.d.sec;rt.el.append(t)}
+  if(rt.d.fav){const f=document.createElement('div');f.className='fav-mark';f.innerHTML=STAR;rt.el.append(f)}
+}
+function togglePanel(force){
+  const open=force!==undefined?force:panel.hidden;panel.hidden=!open;$('#btnPages').setAttribute('aria-pressed',open);
+  if(open)renderPanel();else if(thumbIO)thumbIO.disconnect();
+}
+function renderPanel(){
+  if(panel.hidden||!S.nb)return;
+  panel.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===panelMode));
+  const box=$('#thumbs');box.innerHTML='';if(thumbIO)thumbIO.disconnect();
+  thumbIO=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){thumbIO.unobserve(e.target);drawThumb(e.target)}}),{root:box,rootMargin:'300px'});
+  let any=false;
+  S.pages.forEach((rt,i)=>{
+    const d=rt.d;
+    if(panelMode==='fav'&&!d.fav||panelMode==='sec'&&!d.sec)return;
+    if(d.sec&&panelMode!=='fav'){const h=document.createElement('div');h.className='sec-h';h.textContent=d.sec;box.append(h)}
+    const t=document.createElement('div');t.className='thumb'+(i===S.cur?' cur':'');t._i=i;
+    t.innerHTML=`<button class="tgo" aria-label="Ir para a página ${i+1}"><canvas width="240" height="${Math.round(240*d.h/d.w)}"></canvas></button><span>${i+1}</span><button class="star ${d.fav?'on':''}" aria-label="${d.fav?'Tirar dos favoritos':'Favoritar'}">${STAR}</button>`;
+    $('.tgo',t).onclick=()=>gotoPage(i);$('.star',t).onclick=()=>toggleFav(i);
+    box.append(t);thumbIO.observe(t);any=true;
+  });
+  if(!any)box.innerHTML=`<p class="panel-empty">${panelMode==='fav'?'Nenhuma página favorita ainda. Toque na estrela de uma miniatura.':'Nenhuma divisória ainda. Crie em ⋯ › Criar divisória nesta página.'}</p>`;
+}
+async function drawThumb(t){
+  const rt=S.pages[t._i];if(!rt)return;const cv=$('canvas',t),c=cv.getContext('2d'),d=rt.d,k=cv.width/d.w;
+  let bg=rt.bgImg,own=false;if(d.bg&&!bg){bg=await loadBg(d.bg);own=true}
+  c.setTransform(k,0,0,k,0,0);paint(c,d,bg);if(own&&bg&&bg.close)bg.close();
+}
+function gotoPage(i){const rt=S.pages[i];if(!rt)return;desk.scrollTo({top:rt.el.offsetTop-24});if(innerWidth<900)togglePanel(false)}
+function toggleFav(i){const rt=S.pages[i];rt.d.fav=!rt.d.fav;save(rt);decoratePage(rt);renderPanel();updateIndicator();toast(rt.d.fav?'Página favoritada ★':'Página tirada dos favoritos')}
+$('#btnPages').onclick=()=>{commitText();togglePanel()};
+$('#panelClose').onclick=()=>togglePanel(false);
+panel.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{panelMode=b.dataset.m;renderPanel()});
 
 /* ---------- Páginas: criar, trocar modelo, apagar ---------- */
 async function addPage(after){
@@ -1196,6 +1438,9 @@ async function editorMenu(){
   const i=S.cur,rt=S.pages[i],isPdf=rt.d.tpl==='pdf';
   const a=await menu('Página '+(i+1)+' de '+S.pages.length,[
     {id:'add',label:'Nova página depois desta'},
+    {id:'fav',label:rt.d.fav?'Tirar dos favoritos':'Favoritar esta página'},
+    {id:'sec',label:rt.d.sec?'Renomear a divisória “'+rt.d.sec+'”':'Criar divisória nesta página',sub:'Marca o começo de uma seção, como as abas de um fichário'},
+    ...(rt.d.sec?[{id:'secDel',label:'Remover a divisória'}]:[]),
     ...(isPdf?[]:[{id:'tpl',label:'Mudar o modelo desta página',sub:'Liso, pautado, quadriculado, pontilhado ou Cornell'}]),
     {id:'pdfIn',label:'Inserir PDF no fim do caderno'},
     {id:'pdfOut',label:'Exportar caderno em PDF'},
@@ -1204,6 +1449,9 @@ async function editorMenu(){
     {id:'del',label:'Apagar esta página',danger:true}
   ]);
   if(a==='add')addPage(i);
+  else if(a==='fav')toggleFav(i);
+  else if(a==='sec'){const n=await ask(rt.d.sec?'Renomear divisória':'Nova divisória',rt.d.sec||'','Salvar');if(n){rt.d.sec=n;save(rt);decoratePage(rt);renderPanel();toast('Divisória “'+n+'” criada ✦')}}
+  else if(a==='secDel'){delete rt.d.sec;save(rt);decoratePage(rt);renderPanel()}
   else if(a==='tpl'){const r=await templateForm(rt.d);if(r){rt.d.tpl=r.tpl;rt.d.paper=r.paper;layout();renderPage(rt);save(rt)}}
   else if(a==='pdfIn'){pdfTarget=S.nb;$('#pdfInput').click()}
   else if(a==='pdfOut'){await flushSaves();exportPDF(S.nb.title,S.pages.map(r=>r.d))}
@@ -1221,7 +1469,7 @@ document.addEventListener('keydown',e=>{
   if(mod)return;
   if((k==='delete'||k==='backspace')&&S.sel){e.preventDefault();deleteSelection();return}
   if(k==='escape'){clearSelection();return}
-  const map={p:'pen',h:'hl',e:'eraser',l:'lasso',t:'text'};if(map[k])setTool(map[k]);
+  const map={p:'pen',h:'hl',e:'eraser',l:'lasso',t:'text',f:'shape'};if(map[k])setTool(map[k]);
 });
 
 /* =====================================================================
@@ -1245,7 +1493,7 @@ async function importPDF(file,target){
   const lib=await loadPdfJs();
   const task=lib.getDocument({data:new Uint8Array(await file.arrayBuffer())}),doc=await task.promise;
   let nb=target;
-  if(!nb){nb={id:uid(),title:file.name.replace(/\.pdf$/i,'')||'PDF',cover:'holo',tpl:'blank',paper:'white',pdf:true,created:Date.now(),updated:Date.now(),order:[]}}
+  if(!nb){nb={id:uid(),title:file.name.replace(/\.pdf$/i,'')||'PDF',cover:'holo',tpl:'blank',paper:'white',pdf:true,folder:LIB.folder,created:Date.now(),updated:Date.now(),order:[]}}
   const added=[];
   for(let i=1;i<=doc.numPages;i++){
     toast('Preparando a página '+i+' de '+doc.numPages+'…',0);
@@ -1317,10 +1565,10 @@ const blobToData=b=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()
 async function makeBackup(){
   try{
     toast('Preparando o backup…',0);
-    const notebooks=await DB.all('notebooks'),pages=await DB.all('pages'),blobs=[];
+    const notebooks=await DB.all('notebooks'),pages=await DB.all('pages'),folders=await DB.all('folders'),blobs=[];
     for(const b of await DB.all('blobs'))blobs.push({id:b.id,data:await blobToData(b.blob)});
     const date=new Date().toISOString().slice(0,10);
-    const file=new File([JSON.stringify({app:'sinapse',versao:1,data:new Date().toISOString(),notebooks,pages,blobs})],`Sinapse backup ${date}.json`,{type:'application/json'});
+    const file=new File([JSON.stringify({app:'sinapse',versao:2,data:new Date().toISOString(),folders,notebooks,pages,blobs})],`Sinapse backup ${date}.json`,{type:'application/json'});
     hideToast();
     if(await offerFile(file,'Backup do Sinapse','Backup pronto','Guarde no iCloud Drive, Google Drive ou Arquivos')){P.lastBackup=Date.now();savePrefs();backupNote()}
   }catch(e){console.error(e);hideToast();toast('Não consegui criar o backup.',4000)}
@@ -1335,6 +1583,7 @@ async function restoreBackup(file){
     toast('Restaurando…',0);
     for(const b of data.blobs||[])await DB.put('blobs',{id:b.id,blob:await (await fetch(b.data)).blob()});
     for(const pg of data.pages||[])await DB.put('pages',pg);
+    for(const f of data.folders||[])await DB.put('folders',f);
     for(const nb of data.notebooks)await DB.put('notebooks',nb);
     hideToast();await renderLibrary();toast(n+(n===1?' caderno restaurado ✦':' cadernos restaurados ✦'));
   }catch(e){console.error(e);hideToast();toast('Não consegui restaurar tudo. Tente de novo.',5000)}
@@ -1362,6 +1611,7 @@ function download(file){const u=URL.createObjectURL(file),a=document.createEleme
 const HELLO={0:['Boa madrugada, estrela ✦','A lua está do seu lado ☾'],1:['Bom dia, luz ✦','Que hoje flua leve ✦'],2:['Boa tarde, energia boa ✦','Seu brilho continua ✦'],3:['Boa noite, estrela ✦','Hora de assentar as ideias ☾']};
 {const h=new Date().getHours(),l=HELLO[h<5?0:h<12?1:h<18?2:3];$('#hello').textContent=l[Math.floor(Math.random()*l.length)]}
 $('#btnNew').onclick=newNotebookDialog;
+$('#btnFolder').onclick=newFolder;
 document.querySelector('[data-act=new]').onclick=newNotebookDialog;
 $('#btnImport').onclick=()=>{pdfTarget=null;$('#pdfInput').click()};
 (async()=>{

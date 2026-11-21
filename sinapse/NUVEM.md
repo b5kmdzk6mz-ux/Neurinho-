@@ -57,5 +57,6 @@ Essas duas são **públicas por natureza**: vão dentro do app, e a segurança f
 
 ## Bom saber
 
-- **E-mails para outras pessoas:** o e-mail que vem pronto no Supabase só entrega para quem é da equipe do projeto e tem limite baixo por hora. Para outras pessoas entrarem (amigas com quem você compartilhar), é preciso ligar um serviço de e-mail próprio (por exemplo, o Resend, que tem plano grátis) em **Authentication › Emails › SMTP Settings**. Eu te guio quando chegar a hora.
+- **Uso próprio:** o e-mail que vem pronto no Supabase entrega para quem é dona do projeto, então serve para você sem configurar mais nada. Você entra uma vez em cada aparelho (iPad, celular, computador) e o login fica salvo. Ele tem um limite de poucos e-mails por hora, o que só atrapalha se pedir vários códigos seguidos.
+- **Compartilhar depois:** se um dia quiser compartilhar cadernos com outras pessoas, elas também precisam receber o código. Aí é só ligar um serviço de e-mail próprio (por exemplo, o Resend, que é grátis) em **Authentication › Emails › SMTP Settings**.
 - **Limites do plano grátis:** 500 MB de banco, 1 GB de arquivos (PDFs, fotos, áudios) e 50 mil pessoas ativas por mês. Para começar, sobra.

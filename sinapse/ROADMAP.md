@@ -15,8 +15,8 @@
 4. Navegação: miniaturas das páginas ✓, favoritos ✓, divisórias como sumário ✓, links entre páginas ○, abas de cadernos abertos ○
 5. Organização: pastas e subpastas ✓, divisórias e seções ✓, duplicar caderno ✓
 6. Modelos prontos: planner do dia ✓, semana ✓, mês ✓, diário ✓, lista de tarefas ✓, Cornell ✓
-7. Busca no texto digitado e nos PDFs ○
-8. Modo apresentação para tela externa, com ponteiro laser ○; imprimir ◐ (pelo PDF)
+7. Busca no texto digitado, divisórias, nomes de cadernos e PDFs ✓ (a escrita à mão entra na Fase 4)
+8. Modo apresentação para tela externa, com ponteiro laser ✓; imprimir ◐ (pelo PDF)
 9. Gravar áudio da aula ligado às anotações (tocar o trecho de quando você escreveu) ○
 10. Ferramentas de desenho: mapas mentais, fluxogramas e quadro branco infinito ○
 

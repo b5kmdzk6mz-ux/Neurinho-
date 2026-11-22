@@ -23,10 +23,10 @@
 ## Fase 2: estudo ✓
 Flashcards ✓, perguntas e respostas ✓, repetição espaçada (Errei, Difícil, Bom, Fácil) ✓, testes de múltipla escolha ✓, estudar pelas próprias anotações (modo revisão que cobre o marca-texto) ✓, transformar anotações em cartões (definições, mapas mentais, PDFs e marca-texto) ✓, cartão a partir de uma seleção do laço ✓
 
-## Fase 3: nuvem (precisa de servidor, sugestão: Supabase)
-Login ○, sincronizar entre aparelhos ○, guardar na nuvem ○, compartilhar por link ○, comentários ○, colaboração em tempo real ○, planos pagos ○
+## Fase 3: nuvem (Supabase) ◐ pronta no app, falta ligar o projeto (veja NUVEM.md)
+Login pelo e-mail (link ou código) ✓, sincronizar entre aparelhos ✓, guardar na nuvem (cadernos, páginas, cartões, pastas, PDFs, fotos e áudios) ✓, compartilhar por link (ver, comentar ou editar) ✓, comentários ✓, colaboração em tempo real com junção de edições simultâneas e presença ✓, remover pessoas e desativar links ✓
+Planos pagos: fora do plano. O Sinapse é para uso próprio.
 
 ## Fase 4: inteligência artificial ✓ (com a chave da própria pessoa, a mesma do Neurinho)
 Resumir ✓, perguntar sobre os próprios cadernos (conversa) ✓, explicar ✓, gerar questionários ✓, gerar cartões ✓, corrigir ortografia ✓, resolver problemas de matemática passo a passo ✓, reorganizar e reescrever ✓, converter escrita à mão em texto na fonte escolhida ✓, ler a letra das páginas para a busca ✓, transcrever aulas ao vivo (reconhecimento de fala do aparelho) ✓, resumir a aula ✓, localizar nas transcrições ✓, gerar ilustrações e diagramas (SVG) ✓
-Depende da Fase 3: oferecer a IA em planos pagos sem a pessoa precisar de chave própria.
 

@@ -10,6 +10,7 @@ Só carregam quando a pessoa anexa um arquivo na aba Cartões > Anexar.
 | `mammoth.browser.min.js` | mammoth (leitura de .docx) | 1.13.0 | BSD-2-Clause |
 | `tesseract/tesseract.min.js`, `tesseract/worker.min.js` | tesseract.js (leitura de texto em imagens) | 7.0.0 | Apache-2.0 |
 | `tesseract/tesseract-core-simd-lstm.wasm.js` | tesseract.js-core | 7.0.0 | Apache-2.0 |
+| `supabase.js` | @supabase/supabase-js (versão UMD, usada pela nuvem do Sinapse) | 2.119.2 | MIT |
 | `tesseract/por.traineddata.gz` | @tesseract.js-data/por (4.0.0_best_int) | 1.0.0 | Apache-2.0 |
 
 Os textos das licenças estão em `licenses/`.

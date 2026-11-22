@@ -3012,11 +3012,27 @@ async function cloudInit(){
   SB=window.supabase.createClient(c.url,c.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false,storageKey:'sinapse-auth'}});
   const {data}=await SB.auth.getSession();CU=data.session?data.session.user:null;
   SB.auth.onAuthStateChange((ev,ses)=>{const was=CU&&CU.id;CU=ses?ses.user:null;updateCloudBtn();if(CU&&CU.id!==was)afterLogin()});
-  updateCloudBtn();if(CU)afterLogin();
+  let viaLink=false;
+  if(!CU&&/access_token=/.test(location.hash)){ // abriu pelo link do e-mail
+    viaLink=true;
+    const err=await loginWith('',location.hash);history.replaceState(null,'',location.pathname);
+    if(!err){const r=await SB.auth.getSession();CU=r.data.session?r.data.session.user:null;if(CU)toast('Pronto ✦ Sincronizando seus cadernos…',4000);else viaLink=false}else viaLink=false
+  }else if(/error_description=/.test(location.hash)){history.replaceState(null,'',location.pathname);toast('O link venceu ou já foi usado. Peça outro.',6000)}
+  updateCloudBtn();if(CU&&!viaLink)afterLogin();
   const m=location.hash.match(/^#join=([\w-]+)/);if(m){LSS('sinapse-join',m[1]);history.replaceState(null,'',location.pathname);if(!CU)cloudDialog()}
   addEventListener('online',()=>schedSync(300));
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedSync(500)});
   setInterval(()=>schedSync(0),90e3);
+}
+// entra com o código de 6 números, com o link do e-mail colado, ou com o endereço que o link abriu
+async function loginWith(email,v){
+  v=v.trim();
+  const h=v.match(/[#&?]access_token=([^&]+)/),rt=v.match(/[#&?]refresh_token=([^&]+)/);
+  if(h&&rt){const {error}=await SB.auth.setSession({access_token:decodeURIComponent(h[1]),refresh_token:decodeURIComponent(rt[1])});return error}
+  const t=v.match(/[?&]token=([^&#\s]+)/);
+  if(t){const ty=(v.match(/[?&]type=([a-z_]+)/)||[])[1]||'magiclink';
+    const {error}=await SB.auth.verifyOtp({token_hash:decodeURIComponent(t[1]),type:ty});return error}
+  const {error}=await SB.auth.verifyOtp({email,token:v.replace(/\s/g,''),type:'email'});return error;
 }
 async function afterLogin(){
   if(SY.owner!==CU.id){ // primeira vez nesta conta neste aparelho: sobe tudo
@@ -3290,9 +3306,13 @@ async function cloudDialog(){
     const email=await ask('Entrar na nuvem','', 'Enviar código');if(!email)return;
     const {error}=await SB.auth.signInWithOtp({email,options:{shouldCreateUser:true}});
     if(error){toast('Não consegui enviar o código: '+error.message,6000);return}
-    const code=await ask('Digite o código que chegou em '+email,'','Entrar');if(!code)return;
-    const {error:e2}=await SB.auth.verifyOtp({email,token:code.trim(),type:'email'});
-    if(e2){toast('Código inválido ou vencido. Tente de novo.',5000);return}
+    const code=await openDlg(`<h2>Confira o e-mail ✉</h2><p>Mandei uma mensagem para <b>${esc(email)}</b>.</p>
+      <p>Se veio um <b>código</b>, digite aqui. Se veio um <b>link</b>, toque e segure nele, escolha <b>Copiar Link</b> e cole aqui.</p>
+      <form><input type="text" maxlength="3000" autocomplete="one-time-code" aria-label="Código ou link" placeholder="Código ou link"><div class="actions"><button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Entrar</button></div></form>`,
+      (d,done)=>{const i=$('input',d);setTimeout(()=>i.focus(),50);$('[data-x]',d).onclick=()=>done(null);$('form',d).onsubmit=e=>{e.preventDefault();done(i.value.trim()||null)}});
+    if(!code)return;
+    const e2=await loginWith(email,code);
+    if(e2){toast('Código ou link inválido ou vencido. Tente de novo.',5000);return}
     toast('Pronto ✦ Sincronizando seus cadernos…',4000);return;
   }
   const pend=Object.keys(SY.out).length;

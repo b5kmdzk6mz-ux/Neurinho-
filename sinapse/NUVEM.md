@@ -20,23 +20,20 @@ Leva uns 10 minutos e é tudo gratuito no começo.
 
 Esse arquivo cria as tabelas e as **regras de segurança**: cada pessoa só vê os próprios cadernos e os que foram compartilhados com ela. Essas regras foram testadas com quatro usuários diferentes antes de chegar aqui.
 
-## 3. Login por código no e-mail
+## 3. Login pelo e-mail
 
-O Sinapse entra com um código de 6 números enviado por e-mail (funciona melhor no iPad do que um link).
+O Sinapse entra sem senha: você digita seu e-mail e chega uma mensagem.
 
-1. Abra **Authentication › Emails** (ou **Email Templates**).
-2. No modelo **Magic Link**, troque o texto por:
-
-   - Assunto: `Seu código do Sinapse`
-   - Corpo:
-     ```html
-     <h2>Seu código do Sinapse ✦</h2>
-     <p>Digite este código no app:</p>
-     <p style="font-size:28px;font-weight:bold;letter-spacing:4px">{{ .Token }}</p>
-     <p>Se não foi você, é só ignorar.</p>
-     ```
-3. Faça o mesmo no modelo **Confirm signup** (é o que vai para quem entra pela primeira vez).
-4. Salve.
+- **Sem configurar nada**, o Supabase manda um **link**. No iPad, toque e segure no link, escolha **Copiar Link** e cole no Sinapse. Também dá para só tocar no link, mas aí ele abre no Safari e o login fica no Safari. Se o Sinapse estiver instalado na tela de início, ele não vê esse login, por isso o jeito de colar é melhor.
+- **Código de 6 números (opcional):** o Supabase só deixa mudar o modelo do e-mail depois de ligar um serviço de e-mail próprio (**Authentication › Emails › SMTP Settings**). Se um dia ligar, troque o modelo **Magic Link** e o **Confirm signup** por:
+  - Assunto: `Seu código do Sinapse`
+  - Corpo:
+    ```html
+    <h2>Seu código do Sinapse ✦</h2>
+    <p>Digite este código no app:</p>
+    <p style="font-size:28px;font-weight:bold;letter-spacing:4px">{{ .Token }}</p>
+    <p>Se não foi você, é só ignorar.</p>
+    ```
 
 ## 4. Endereço do app
 

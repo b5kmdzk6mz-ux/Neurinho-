@@ -41,7 +41,15 @@ for f in arquivos:
     shutil.copy(os.path.join(AQUI, f), os.path.join(saida, f))
 extras = {'vendor/pdf.min.mjs': 'vendor/pdf.min.mjs', 'vendor/pdf.worker.min.mjs': 'vendor/pdf.worker.min.mjs',
           'OpenDyslexic-Regular.otf': 'OpenDyslexic-Regular.otf'}
+def sem_controles(txt):
+    # o Claude só publica texto sem caracteres de controle; dentro das strings do
+    # pdf.js eles valem o mesmo escritos como \xNN
+    return re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]', lambda m: '\\x%02x' % ord(m.group(0)), txt)
 for dest, src in extras.items():
     os.makedirs(os.path.dirname(os.path.join(saida, dest)) or saida, exist_ok=True)
-    shutil.copy(os.path.join(RAIZ, src), os.path.join(saida, dest))
+    if dest.endswith('.mjs'):
+        txt = open(os.path.join(RAIZ, src), encoding='utf-8').read()
+        open(os.path.join(saida, dest), 'w', encoding='utf-8').write(sem_controles(txt))
+    else:
+        shutil.copy(os.path.join(RAIZ, src), os.path.join(saida, dest))
 print('\n'.join(['index.html'] + arquivos + list(extras)))

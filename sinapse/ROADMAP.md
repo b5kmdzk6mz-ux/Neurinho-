@@ -30,3 +30,10 @@ Planos pagos: fora do plano. O Sinapse é para uso próprio.
 ## Fase 4: inteligência artificial ✓ (pelo app do Claude da própria pessoa, sem custo extra, ou com uma chave da API)
 Resumir ✓, perguntar sobre os próprios cadernos (conversa) ✓, explicar ✓, gerar questionários ✓, gerar cartões ✓, corrigir ortografia ✓, resolver problemas de matemática passo a passo ✓, reorganizar e reescrever ✓, converter escrita à mão em texto na fonte escolhida ✓, ler a letra das páginas para a busca ✓, transcrever aulas ao vivo (reconhecimento de fala do aparelho) ✓, resumir a aula ✓, localizar nas transcrições ✓, gerar ilustrações e diagramas (SVG) ✓
 
+## Sinapse dentro do Claude ✓
+O mesmo app também roda como artifact no Claude (gerado por `claude-build.py`). Lá dentro:
+- IA automática pela assinatura do Claude da pessoa, inclusive lendo a letra pelas imagens das páginas ✓
+- Cadernos guardados na nuvem do próprio Claude, só da pessoa, sincronizando entre aparelhos ✓ (fotos e PDFs de até 20 MB)
+- Salvar backup e PDF pelo aviso de download do Claude ✓
+- Fica de fora: gravar áudio (o Claude não libera o microfone para páginas), uso sem internet e compartilhar com outras pessoas
+

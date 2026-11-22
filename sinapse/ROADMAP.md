@@ -23,7 +23,7 @@
 ## Fase 2: estudo ✓
 Flashcards ✓, perguntas e respostas ✓, repetição espaçada (Errei, Difícil, Bom, Fácil) ✓, testes de múltipla escolha ✓, estudar pelas próprias anotações (modo revisão que cobre o marca-texto) ✓, transformar anotações em cartões (definições, mapas mentais, PDFs e marca-texto) ✓, cartão a partir de uma seleção do laço ✓
 
-## Fase 3: nuvem (Supabase) ◐ pronta no app, falta ligar o projeto (veja NUVEM.md)
+## Fase 3: nuvem (Supabase) ✓ (ligada; configuração em NUVEM.md)
 Login pelo e-mail (link ou código) ✓, sincronizar entre aparelhos ✓, guardar na nuvem (cadernos, páginas, cartões, pastas, PDFs, fotos e áudios) ✓, compartilhar por link (ver, comentar ou editar) ✓, comentários ✓, colaboração em tempo real com junção de edições simultâneas e presença ✓, remover pessoas e desativar links ✓
 Planos pagos: fora do plano. O Sinapse é para uso próprio.
 

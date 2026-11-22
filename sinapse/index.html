@@ -262,6 +262,7 @@ mark{background:linear-gradient(transparent 35%,#FFD6EC 35%);color:inherit;borde
 .rec-pill i{width:10px;height:10px;border-radius:50%;background:#FF4F7B;animation:recblink 1.2s ease-in-out infinite}
 @keyframes recblink{50%{opacity:.25}}
 #btnMic.rec{background:#FF4F7B;color:#fff}
+#btnFinger .slash{display:none}#btnFinger.only .slash{display:inline}
 .player{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom) + 14px);transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:6px;
   width:min(640px,calc(100vw - 24px));padding:6px 10px 6px 6px;border-radius:999px;background:var(--glass-strong);border:1px solid var(--line);box-shadow:var(--shadow);
   -webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
@@ -549,6 +550,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
     </div>
     <div class="bar-right">
       <span id="presence" class="presence" hidden></span>
+      <button id="btnFinger" class="icon" aria-label="Dedo escreve ou só rola" title="Dedo: escreve ou só rola a página"><svg class="i" viewBox="0 0 24 24"><path d="M9 12V5.5a1.5 1.5 0 0 1 3 0V11"/><path d="M12 10.5V9a1.5 1.5 0 0 1 3 0v2"/><path d="M15 10.5a1.5 1.5 0 0 1 3 0V15a6 6 0 0 1-6 6h-.6a5 5 0 0 1-4-2l-2.8-3.8a1.5 1.5 0 0 1 2.3-1.9L9 15"/><path class="slash" d="M3.5 3.5l17 17"/></svg></button>
       <button id="btnAI" class="icon" aria-label="Assistente de IA" title="Assistente de IA"><svg class="i" viewBox="0 0 24 24"><path d="M12 3c.6 4.2 2.8 6.4 7 7-4.2.6-6.4 2.8-7 7-.6-4.2-2.8-6.4-7-7 4.2-.6 6.4-2.8 7-7z"/><path d="M19 15.5c.3 1.6 1 2.3 2.5 2.5-1.5.2-2.2 1-2.5 2.5-.3-1.5-1-2.3-2.5-2.5 1.5-.2 2.2-.9 2.5-2.5z"/></svg></button>
       <button id="btnMic" class="icon" aria-label="Gravar ou ouvir aula" title="Gravar e ouvir aulas"><svg class="i" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M9 21h6"/></svg></button>
       <button id="btnUndo" class="icon" aria-label="Desfazer" title="Desfazer"><svg class="i" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
@@ -1537,6 +1539,12 @@ $('#btnMenu').onclick=editorMenu;
 async function renameCurrent(){const t=await ask('Renomear caderno',S.nb.title);if(t){S.nb.title=t;$('#nbTitle').textContent=t;touchNb()}}
 
 /* ---------- Entrada: caneta, dedo e mouse ---------- */
+// botão do dedo na barra: riscado = o dedo só rola a página; sem risco = o dedo também escreve
+function updateFingerBtn(){const b=$('#btnFinger');if(!b)return;b.classList.toggle('only',!!P.penOnly);b.setAttribute('aria-pressed',P.penOnly?'false':'true');
+  b.title=b.ariaLabel=P.penOnly?'Dedo só rola a página (toque para o dedo também escrever)':'Dedo também escreve (toque para o dedo só rolar a página)'}
+function toggleFinger(){P.penOnly=!P.penOnly;P.penSeen=true;savePrefs();updateFingerBtn();
+  toast(P.penOnly?'Dedo só rola a página ✦ Para escrever, use a caneta.':'Agora o dedo também escreve. Para rolar, use dois dedos.',4500)}
+$('#btnFinger').onclick=toggleFinger;updateFingerBtn();
 function pressureOf(e){return e.pointerType==='pen'?Math.max(.05,e.pressure||.5):.5}
 /* ---------- Régua ---------- */
 const RL={on:false,cx:0,cy:0,a:0,len:2000,h:76,g:null};
@@ -1580,8 +1588,8 @@ function toPage(e,a){
 
 pagesEl.addEventListener('pointerdown',e=>{
   if(e.pointerType==='pen'&&!P.penSeen){
-    P.penSeen=true;P.penOnly=true;savePrefs();
-    toast('Caneta detectada: agora só a caneta escreve e o dedo rola a página. Dá para mudar em “Mais opções”.',6000);
+    P.penSeen=true;P.penOnly=true;savePrefs();updateFingerBtn();
+    toast('Caneta detectada: agora só a caneta escreve e o dedo rola a página. Dá para mudar no botão do dedo, na barra de cima.',6000);
   }
   if(e.target.closest('.tbox'))return;
   if(act||pinch)return;
@@ -2396,7 +2404,7 @@ async function editorMenu(){
   else if(a==='img')$('#imgInput').click();
   else if(a==='pdfIn'){pdfTarget=S.nb;$('#pdfInput').click()}
   else if(a==='pdfOut'){await flushSaves();exportPDF(S.nb.title,S.pages.map(r=>r.d))}
-  else if(a==='penOnly'){P.penOnly=!P.penOnly;P.penSeen=true;savePrefs();toast(P.penOnly?'Só a caneta escreve. O dedo rola a página.':'O dedo também escreve. Para rolar, use dois dedos.')}
+  else if(a==='penOnly')toggleFinger();
   else if(a==='rename')renameCurrent();
   else if(a==='del')deletePage(i);
 }

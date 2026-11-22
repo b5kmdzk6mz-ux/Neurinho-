@@ -574,7 +574,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
   <div id="selBar" class="sel-bar" hidden></div>
   <div id="ruler" class="ruler" hidden><span class="rl-angle">0°</span></div>
   <aside id="aiPanel" class="panel ai-panel" hidden aria-label="Assistente de IA">
-    <div class="panel-head"><h3>Assistente ✦</h3><button class="icon" id="aiCfg" aria-label="Configurar a IA" title="Configurar"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 6.2l2.1 2.1M17.7 15.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 17.8l2.1-2.1M17.7 8.3l2.1-2.1"/></svg></button><button class="icon" id="aiClose" aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="panel-head"><h3>Assistente ✦</h3><button class="icon" id="aiNew" aria-label="Nova conversa" title="Nova conversa"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button class="icon" id="aiCfg" aria-label="Configurar a IA" title="Configurar"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M4.2 6.2l2.1 2.1M17.7 15.7l2.1 2.1M2.5 12h3M18.5 12h3M4.2 17.8l2.1-2.1M17.7 8.3l2.1-2.1"/></svg></button><button class="icon" id="aiClose" aria-label="Fechar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
     <div class="seg ai-scope" role="group" aria-label="Sobre o quê"><button data-s="page" aria-pressed="true">Esta página</button><button data-s="nb" aria-pressed="false">Este caderno</button></div>
     <div class="ai-chips"></div>
     <div class="ai-log" id="aiLog"><p class="ai-empty">Peça um resumo, uma explicação, cartões, um questionário… ou pergunte qualquer coisa sobre suas anotações. A IA lê o texto, a sua letra e as transcrições das aulas.</p></div>
@@ -1291,7 +1291,7 @@ async function openNotebook(id,opt){
   else if(opt&&opt.pageId){const i=S.pages.findIndex(r=>r.d.id===opt.pageId);if(i>0)requestAnimationFrame(()=>{desk.scrollTop=S.pages[i].el.offsetTop-24;updateIndicator()})}
 }
 async function closeNotebook(discard){
-  setReview(false);aiClosePanel();cloudClosed();
+  setReview(false);aiClosePanel(true);cloudClosed();
   commitText();clearSelection();togglePanel(false);toggleRuler(false);closePlayer();if(REC.on)await stopRec();
   if(discard){saveTimers.forEach(t=>clearTimeout(t));saveTimers.clear();clearTimeout(nbTimer);nbDirty=false}else await flushSaves();
   io.disconnect();S.pages.forEach(detach);pagesEl.innerHTML='';desk.classList.remove('boardmode');$('#pageInd').hidden=false;BT=null;
@@ -2924,10 +2924,47 @@ async function selectionImage(s){
 }
 /* ---------- painel ---------- */
 const aiPanel=$('#aiPanel'),aiLog=$('#aiLog');
-function openAI(){commitText();aiPanel.hidden=false;$('#btnAI').setAttribute('aria-pressed','true');if(innerWidth<900)togglePanel(false);renderChips()}
-function aiClosePanel(){aiPanel.hidden=true;$('#btnAI').setAttribute('aria-pressed','false');AIC.msgs=[];aiLog.innerHTML='<p class="ai-empty">Peça um resumo, uma explicação, cartões, um questionário… ou pergunte qualquer coisa sobre suas anotações. A IA lê o texto, a sua letra e as transcrições das aulas.</p>'}
+const AI_EMPTY='<p class="ai-empty">Peça um resumo, uma explicação, cartões, um questionário… ou pergunte qualquer coisa sobre suas anotações. A IA lê o texto, a sua letra e as transcrições das aulas.</p>';
+function openAI(){commitText();aiPanel.hidden=false;$('#btnAI').setAttribute('aria-pressed','true');if(innerWidth<900)togglePanel(false);renderChips();aiRestore()}
+// fechar o painel só esconde; a conversa continua (e fica salva no caderno). Ao trocar de caderno, limpa a tela.
+function aiClosePanel(reset){aiPanel.hidden=true;$('#btnAI').setAttribute('aria-pressed','false');if(reset){AIC.msgs=[];AIC.shown=null;aiLog.innerHTML=AI_EMPTY}}
 $('#btnAI').onclick=()=>aiPanel.hidden?openAI():aiClosePanel();
-$('#aiClose').onclick=aiClosePanel;
+/* ---------- histórico da conversa, salvo em cada caderno ---------- */
+function aiAnswerActs(el,text){
+  el.insertAdjacentHTML('beforeend',`<div class="ai-acts"><button data-a="ins">Inserir na página</button><button data-a="page">Nova página</button><button data-a="cp">Copiar</button></div>`);
+  $('[data-a=ins]',el).onclick=()=>aiInsert(plain(text));
+  $('[data-a=page]',el).onclick=()=>aiNewPage(plain(text));
+  $('[data-a=cp]',el).onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(plain(text)).then(()=>toast('Copiado ✦'),()=>{})};
+}
+function aiRestore(){
+  if(!S.nb||AIC.shown===S.nb.id)return;AIC.shown=S.nb.id;AIC.msgs=[];
+  const h=S.nb.aiLog||[];aiLog.innerHTML=h.length?'':AI_EMPTY;
+  for(const m of h){const el=document.createElement('div');el.className='ai-msg '+(m.r==='u'?'user':'ai');
+    if(m.md!=null){el.innerHTML=md(m.md);el.dataset.md=m.md;aiAnswerActs(el,m.md)}else el.innerHTML=m.h||'';aiLog.append(el)}
+  aiLog.scrollTop=aiLog.scrollHeight;
+}
+let aiSaveT=0;
+function aiSaveLog(){ // guarda o que está na conversa (sem os avisos de "pensando…")
+  if(!S.nb||AIC.shown!==S.nb.id)return; // a tela mostra a conversa de outro caderno (ou foi limpa ao fechar)
+  const out=[];
+  for(const el of aiLog.querySelectorAll('.ai-msg')){
+    if(el.querySelector('.ai-wait')&&el.textContent.length<80)continue;
+    const user=el.classList.contains('user');
+    if(!user&&el.dataset.md!=null)out.push({r:'a',md:el.dataset.md.slice(0,20000)});
+    else{const c=el.cloneNode(true);c.querySelectorAll('.ai-acts').forEach(x=>x.remove());out.push({r:user?'u':'a',h:c.innerHTML.slice(0,8000)})}
+  }
+  const keep=out.slice(-80),same=JSON.stringify(keep)===JSON.stringify(S.nb.aiLog||[]);
+  if(!same){S.nb.aiLog=keep;touchNb()}
+}
+new MutationObserver(()=>{clearTimeout(aiSaveT);aiSaveT=setTimeout(()=>{if(!aiBusy)aiSaveLog();else aiSaveT=setTimeout(aiSaveLog,1500)},800)}).observe(aiLog,{childList:true,subtree:true,characterData:true});
+function aiHistoryText(){
+  const h=(S.nb&&S.nb.aiLog||[]).slice(-16);if(!h.length)return '';
+  const tx=m=>{if(m.md!=null)return m.md;const d=document.createElement('div');d.innerHTML=m.h||'';return d.textContent};
+  return 'Nossa conversa até agora sobre este caderno (para você ter contexto):\n'+h.map(m=>(m.r==='u'?'EU: ':'VOCÊ: ')+tx(m).slice(0,1500)).join('\n');
+}
+$('#aiNew').onclick=async()=>{if(aiBusy)return;if(S.nb&&(S.nb.aiLog||[]).length&&!(await confirmDlg('Começar uma nova conversa?','A conversa atual deste caderno será apagada.','Nova conversa')))return;
+  AIC.msgs=[];aiLog.innerHTML=AI_EMPTY;if(S.nb){S.nb.aiLog=[];touchNb()}};
+$('#aiClose').onclick=()=>aiClosePanel();
 $('#aiCfg').onclick=()=>aiSettings(false);
 aiPanel.querySelectorAll('.ai-scope button').forEach(b=>b.onclick=()=>{aiScope=b.dataset.s;AIC.msgs=[];aiPanel.querySelectorAll('.ai-scope button').forEach(x=>x.setAttribute('aria-pressed',x===b))});
 function renderChips(){
@@ -2973,24 +3010,21 @@ async function aiRun(label,instruction,opt={}){
   addLog('user',esc(label));const el=addLog('ai','<span class="ai-wait">Lendo suas anotações…</span>');
   const fresh=opt.fresh!==false||!AIC.msgs.length,saved=AIC.msgs.slice();
   try{
-    if(fresh){const ctx=opt.context||await buildContext(aiScope);AIC.msgs=[{role:'user',content:[...ctx.blocks,...(opt.extra||[]),{type:'text',text:instruction}]}];
+    if(fresh){const ctx=opt.context||await buildContext(aiScope),hist=opt.free?aiHistoryText():'';AIC.msgs=[{role:'user',content:[...ctx.blocks,...(opt.extra||[]),...(hist?[{type:'text',text:hist}]:[]),{type:'text',text:instruction}]}];
       if(ctx.skipped)el.dataset.note=`(${ctx.skipped} páginas escritas à mão ficaram de fora deste pedido para não ficar grande demais.)`}
     else AIC.msgs.push({role:'user',content:[...(opt.extra||[]),{type:'text',text:instruction}]});
     el.innerHTML='<span class="ai-wait">Pensando…</span>';
     const r=await aiStream(AIC.msgs,{effort:opt.effort||'medium',onText:t=>{el.innerHTML=md(t);aiLog.scrollTop=aiLog.scrollHeight}});
     if(!r){el.innerHTML=aiNone();AIC.msgs=saved;return}
     AIC.msgs.push({role:'assistant',content:r.content});
-    el.innerHTML=md(r.text)+(el.dataset.note?`<div class="ai-meta">${el.dataset.note}</div>`:'')+`<div class="ai-acts"><button data-a="ins">Inserir na página</button><button data-a="page">Nova página</button><button data-a="cp">Copiar</button></div>`;
-    $('[data-a=ins]',el).onclick=()=>aiInsert(plain(r.text));
-    $('[data-a=page]',el).onclick=()=>aiNewPage(plain(r.text));
-    $('[data-a=cp]',el).onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(plain(r.text)).then(()=>toast('Copiado ✦'),()=>{})};
+    el.innerHTML=md(r.text)+(el.dataset.note?`<div class="ai-meta">${el.dataset.note}</div>`:'');el.dataset.md=r.text;aiAnswerActs(el,r.text);
     aiLog.scrollTop=aiLog.scrollHeight;
   }catch(e){console.error(e);el.innerHTML=`<span class="ai-wait">${esc(aiErr(e))}</span>`;AIC.msgs=saved}
   finally{aiBusy=false}
 }
 $('.ai-ask',aiPanel).onsubmit=e=>{
   e.preventDefault();const ta=$('textarea',aiPanel),q=ta.value.trim();if(!q||aiBusy)return;ta.value='';
-  AIACT=AIC.msgs.length?null:{q};aiRun(q,q,{fresh:!AIC.msgs.length});
+  AIACT=AIC.msgs.length?null:{q};aiRun(q,q,{fresh:!AIC.msgs.length,free:true});
 };
 $('textarea',aiPanel).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('.ai-ask',aiPanel).requestSubmit()}});
 function textItem(txt,w){return {t:'text',x:0,y:0,w,txt,f:P.textFont,s:SIZES.text[0],c:P.textColor}}

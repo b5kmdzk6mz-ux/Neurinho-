@@ -2987,7 +2987,7 @@ async function aiLecture(rec){
    e colaboração. O app continua funcionando offline: tudo vive no aparelho
    e a nuvem sincroniza quando há internet e a pessoa entrou na conta.
    ===================================================================== */
-const CLOUD_URL='',CLOUD_KEY='';   // endereço e chave pública do projeto Supabase do Sinapse
+const CLOUD_URL='https://kiokrkhirgjiacsldrdx.supabase.co',CLOUD_KEY='sb_publishable_JCmLnm_Uccd8TV0pVBHDQA_0ONeqw1P';   // endereço e chave pública do projeto Supabase do Sinapse
 const LSJ=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}};
 const LSS=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const cloudCfg=()=>{const o=LSJ('sinapse-cloud',null);return o&&o.url?o:{url:CLOUD_URL,key:CLOUD_KEY}};

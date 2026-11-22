@@ -172,6 +172,13 @@ create policy cm_select on public.comments for select using (public.nb_role(nb) 
 create policy cm_insert on public.comments for insert with check (author = auth.uid() and public.nb_role(nb) in ('owner','edit','comment'));
 create policy cm_update on public.comments for update using (author = auth.uid() or public.nb_role(nb) = 'owner') with check (public.nb_role(nb) is not null);
 
+-- ---------- Permissões (projetos novos do Supabase não liberam as tabelas sozinhos) ----------
+-- só quem entrou na conta; as regras acima decidem o que cada pessoa vê
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.folders, public.notebooks, public.pages, public.cards,
+  public.members, public.shares, public.comments to authenticated;
+grant execute on function public.nb_owner(text), public.nb_role(text), public.join_share(text) to authenticated;
+
 -- ---------- Arquivos (PDFs, fotos, áudios) ----------
 -- caminho: <caderno>/<arquivo> ou u/<usuário>/<arquivo> (imagens dos cartões)
 insert into storage.buckets (id, name, public) values ('sinapse', 'sinapse', false) on conflict (id) do nothing;

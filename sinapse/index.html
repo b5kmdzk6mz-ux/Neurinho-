@@ -349,6 +349,7 @@ mark{background:linear-gradient(transparent 35%,#FFD6EC 35%);color:inherit;borde
 .ai-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .ai-acts button{padding:6px 10px;border-radius:999px;background:var(--surface-2);font-size:12px;font-weight:700;color:var(--accent)}
 .ai-wait{color:var(--muted);font-style:italic}
+.cb-steps{padding-left:22px;margin:8px 0}.cb-steps li{margin:0 0 14px;line-height:1.45}.cb-steps .actions{margin-top:8px}
 .ai-meta{font-size:11px;color:var(--muted);margin-top:6px}
 .ai-ask{display:flex;gap:8px;padding:8px 12px 12px;align-items:flex-end}
 .ai-ask textarea{flex:1;min-height:44px;max-height:120px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:10px 12px;font:inherit;font-size:14px;resize:none}
@@ -2721,24 +2722,89 @@ const AI_SYS=`Você é o assistente de estudos do Sinapse, um app de cadernos à
 Use as anotações enviadas (texto digitado, imagens das páginas com a letra da pessoa, PDFs e transcrições de aulas) como fonte principal. Se algo não estiver nas anotações, diga isso; se for útil, complemente com conhecimento geral deixando claro que veio de fora.
 Formate para estudar: títulos curtos, listas e **negrito** nos conceitos-chave. Não use LaTeX: escreva matemática em texto simples (x², √, a/b, ×, ÷, ≤).`;
 const BASEP={model:IAMODEL,betas:['server-side-fallback-2026-07-01'],fallbacks:'default'};
+// dois jeitos de usar a IA: 'app' (o app do Claude da própria pessoa, com a assinatura dela) ou 'key' (chave da API)
+const IAMODE='sinapse.iamode';
+const iaMode=()=>{let m='';try{m=localStorage.getItem(IAMODE)||''}catch(e){}return m||(iaKey()?'key':'')};
+const iaSetMode=m=>{try{localStorage.setItem(IAMODE,m)}catch(e){}};
 async function aiSettings(required){
-  const cur=iaKey();
+  const cur=iaKey(),mode=iaMode();
   const r=await openDlg(`<h2>Inteligência artificial ✦</h2>
-    <p>O Sinapse usa o Claude, da Anthropic, com a <b>sua própria chave de API</b>. Cada pedido é cobrado na sua conta da Anthropic (console.anthropic.com). A chave fica salva só neste aparelho e é a mesma do Neurinho.</p>
-    ${required?'<p>Para usar a IA, cole sua chave abaixo.</p>':''}
-    <form><label class="f" for="aiKey">Chave da API</label><input id="aiKey" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(cur)}" style="width:100%;min-height:48px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 16px;font:inherit">
+    ${required?'<p>Escolha como o Sinapse vai usar o Claude:</p>':''}
+    <div class="menu">
+      <button type="button" data-m="app"><span><span>Com o app do Claude (sua assinatura)</span><span class="sub">Sem custo extra. O Sinapse prepara o pedido, você envia no app do Claude e cola a resposta de volta.</span></span><span class="chk ${mode==='app'?'on':''}" aria-hidden="true"></span></button>
+      <button type="button" data-m="key"><span><span>Com uma chave da API</span><span class="sub">Automático, direto no Sinapse. Cobrado à parte na sua conta da Anthropic (console.anthropic.com).</span></span><span class="chk ${mode==='key'?'on':''}" aria-hidden="true"></span></button>
+    </div>
+    <form data-kf ${mode==='key'?'':'hidden'}><label class="f" for="aiKey">Chave da API</label><input id="aiKey" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(cur)}" style="width:100%;min-height:48px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 16px;font:inherit">
+    <p class="sub" style="font-size:.85rem;opacity:.75">A chave fica salva só neste aparelho e é a mesma do Neurinho.</p>
     <div class="actions">${cur?'<button type="button" class="btn" data-rm style="color:var(--danger);margin-right:auto">Remover chave</button>':''}<button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Salvar</button></div></form>`,
-    (d,done)=>{$('[data-x]',d).onclick=()=>done(null);const rm=$('[data-rm]',d);if(rm)rm.onclick=()=>done({rm:true});
-      $('form',d).onsubmit=e=>{e.preventDefault();done({k:$('#aiKey',d).value.trim()})};setTimeout(()=>$('#aiKey',d).focus(),60)});
-  if(!r)return !!iaKey();
-  if(r.rm){iaSet('');toast('Chave removida deste aparelho.');return false}
+    (d,done)=>{const kf=$('[data-kf]',d);
+      $('[data-m=app]',d).onclick=()=>done({mode:'app'});
+      $('[data-m=key]',d).onclick=()=>{kf.hidden=false;d.querySelectorAll('[data-m] .chk').forEach(c=>c.classList.toggle('on',c.closest('[data-m]').dataset.m==='key'));setTimeout(()=>$('#aiKey',d).focus(),60)};
+      $('[data-x]',d).onclick=()=>done(null);const rm=$('[data-rm]',d);if(rm)rm.onclick=()=>done({rm:true});
+      kf.onsubmit=e=>{e.preventDefault();done({k:$('#aiKey',d).value.trim()})}});
+  if(!r)return !!iaMode();
+  if(r.mode==='app'){iaSetMode('app');toast('Pronto ✦ A IA vai usar o app do Claude.');return true}
+  if(r.rm){iaSet('');iaSetMode('');toast('Chave removida deste aparelho.');return false}
   if(!/^sk-ant-/.test(r.k)){toast('Essa não parece uma chave da Anthropic (começa com sk-ant-).',5000);return false}
-  iaSet(r.k);toast('Chave salva ✦');return true;
+  iaSet(r.k);iaSetMode('key');toast('Chave salva ✦');return true;
 }
+async function aiReady(){return !!iaMode()||await aiSettings(true)}
 async function aiClient(){
   if(!iaKey()&&!(await aiSettings(true)))return null;
+  if(!iaKey())return null;
   if(!AIM)AIM=await import('../vendor/anthropic-sdk.mjs');
   return new AIM.Anthropic({apiKey:iaKey(),dangerouslyAllowBrowser:true});
+}
+const aiNone=()=>'<span class="ai-wait">'+(iaMode()==='app'?'Pedido cancelado.':'A IA precisa ser configurada. Toque em ⚙.')+'</span>';
+/* ---------- ponte com o app do Claude ---------- */
+function schemaSample(sc){
+  if(!sc)return null;if(sc.type==='object'){const o={};for(const k of Object.keys(sc.properties||{}))o[k]=schemaSample(sc.properties[k]);return o}
+  if(sc.type==='array')return [schemaSample(sc.items)];if(sc.type==='integer'||sc.type==='number')return 0;if(sc.type==='boolean')return false;return '…';
+}
+function parseLooseJSON(t){
+  t=String(t||'').trim();const f=t.match(/```(?:json)?\s*([\s\S]*?)```/i);if(f)t=f[1].trim();
+  const a=t.indexOf('{'),b=t.lastIndexOf('}');if(a<0||b<a)throw new Error('sem JSON');
+  return JSON.parse(t.slice(a,b+1));
+}
+const b64File=(b64,name,type)=>{const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new File([u],name,{type})};
+async function claudeBridge(messages,schema){
+  hideToast();
+  const texts=[],imgs=[];
+  for(const m of messages){const parts=typeof m.content==='string'?[{type:'text',text:m.content}]:m.content;
+    const t=[];for(const b of parts){if(b.type==='text')t.push(b.text);else if(b.type==='image'&&m.role==='user')imgs.push(b);}
+    if(t.length)texts.push((messages.length>1?(m.role==='user'?'EU: ':'VOCÊ (Claude): '):'')+t.join('\n'))}
+  let prompt=AI_SYS+'\n\n'+texts.join('\n\n');
+  if(imgs.length)prompt+=`\n\n(Anexei ${imgs.length===1?'a imagem':'as '+imgs.length+' imagens'} das páginas do caderno.)`;
+  if(schema)prompt+='\n\nResponda SOMENTE com um bloco de código JSON válido, sem texto antes ou depois, exatamente neste formato:\n```json\n'+JSON.stringify(schemaSample(schema),null,1)+'\n```';
+  const files=imgs.map((b,i)=>b64File(b.source.data,`sinapse-pagina-${i+1}.${b.source.media_type==='image/png'?'png':'jpg'}`,b.source.media_type));
+  return openDlg(`<h2>Pedir ao Claude ✦</h2>
+    <ol class="cb-steps">
+      <li><b>Copie o pedido</b> e cole numa conversa nova do app do Claude.
+        <div class="actions" style="justify-content:flex-start"><button type="button" class="btn primary" data-cp>Copiar e abrir o Claude</button><button type="button" class="btn" data-cp2>Só copiar</button></div></li>
+      ${files.length?`<li><b>Mande ${files.length===1?'a imagem da página':'as '+files.length+' imagens das páginas'}</b> na mesma conversa (é onde está a sua letra).
+        <div class="actions" style="justify-content:flex-start"><button type="button" class="btn" data-sh>Compartilhar ${files.length===1?'imagem':'imagens'}</button></div></li>`:''}
+      <li><b>Copie a resposta</b> do Claude${schema?' (toque em copiar no bloco de código)':''} e cole aqui:
+        <textarea data-ans rows="5" placeholder="Cole aqui a resposta do Claude" style="width:100%;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:12px 16px;font:inherit;margin-top:8px"></textarea>
+        <p data-er style="color:var(--danger)" hidden></p></li>
+    </ol>
+    <details style="margin:6px 0"><summary>Ver o pedido</summary><textarea readonly rows="6" style="width:100%;font:inherit;font-size:.8rem;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:8px">${esc(prompt)}</textarea></details>
+    <div class="actions"><button type="button" class="btn" data-x>Cancelar</button><button type="button" class="btn" data-paste>Colar</button><button type="button" class="btn primary" data-ok>Pronto</button></div>`,
+    (d,done)=>{
+      const ans=$('[data-ans]',d),er=$('[data-er]',d);
+      const copy=()=>{if(navigator.clipboard)navigator.clipboard.writeText(prompt).then(()=>toast('Pedido copiado ✦ Cole no Claude.'),()=>toast('Não consegui copiar. Abra “Ver o pedido” e copie de lá.',5000));else toast('Abra “Ver o pedido” e copie de lá.',5000)};
+      $('[data-cp]',d).onclick=()=>{copy();window.open('https://claude.ai/new','_blank')};
+      $('[data-cp2]',d).onclick=copy;
+      const sh=$('[data-sh]',d);if(sh)sh.onclick=async()=>{
+        try{if(navigator.canShare&&navigator.canShare({files})){await navigator.share({files});return}}catch(e){if(e&&e.name==='AbortError')return}
+        for(const f of files){const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=f.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+        toast('Imagens salvas. Anexe no Claude pelo clipe 📎.',5000)};
+      $('[data-paste]',d).onclick=async()=>{try{ans.value=await navigator.clipboard.readText()}catch(e){toast('Toque e segure na caixa para colar.')}};
+      $('[data-x]',d).onclick=()=>done(null);
+      $('[data-ok]',d).onclick=()=>{const v=ans.value.trim();if(!v){er.textContent='Cole a resposta do Claude primeiro.';er.hidden=false;return}
+        if(!schema){done({text:v});return}
+        try{const o=parseLooseJSON(v);const miss=(schema.required||[]).filter(k=>!(k in o));if(miss.length)throw new Error('faltou '+miss.join(', '));done({json:o})}
+        catch(e){er.textContent='A resposta não veio no formato certo. Copie só o bloco de código que começa com { e cole de novo.';er.hidden=false}};
+    },true);
 }
 function aiErr(e){
   const A=AIM&&AIM.Anthropic;
@@ -2754,6 +2820,8 @@ function aiErr(e){
   return 'Algo deu errado: '+(e&&e.message||e);
 }
 async function aiStream(messages,{effort='medium',onText}={}){
+  if(!(await aiReady()))return null;
+  if(iaMode()==='app'){const r=await claudeBridge(messages,null);return r?{text:r.text,content:[{type:'text',text:r.text}]}:null}
   const c=await aiClient();if(!c)return null;
   const st=c.beta.messages.stream({...BASEP,max_tokens:64000,system:AI_SYS,output_config:{effort},messages});
   let txt='';
@@ -2763,6 +2831,8 @@ async function aiStream(messages,{effort='medium',onText}={}){
   return {text:txt||msg.content.filter(b=>b.type==='text').map(b=>b.text).join(''),content:msg.content,usage:msg.usage};
 }
 async function aiJSON(content,schema,{effort='medium'}={}){
+  if(!(await aiReady()))return null;
+  if(iaMode()==='app'){const r=await claudeBridge([{role:'user',content}],schema);return r?r.json:null}
   const c=await aiClient();if(!c)return null;
   const msg=await c.beta.messages.create({...BASEP,max_tokens:16000,system:AI_SYS,output_config:{effort,format:{type:'json_schema',schema}},messages:[{role:'user',content}]});
   if(msg.stop_reason==='refusal')throw Object.assign(new Error('refusal'),{refusal:true});
@@ -2856,7 +2926,7 @@ async function aiRun(label,instruction,opt={}){
     else AIC.msgs.push({role:'user',content:[...(opt.extra||[]),{type:'text',text:instruction}]});
     el.innerHTML='<span class="ai-wait">Pensando…</span>';
     const r=await aiStream(AIC.msgs,{effort:opt.effort||'medium',onText:t=>{el.innerHTML=md(t);aiLog.scrollTop=aiLog.scrollHeight}});
-    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API. Toque em ⚙ para configurar.</span>';AIC.msgs=saved;return}
+    if(!r){el.innerHTML=aiNone();AIC.msgs=saved;return}
     AIC.msgs.push({role:'assistant',content:r.content});
     el.innerHTML=md(r.text)+(el.dataset.note?`<div class="ai-meta">${el.dataset.note}</div>`:'')+`<div class="ai-acts"><button data-a="ins">Inserir na página</button><button data-a="page">Nova página</button><button data-a="cp">Copiar</button></div>`;
     $('[data-a=ins]',el).onclick=()=>aiInsert(plain(r.text));
@@ -2887,7 +2957,7 @@ async function aiCards(){
   try{const ctx=await buildContext(aiScope);
     const r=await aiJSON([...ctx.blocks,{type:'text',text:'Crie de 5 a 15 cartões de estudo (flashcards) com o que é mais importante nessas anotações. Pergunta curta e direta; resposta objetiva, de até 3 linhas.'}],
       obj({cartoes:{type:'array',items:obj({pergunta:{type:'string'},resposta:{type:'string'}})}}));
-    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+    if(!r){el.innerHTML=aiNone();return}
     const list=r.cartoes||[];el.innerHTML=`<p>Criei <b>${list.length}</b> cartões.</p><ul>${list.slice(0,6).map(c=>`<li><b>${esc(c.pergunta)}</b><br>${esc(c.resposta)}</li>`).join('')}</ul>${list.length>6?'<p>…</p>':''}<div class="ai-acts"><button data-a="save">Guardar ${list.length} cartões</button></div>`;
     $('[data-a=save]',el).onclick=async()=>{const pid=S.pages[S.cur].d.id;for(const c of list)await DB.put('cards',{id:uid(),nb:S.nb.id,q:c.pergunta,a:c.resposta,src:aiScope==='page'?{p:pid}:null,key:'t:'+c.pergunta+'|'+c.resposta,created:Date.now(),due:Date.now(),reps:0,ivl:0,ease:2.5});
       updateStudyBtn();el.querySelector('.ai-acts').innerHTML='<button data-a="study">Estudar agora</button>';toast(list.length+' cartões guardados ✦');
@@ -2899,7 +2969,7 @@ async function aiQuiz(){
   try{const ctx=await buildContext(aiScope);
     const r=await aiJSON([...ctx.blocks,{type:'text',text:'Crie um questionário de 6 a 10 questões de múltipla escolha sobre essas anotações, no estilo de prova. Cada questão com 4 alternativas plausíveis e só uma correta, e uma explicação curta de por que ela é a certa.'}],
       obj({questoes:{type:'array',items:obj({pergunta:{type:'string'},alternativas:{type:'array',items:{type:'string'}},correta:{type:'integer'},explicacao:{type:'string'}})}}),{effort:'medium'});
-    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+    if(!r){el.innerHTML=aiNone();return}
     const qs=(r.questoes||[]).filter(q=>q.alternativas&&q.alternativas.length>=2&&q.correta>=0&&q.correta<q.alternativas.length)
       .map(q=>({c:{q:q.pergunta,a:q.alternativas[q.correta]},opts:q.alternativas,exp:q.explicacao}));
     el.innerHTML=`<p>Questionário pronto: <b>${qs.length}</b> questões.</p><div class="ai-acts"><button data-a="go">Começar</button></div>`;
@@ -2913,7 +2983,7 @@ async function aiReadHandwriting(){
   try{let n=0;
     for(const i of idx){const rt=S.pages[i];el.innerHTML=`<span class="ai-wait">Lendo a página ${i+1}… (${++n} de ${idx.length})</span>`;
       const r=await aiJSON([{type:'image',source:{type:'base64',media_type:'image/jpeg',data:await pageJPEG(rt.d,1400)}},{type:'text',text:'Transcreva fielmente todo o texto escrito à mão nesta página de caderno, na ordem de leitura, mantendo quebras de linha. Inclua fórmulas em texto simples. Não resuma nem corrija.'}],obj({texto:{type:'string'}}));
-      if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+      if(!r){el.innerHTML=aiNone();return}
       rt.d.ocr=r.texto||'';save(rt);}
     const last=S.pages[idx[idx.length-1]].d.ocr||'';
     el.innerHTML=`<p>Pronto ✦ Li ${idx.length} ${idx.length===1?'página':'páginas'}. Agora a <b>busca encontra o que você escreveu à mão</b>, e a IA entende melhor suas anotações.</p>${aiScope==='page'?`<p style="white-space:pre-wrap">${esc(last.slice(0,1200))}</p><div class="ai-acts"><button data-a="ins">Inserir como texto</button></div>`:''}`;
@@ -2926,7 +2996,7 @@ async function aiSpell(sel){
   if(aiBusy)return;aiBusy=true;openAI();addLog('user','Corrigir ortografia');const el=addLog('ai','<span class="ai-wait">Revisando…</span>');
   try{const r=await aiJSON([{type:'text',text:'Corrija ortografia, acentuação e gramática destes textos em português, sem mudar o sentido nem o estilo. Devolva cada um com o mesmo número.\n'+JSON.stringify(items.map((st,i)=>({n:i,texto:st.txt})))}],
       obj({itens:{type:'array',items:obj({n:{type:'integer'},texto:{type:'string'}})}}),{effort:'low'});
-    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+    if(!r){el.innerHTML=aiNone();return}
     const acts=[];for(const it of r.itens||[]){const st=items[it.n];if(!st||!it.texto||it.texto===st.txt)continue;
       const from={txt:st.txt,x:st.x,y:st.y,w:st.w,h:st.h};st.txt=it.texto;if(st.t==='node')sizeNode(st);acts.push({t:'props',rt,st,from,to:{txt:st.txt,x:st.x,y:st.y,w:st.w,h:st.h}})}
     if(acts.length){pushUndo({t:'batch',rt,acts});renderPage(rt);save(rt)}
@@ -2964,7 +3034,7 @@ async function aiIllustration(){
   const q=await ask('O que desenhar?','','Criar');if(!q)return;if(aiBusy)return;aiBusy=true;openAI();
   addLog('user','Ilustração: '+esc(q));const el=addLog('ai','<span class="ai-wait">Desenhando…</span>');
   try{const r=await aiJSON([{type:'text',text:`Crie uma ilustração ou diagrama didático em SVG para um caderno de estudos: “${q}”. Estilo limpo e fofo, traço ameixa (#2A1B3D) e cores pastel (lilás #D9C6FF, rosa #FFC2DD, pêssego #FFD9BD, azul #C7D6FF). Use viewBox="0 0 800 600", sem scripts, sem imagens externas, com rótulos em português em fonte sans-serif.`}],obj({svg:{type:'string'}}),{effort:'medium'});
-    if(!r){el.innerHTML='<span class="ai-wait">A IA precisa da sua chave da API.</span>';return}
+    if(!r){el.innerHTML=aiNone();return}
     let svg=(r.svg||'').replace(/<script[\s\S]*?<\/script>/gi,'');if(!/xmlns=/.test(svg))svg=svg.replace('<svg','<svg xmlns="http://www.w3.org/2000/svg"');
     const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'})),im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
     const W=1200,H=Math.round(W*(im.naturalHeight||600)/(im.naturalWidth||800)),cv=document.createElement('canvas');cv.width=W;cv.height=H;const x=cv.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(im,0,0,W,H);URL.revokeObjectURL(url);

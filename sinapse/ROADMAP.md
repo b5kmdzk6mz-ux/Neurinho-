@@ -27,6 +27,6 @@ Flashcards ✓, perguntas e respostas ✓, repetição espaçada (Errei, Difíci
 Login pelo e-mail (link ou código) ✓, sincronizar entre aparelhos ✓, guardar na nuvem (cadernos, páginas, cartões, pastas, PDFs, fotos e áudios) ✓, compartilhar por link (ver, comentar ou editar) ✓, comentários ✓, colaboração em tempo real com junção de edições simultâneas e presença ✓, remover pessoas e desativar links ✓
 Planos pagos: fora do plano. O Sinapse é para uso próprio.
 
-## Fase 4: inteligência artificial ✓ (com a chave da própria pessoa, a mesma do Neurinho)
+## Fase 4: inteligência artificial ✓ (pelo app do Claude da própria pessoa, sem custo extra, ou com uma chave da API)
 Resumir ✓, perguntar sobre os próprios cadernos (conversa) ✓, explicar ✓, gerar questionários ✓, gerar cartões ✓, corrigir ortografia ✓, resolver problemas de matemática passo a passo ✓, reorganizar e reescrever ✓, converter escrita à mão em texto na fonte escolhida ✓, ler a letra das páginas para a busca ✓, transcrever aulas ao vivo (reconhecimento de fala do aparelho) ✓, resumir a aula ✓, localizar nas transcrições ✓, gerar ilustrações e diagramas (SVG) ✓
 

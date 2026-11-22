@@ -3151,7 +3151,8 @@ const cloudCfg=()=>{const o=LSJ('sinapse-cloud',null);return o&&o.url?o:{url:CLO
 let SB=null,CU=null;
 const SY={applying:0,out:LSJ('sinapse-out',{}),up:new Set(LSJ('sinapse-up',[])),last:LSJ('sinapse-last',{}),roles:LSJ('sinapse-roles',{}),owner:LSJ('sinapse-owner',null),
   lastOk:LSJ('sinapse-lastok',0),state:'off',t:0,busy:false,again:false,blobDirty:true};
-const saveSY=()=>{LSS('sinapse-out',SY.out);LSS('sinapse-up',[...SY.up]);LSS('sinapse-last',SY.last);LSS('sinapse-roles',SY.roles);LSS('sinapse-owner',SY.owner);LSS('sinapse-lastok',SY.lastOk)};
+SY.up2=new Set(LSJ('sinapse-up2',[]));
+const saveSY=()=>{LSS('sinapse-out',SY.out);LSS('sinapse-up',[...SY.up]);LSS('sinapse-up2',[...SY.up2]);LSS('sinapse-last',SY.last);LSS('sinapse-roles',SY.roles);LSS('sinapse-owner',SY.owner);LSS('sinapse-lastok',SY.lastOk)};
 const SYNCED={folders:1,notebooks:1,pages:1,cards:1},ORDER=['folders','notebooks','pages','cards'];
 const roleOf=id=>SY.roles[id]||'owner',canEdit=id=>['owner','edit'].includes(roleOf(id));
 {const put=DB.put,del=DB.del;DB._put=put;DB._del=del;
@@ -3205,7 +3206,7 @@ async function loginWith(email,v){
 }
 async function afterLogin(){
   if(SY.owner!==CU.id){ // primeira vez nesta conta neste aparelho: sobe tudo
-    SY.owner=CU.id;SY.last={};SY.up=new Set();SY.roles={};SY.out={};
+    SY.owner=CU.id;SY.last={};SY.up=new Set();SY.up2=new Set();SY.roles={};SY.out={};
     for(const st of ORDER)for(const r of await DB.all(st))SY.out[st+':'+r.id]={s:st,id:r.id,nb:r.nb||null,del:false};
     saveSY();
   }
@@ -3218,7 +3219,7 @@ async function cloudSync(pushOnly){
   if(IN_CLAUDE?!CS.ready:(!SB||!CU))return;if(SY.busy){SY.again=true;return}
   if(!navigator.onLine){setCloudState('offline');return}
   SY.busy=true;setCloudState('sync');
-  try{if(S.nb)await flushSaves();if(IN_CLAUDE){await csPull();await csPush()}else{await pull();await push()}SY.lastOk=Date.now();setCloudState('ok')}
+  try{if(S.nb)await flushSaves();if(IN_CLAUDE){if(MS.on){await msPull();await msPush()}else{await csPull();await csPush()}}else{await pull();await push()}SY.lastOk=Date.now();setCloudState('ok')}
   catch(e){console.error('sync',e);setCloudState('erro',e);if(IN_CLAUDE&&e&&['resource_exhausted','unavailable'].includes(e.code)){clearTimeout(SY.t);SY.t=setTimeout(()=>cloudSync(),20000)}}
   finally{SY.busy=false;saveSY();if(SY.again){SY.again=false;schedSync(600)}}
 }
@@ -3271,6 +3272,23 @@ async function pushBlobs(){
     if(error&&!/exist|duplicate/i.test(error.message||''))throw error;
     SY.up.add(bid);saveSY();
   }
+  // cópia no banco, para o Sinapse dentro do Claude (o conector não enxerga o Storage)
+  for(const [bid,path] of m){
+    if(SY.up2.has(bid))continue;const nbid=path.split('/')[0];if(nbid!=='u'&&!canEdit(nbid))continue;
+    const rec=await DB.get('blobs',bid);if(!rec)continue;
+    const b64=(await blobToData(rec.blob)).split(',')[1]||'',n=Math.max(1,Math.ceil(b64.length/BLOB_PART));
+    const rows=[];for(let i=0;i<n;i++)rows.push({id:bid,part:i,parts:n,owner:CU.id,nb:nbid==='u'?null:nbid,mime:rec.blob.type||'application/octet-stream',b64:b64.slice(i*BLOB_PART,(i+1)*BLOB_PART)});
+    for(const r of rows){const {error}=await SB.from('blobs').upsert([r],{onConflict:'id,part'});
+      if(error){if(/relation|does not exist|schema cache/i.test(error.message||'')){console.warn('tabela blobs ainda não existe');return}throw error}}
+    SY.up2.add(bid);saveSY();
+  }
+}
+const BLOB_PART=900000;
+async function blobFromTable(bid){ // monta um arquivo guardado em pedaços na tabela blobs
+  const {data,error}=await SB.from('blobs').select('part,parts,mime,b64').eq('id',bid).order('part',{ascending:true});
+  if(error||!data||!data.length||data.length!==data[0].parts)return null;
+  const bin=atob(data.map(r=>r.b64).join('')),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  return new Blob([u],{type:data[0].mime});
 }
 function mergePage(L,Rm){
   const rNew=(Rm.u||0)>(L.u||0),base=rNew?Rm:L,other=rNew?L:Rm;
@@ -3348,8 +3366,9 @@ async function pull(){
   }
   for(const [bid,path] of need){
     if(await DB.get('blobs',bid))continue;
-    const {data,error}=await SB.storage.from('sinapse').download(path);if(error){console.warn('baixar',path,error);continue}
-    await DB._put('blobs',{id:bid,blob:data});SY.up.add(bid);if(S.nb)S.pages.forEach(rt=>{if(rt.d.bg===bid&&rt.canvas){rt.bgImg=null;rt.bgLoading=false;detach(rt);attach(rt)}});IMG.delete(bid);
+    let {data,error}=await SB.storage.from('sinapse').download(path);
+    if(error||!data){data=await blobFromTable(bid);if(!data){console.warn('baixar',path,error);continue}}
+    await DB._put('blobs',{id:bid,blob:data});SY.up.add(bid);SY.up2.add(bid);if(S.nb)S.pages.forEach(rt=>{if(rt.d.bg===bid&&rt.canvas){rt.bgImg=null;rt.bgLoading=false;detach(rt);attach(rt)}});IMG.delete(bid);
   }
   if(SY.closeOpen){SY.closeOpen=false;SY.reorder=false;if(S.nb){await closeNotebook(true);toast('Esse caderno não está mais disponível para você.',5000)}}
   if(SY.reorder&&S.nb){SY.reorder=false;await reloadOpenPages()}
@@ -3383,6 +3402,7 @@ async function unpackJSON(z,g){
 }
 async function csInit(){
   setCloudState('conn');
+  if(await msInit())return; // com o conector do Supabase ligado, usa a mesma nuvem do app instalado
   let db=null,id=null;
   try{const [d,user]=await Promise.all([claude.use('db'),claude.use('user')]);db=d;id=d&&user?await user.id():null}catch(e){console.warn('nuvem do Claude',e)}
   CS.as=await Promise.resolve(claude.use('assets')).catch(()=>null);
@@ -3477,6 +3497,125 @@ async function csPushBlobs(){
       const up=t.startsWith('audio/')?new Blob([rec.blob],{type:/webm/.test(t)?'video/webm':'video/mp4'}):rec.blob;
       const r=await CS.as.upload(up);await csCol('b').doc(bid).set({a:r.id,url:r.url||'',t})}
     catch(e){if(e&&['too_large','unsupported_type','invalid_request','quota_exceeded'].includes(e.code)){console.warn('arquivo não subiu',bid,e.code);if(e.code==='too_large')toast('Um PDF é grande demais para a nuvem do Claude (máximo 20 MB). Ele continua neste aparelho.',6000);SY.up.add(bid);continue}throw e}
+    SY.up.add(bid);saveSY();
+  }
+}
+/* ---------- Supabase pelo conector do Claude ----------
+   Dentro do Claude a página não pode falar direto com o Supabase, mas pode usar o
+   conector do Supabase da pessoa (execute_sql). Assim o Sinapse do Claude e o app
+   instalado usam a mesma nuvem. Os arquivos vêm da tabela blobs (o conector não vê o Storage). */
+const MS={on:false,proj:(CLOUD_URL.match(/^https:\/\/([a-z0-9]+)\./)||[])[1]};
+const MS_MAX=1200000; // limite de cada pedido ao conector (ele recusa consultas acima de ~2 MB)
+// corta um texto em pedaços sem separar emojis ao meio
+function msSplit(t,n){const out=[];let i=0;while(i<t.length){let j=Math.min(t.length,i+n);if(j<t.length){const c=t.charCodeAt(j-1);if(c>=0xD800&&c<=0xDBFF)j--}out.push(t.slice(i,j));i=j}return out.length?out:['']}
+function msLit(v){if(v==null)return 'null';v=String(v);let t;do{t='q'+Math.random().toString(36).slice(2,8)}while(v.includes('$'+t+'$'));return '$'+t+'$'+v+'$'+t+'$'}
+function msRows(res){
+  const p=res&&res.payload;if(Array.isArray(p))return p;
+  let t=typeof p==='string'?p:(p&&typeof p.result==='string')?p.result:null;
+  if(t==null){t=((res&&res.content)||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');try{const o=JSON.parse(t);if(Array.isArray(o))return o;if(o&&typeof o.result==='string')t=o.result}catch(e){}}
+  const m=String(t).match(/<untrusted-data-([0-9a-f-]+)>/);if(!m)throw Object.assign(new Error('resposta inesperada do conector'),{code:'formato'});
+  const open='<untrusted-data-'+m[1]+'>',close='</untrusted-data-'+m[1]+'>',b=t.indexOf(close),a=t.lastIndexOf(open,b);
+  if(a<0||b<0)throw Object.assign(new Error('resposta inesperada do conector'),{code:'formato'});
+  return JSON.parse(t.slice(a+open.length,b).trim());
+}
+async function msql(q){return msRows(await MS.mcp.callTool('Supabase','execute_sql',{project_id:MS.proj,query:q},{cache:false}))}
+async function msInit(){
+  try{MS.mcp=await claude.use('mcp')}catch(e){MS.mcp=null}
+  if(!MS.mcp||!MS.proj)return false;
+  try{const r=await msql("select coalesce((select owner::text from public.notebooks group by owner order by count(*) desc limit 1),(select id::text from auth.users limit 1)) as o");
+    MS.owner=r[0]&&r[0].o}catch(e){console.warn('conector do Supabase',e);MS.err=e;return false}
+  if(!/^[0-9a-f-]{36}$/.test(MS.owner||''))return false;
+  MS.on=true;
+  if(SY.owner!=='sb:'+MS.owner){ // primeira vez com o conector neste aparelho: sobe o que existe aqui e baixa tudo
+    SY.owner='sb:'+MS.owner;SY.last={};SY.out={};SY.up=new Set();
+    for(const st of ORDER)for(const r of await DB.all(st))SY.out[st+':'+r.id]={s:st,id:r.id,nb:r.nb||null,del:false};
+    saveSY();
+  }
+  CS.ready=true;setCloudState('ok');schedSync(300);
+  addEventListener('online',()=>schedSync(300));
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)schedSync(500)});
+  setInterval(()=>{if(!document.hidden)schedSync(0)},45e3);
+  return true;
+}
+async function msPull(){
+  const O=MS.owner,need=new Map();SY.changed=false;
+  const mine=`(select id from public.notebooks where owner='${O}' or id in (select nb from public.members where user_id='${O}'))`;
+  const since=st=>msLit(SY.last[st]||'1970-01-01 00:00:00+00')+'::timestamptz';
+  const sel=(st,where,withData)=>`(select coalesce(json_agg(x order by x.ts),'[]'::json) from (select id,${st==='pages'||st==='cards'?'nb':'null::text nb'},${withData?'data::text':'null::text'} d,deleted,updated_at ts,updated_at::text t,length(data::text) z from public.${st} where ${where} and updated_at>${since(st)} order by updated_at limit 2000) x)`;
+  const r=await msql(`select json_build_object('folders',${sel('folders',`owner='${O}'`,1)},'notebooks',${sel('notebooks',`id in ${mine}`,1)},'pages',${sel('pages',`nb in ${mine}`,0)},'cards',${sel('cards',`owner='${O}'`,1)})::text as r`);
+  const all=JSON.parse(r[0].r);
+  for(const st of ORDER){
+    const list=all[st]||[];if(!list.length)continue;
+    if(st==='pages')await msPageData(list.filter(x=>!x.deleted));
+    for(const x of list){
+      if(!x.deleted&&x.d==null)break; // não deu para baixar: tenta na próxima sincronização, a partir daqui
+      await applyRow(st,{id:x.id,nb:x.nb,deleted:!!x.deleted,data:x.deleted?{}:JSON.parse(x.d),owner:O},need);
+      SY.last[st]=x.t;
+    }
+    saveSY();
+  }
+  for(const bid of need.keys())await msFetchBlob(bid);
+  if(SY.closeOpen){SY.closeOpen=false;SY.reorder=false;if(S.nb){await closeNotebook(true);toast('Esse caderno foi apagado em outro aparelho.',5000)}}
+  if(SY.reorder&&S.nb){SY.reorder=false;await reloadOpenPages()}
+  if(SY.changed&&!$('#library').hidden)renderLibrary();
+}
+async function msPageData(list){ // baixa o conteúdo das páginas em lotes que cabem num pedido
+  let batch=[],size=0;
+  const flush=async()=>{if(!batch.length)return;const rows=await msql(`select id,data::text d,updated_at::text t from public.pages where id in (${batch.map(x=>msLit(x.id)).join(',')})`);
+    const m=new Map(rows.map(r=>[r.id,r]));for(const x of batch){const r=m.get(x.id);if(r&&r.t===x.t)x.d=r.d}batch=[];size=0};
+  for(const x of list){
+    if(x.z>MS_MAX){await flush();let d='';
+      for(let a=1;a<=x.z;a+=MS_MAX){const r=await msql(`select substr(data::text,${a},${MS_MAX}) s,updated_at::text t from public.pages where id=${msLit(x.id)}`);if(!r[0]||r[0].t!==x.t){d=null;break}d+=r[0].s}
+      if(d!=null)x.d=d;continue}
+    if(size+x.z>MS_MAX)await flush();batch.push(x);size+=x.z;
+  }
+  await flush();
+}
+async function msFetchBlob(bid){
+  if(await DB.get('blobs',bid))return;
+  const meta=await msql(`select part,parts,mime from public.blobs where id=${msLit(bid)} order by part`);
+  if(!meta.length||meta.length!==meta[0].parts)return; // ainda não chegou (o app instalado manda na próxima sincronização dele)
+  let b64='';for(const m of meta){const r=await msql(`select b64 from public.blobs where id=${msLit(bid)} and part=${m.part|0}`);if(!r[0])return;b64+=r[0].b64}
+  const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  await DB._put('blobs',{id:bid,blob:new Blob([u],{type:meta[0].mime})});SY.up.add(bid);saveSY();
+  if(S.nb)S.pages.forEach(rt=>{if(rt.d.bg===bid&&rt.canvas){rt.bgImg=null;rt.bgLoading=false;detach(rt);attach(rt)}});IMG.delete(bid);
+  if(S.nb)S.pages.forEach(rt=>rt.canvas&&renderPage(rt));
+}
+async function msPush(){
+  const O=MS.owner,keys=Object.keys(SY.out);let pushed=false;
+  for(const st of ORDER){
+    const hasNb=st==='pages'||st==='cards',items=keys.filter(k=>k.startsWith(st+':')).map(k=>[k,SY.out[k]]);
+    let vals=[],done=[],size=0;
+    const up=`on conflict (id) do update set data=excluded.data,deleted=excluded.deleted${hasNb?',nb=excluded.nb':''}`;
+    const flush=async()=>{if(!vals.length)return;await msql(`insert into public.${st} (id,owner${hasNb?',nb':''},data,deleted) values ${vals.join(',')} ${up}`);
+      for(const [k,x] of done)if(SY.out[k]===x)delete SY.out[k];saveSY();vals=[];done=[];size=0;pushed=true};
+    for(const [k,x] of items){
+      let rec=null;
+      if(!x.del){const rt=st==='pages'&&S.nb?S.pages.find(r=>r.d.id===x.id):null;rec=rt?rt.d:await DB.get(st,x.id)}
+      if(!rec&&hasNb&&!x.nb){delete SY.out[k];continue}
+      if(rec&&st==='pages'){prepPage(rec);SY.applying++;try{await DB._put('pages',rec)}finally{SY.applying--}}
+      const json=rec?JSON.stringify(clean(rec)):'{}',nb=rec?rec.nb:x.nb;
+      if(json.length>MS_MAX){ // página enorme: sobe em pedaços pela tabela blobs e monta lá
+        await flush();const tmp='~pg~'+x.id,parts=msSplit(json,MS_MAX),n=parts.length;
+        for(let i=0;i<n;i++)await msql(`insert into public.blobs (id,part,parts,owner,nb,mime,b64) values (${msLit(tmp)},${i},${n},'${O}',null,'application/json',${msLit(parts[i])}) on conflict (id,part) do update set b64=excluded.b64,parts=excluded.parts`);
+        await msql(`with ins as (insert into public.${st} (id,owner${hasNb?',nb':''},data,deleted) select ${msLit(x.id)},'${O}'${hasNb?','+msLit(nb):''},string_agg(b64,'' order by part)::jsonb,false from public.blobs where id=${msLit(tmp)} and part<${n} ${up} returning 1) delete from public.blobs where id=${msLit(tmp)}`);
+        if(SY.out[k]===x)delete SY.out[k];saveSY();pushed=true;continue}
+      if(size+json.length>MS_MAX)await flush();
+      vals.push(`(${msLit(x.id)},'${O}'${hasNb?','+msLit(nb):''},${msLit(json)}::jsonb,${rec?'false':'true'})`);done.push([k,x]);size+=json.length+200;
+    }
+    await flush();
+  }
+  if(pushed||SY.blobDirty)await msPushBlobs();
+}
+async function msPushBlobs(){
+  SY.blobDirty=false;const O=MS.owner,ids=new Map();
+  for(const p of await DB.all('pages'))for(const b of blobIdsOf(p))ids.set(b,p.nb);
+  for(const c of await DB.all('cards'))for(const b of [c.qi,c.ai])if(b)ids.set(b,null);
+  for(const nb of await DB.all('notebooks'))for(const r of nb.recs||[])if(r.bid)ids.set(r.bid,nb.id);
+  for(const [bid,nb] of ids){
+    if(SY.up.has(bid))continue;const rec=await DB.get('blobs',bid);if(!rec)continue;
+    const b64=(await blobToData(rec.blob)).split(',')[1]||'',n=Math.max(1,Math.ceil(b64.length/MS_MAX));
+    for(let i=0;i<n;i++)await msql(`insert into public.blobs (id,part,parts,owner,nb,mime,b64) values (${msLit(bid)},${i},${n},'${O}',${msLit(nb)},${msLit(rec.blob.type||'application/octet-stream')},${msLit(b64.slice(i*MS_MAX,(i+1)*MS_MAX))}) on conflict (id,part) do update set b64=excluded.b64,parts=excluded.parts,mime=excluded.mime`);
     SY.up.add(bid);saveSY();
   }
 }
@@ -3586,10 +3725,10 @@ async function cloudDialog(){
   if(IN_CLAUDE){
     if(!CS.ready){await openDlg(`<h2>Nuvem do Claude ☁</h2><p>${SY.state==='local'?'Nesta tela os cadernos ficam só neste aparelho. Abra o Sinapse logado na sua conta do Claude para guardar na nuvem.':'Conectando à sua conta do Claude…'}</p><div class="actions"><button class="btn primary" data-x>Entendi</button></div>`,(d,done)=>{$('[data-x]',d).onclick=()=>done(null)});return}
     const pend=Object.keys(SY.out).length;
-    const a=await menu('☁ Nuvem do Claude',[
+    const a=await menu(MS.on?'☁ Nuvem do Sinapse (Supabase)':'☁ Nuvem do Claude',[
       {id:'sync',label:'Sincronizar agora',sub:SY.lastOk?'Última vez: '+new Date(SY.lastOk).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+(pend?' · '+pend+' alterações para enviar':''):'Ainda não sincronizou'},
       ...(SY.state==='erro'?[{id:'err',label:'Ver o erro',sub:String(SY.err&&(SY.err.code||SY.err.message)||SY.err||'')}]:[]),
-      {id:'info',label:'Como funciona',sub:'Seus cadernos ficam na sua conta do Claude, só para você, e aparecem em todo aparelho onde abrir o Sinapse no Claude.'}
+      {id:'info',label:'Como funciona',sub:MS.on?'Pelo conector do Supabase: os mesmos cadernos do Sinapse instalado. Novidades de outros aparelhos chegam em até um minuto.':'Seus cadernos ficam na sua conta do Claude, só para você, e aparecem em todo aparelho onde abrir o Sinapse no Claude.'}
     ]);
     if(a==='sync')cloudSync();return;
   }

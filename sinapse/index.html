@@ -3255,6 +3255,7 @@ async function push(){
     }
   }
   if(pushed||SY.blobDirty)await pushBlobs();
+  else if(!COPY.on)copyBlobsSoon(await blobPaths());
 }
 async function blobPaths(){
   const m=new Map();
@@ -3267,20 +3268,31 @@ async function pushBlobs(){
   SY.blobDirty=false;const m=await blobPaths();
   for(const [bid,path] of m){
     if(SY.up.has(bid))continue;const nbid=path.split('/')[0];if(nbid!=='u'&&!canEdit(nbid))continue;
-    const rec=await DB.get('blobs',bid);if(!rec)continue;
-    const {error}=await SB.storage.from('sinapse').upload(path,rec.blob,{upsert:true,contentType:rec.blob.type||'application/octet-stream'});
+    let rec;try{rec=await withTimeout(DB.get('blobs',bid),COPY.t.ler,'ler do aparelho')}catch(e){console.warn('arquivo',bid,e);continue}if(!rec)continue;
+    let error;try{({error}=await withTimeout(SB.storage.from('sinapse').upload(path,rec.blob,{upsert:true,contentType:rec.blob.type||'application/octet-stream'}),COPY.t.enviar,'enviar ao Storage'))}catch(e){console.warn('arquivo',bid,e);continue}
     if(error&&!/exist|duplicate/i.test(error.message||''))throw error;
     SY.up.add(bid);saveSY();
   }
-  // cópia no banco, para o Sinapse dentro do Claude (o conector não enxerga o Storage)
+  copyBlobsSoon(m);
+}
+// cópia no banco, para o Sinapse dentro do Claude (o conector não enxerga o Storage).
+// Roda à parte da sincronização, com tempo limite em cada arquivo, e continua de onde parou.
+const withTimeout=(p,ms,what)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error('demorou demais: '+what)),ms))]);
+const COPY={on:false,fails:new Map(),t:{ler:10000,preparar:20000,enviar:60000}};
+function copyBlobsSoon(m){if(COPY.on||!SB||!CU)return;COPY.on=true;copyBlobsToTable(m).catch(e=>console.warn('cópia dos arquivos',e)).finally(()=>{COPY.on=false})}
+async function copyBlobsToTable(m){
   for(const [bid,path] of m){
-    if(SY.up2.has(bid))continue;const nbid=path.split('/')[0];if(nbid!=='u'&&!canEdit(nbid))continue;
-    const rec=await DB.get('blobs',bid);if(!rec)continue;
-    const b64=(await blobToData(rec.blob)).split(',')[1]||'',n=Math.max(1,Math.ceil(b64.length/BLOB_PART));
-    const rows=[];for(let i=0;i<n;i++)rows.push({id:bid,part:i,parts:n,owner:CU.id,nb:nbid==='u'?null:nbid,mime:rec.blob.type||'application/octet-stream',b64:b64.slice(i*BLOB_PART,(i+1)*BLOB_PART)});
-    for(const r of rows){const {error}=await SB.from('blobs').upsert([r],{onConflict:'id,part'});
-      if(error){if(/relation|does not exist|schema cache/i.test(error.message||'')){console.warn('tabela blobs ainda não existe');return}throw error}}
-    SY.up2.add(bid);saveSY();
+    if(SY.up2.has(bid)||(COPY.fails.get(bid)||0)>=3)continue;const nbid=path.split('/')[0];if(nbid!=='u'&&!canEdit(nbid))continue;
+    try{
+      const rec=await withTimeout(DB.get('blobs',bid),COPY.t.ler,'ler do aparelho');if(!rec){SY.up2.add(bid);continue}
+      const b64=(await withTimeout(blobToData(rec.blob),COPY.t.preparar,'preparar')).split(',')[1]||'',n=Math.max(1,Math.ceil(b64.length/BLOB_PART));
+      for(let i=0;i<n;i++){
+        const r={id:bid,part:i,parts:n,owner:CU.id,nb:nbid==='u'?null:nbid,mime:rec.blob.type||'application/octet-stream',b64:b64.slice(i*BLOB_PART,(i+1)*BLOB_PART)};
+        const {error}=await withTimeout(SB.from('blobs').upsert([r],{onConflict:'id,part'}),COPY.t.enviar,'enviar');
+        if(error){if(/relation|does not exist|schema cache/i.test(error.message||'')){console.warn('tabela blobs ainda não existe');return}throw error}
+      }
+      SY.up2.add(bid);saveSY();
+    }catch(e){console.warn('arquivo',bid,e);COPY.fails.set(bid,(COPY.fails.get(bid)||0)+1)}
   }
 }
 const BLOB_PART=900000;

@@ -606,9 +606,9 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
 <input type="file" id="backupInput" accept=".json,application/json" hidden>
 
 <script>
+'use strict';
 // Dentro do Claude (artifact): IA pela assinatura da pessoa e cadernos na nuvem do Claude
 const IN_CLAUDE=!!(window.claude&&typeof window.claude.use==='function');
-'use strict';
 /* =====================================================================
    Sinapse: cadernos para escrever à mão.
    Tudo roda no aparelho: os cadernos ficam no IndexedDB do navegador.
@@ -2739,12 +2739,14 @@ async function aiSettings(required){
       <button type="button" data-m="app"><span><span>Com o app do Claude (sua assinatura)</span><span class="sub">Sem custo extra. O Sinapse prepara o pedido, você envia no app do Claude e cola a resposta de volta.</span></span><span class="chk ${mode==='app'?'on':''}" aria-hidden="true"></span></button>
       <button type="button" data-m="key"><span><span>Com uma chave da API</span><span class="sub">Automático, direto no Sinapse. Cobrado à parte na sua conta da Anthropic (console.anthropic.com).</span></span><span class="chk ${mode==='key'?'on':''}" aria-hidden="true"></span></button>
     </div>
+    <div class="actions" data-top ${mode==='key'?'hidden':''}>${cur?'<button type="button" class="btn" data-rm2 style="color:var(--danger);margin-right:auto">Remover chave</button>':''}<button type="button" class="btn" data-x2>Fechar</button></div>
     <form data-kf ${mode==='key'?'':'hidden'}><label class="f" for="aiKey">Chave da API</label><input id="aiKey" type="password" autocomplete="off" placeholder="sk-ant-…" value="${esc(cur)}" style="width:100%;min-height:48px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 16px;font:inherit">
     <p class="sub" style="font-size:.85rem;opacity:.75">A chave fica salva só neste aparelho e é a mesma do Neurinho.</p>
     <div class="actions">${cur?'<button type="button" class="btn" data-rm style="color:var(--danger);margin-right:auto">Remover chave</button>':''}<button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Salvar</button></div></form>`,
     (d,done)=>{const kf=$('[data-kf]',d);
       $('[data-m=app]',d).onclick=()=>done({mode:'app'});
-      $('[data-m=key]',d).onclick=()=>{kf.hidden=false;d.querySelectorAll('[data-m] .chk').forEach(c=>c.classList.toggle('on',c.closest('[data-m]').dataset.m==='key'));setTimeout(()=>$('#aiKey',d).focus(),60)};
+      $('[data-x2]',d).onclick=()=>done(null);const rm2=$('[data-rm2]',d);if(rm2)rm2.onclick=()=>done({rm:true});
+      $('[data-m=key]',d).onclick=()=>{kf.hidden=false;$('[data-top]',d).hidden=true;d.querySelectorAll('[data-m] .chk').forEach(c=>c.classList.toggle('on',c.closest('[data-m]').dataset.m==='key'));setTimeout(()=>$('#aiKey',d).focus(),60)};
       $('[data-x]',d).onclick=()=>done(null);const rm=$('[data-rm]',d);if(rm)rm.onclick=()=>done({rm:true});
       kf.onsubmit=e=>{e.preventDefault();done({k:$('#aiKey',d).value.trim()})}});
   if(!r)return !!iaMode();
@@ -2759,7 +2761,9 @@ let SMP;
 async function claudeAsk(messages,schema,{onText,effort}={}){
   if(SMP===undefined)SMP=await claude.use('sample');
   if(!SMP)throw Object.assign(new Error('sem IA'),{code:'sampling_disabled'});
-  const lim=await SMP.limits().catch(()=>null),maxI=lim&&lim.images?lim.images.maxCount:0;
+  const lim=await SMP.limits().catch(()=>null),maxI=lim?(lim.images?lim.images.maxCount:0):1;
+  const wantsImg=messages.some(m=>Array.isArray(m.content)&&m.content.some(b=>b.type==='image'));
+  if(wantsImg&&!maxI&&!messages.some(m=>(Array.isArray(m.content)?m.content:[{type:'text',text:m.content}]).some(b=>b.type==='text'&&b.text.length>200)))throw Object.assign(new Error('sem imagens'),{code:'images_unavailable'});
   const turns=[],imgs=[];
   messages.forEach((m,i)=>{
     const parts=typeof m.content==='string'?[{type:'text',text:m.content}]:m.content,t=[];
@@ -2835,7 +2839,7 @@ const SAMPLE_ERR={not_granted:'Você não permitiu que o Sinapse use o Claude. R
   prompt_too_large:'O pedido ficou grande demais. Tente com “Esta página” em vez do caderno inteiro.',refused:'O Claude preferiu não responder a esse pedido. Tente reformular.',
   invalid_json:'A resposta veio num formato inesperado. Tente de novo.',session_expired:'Sua sessão do Claude expirou. Recarregue a página.',image_rejected:'O Claude não aceitou a imagem desta página.',
   upstream_error:'O Claude não respondeu agora. Tente de novo em instantes.',empty_completion:'O Claude não respondeu agora. Tente de novo em instantes.',sampling_disabled:'A IA não está disponível nesta tela do Claude.',
-  cancelled:'Pedido cancelado.'};
+  cancelled:'Pedido cancelado.',images_unavailable:'Esta tela do Claude não deixa mandar a imagem da página, então não dá para ler a letra aqui. Atualize o app do Claude ou abra pelo navegador.'};
 function aiErr(e){
   if(IN_CLAUDE&&e&&e.code)return SAMPLE_ERR[e.code]||('Algo deu errado ('+e.code+'). Tente de novo.');
   const A=AIM&&AIM.Anthropic;
@@ -3118,10 +3122,21 @@ async function cloudInit(){
   SB.auth.onAuthStateChange((ev,ses)=>{const was=CU&&CU.id;CU=ses?ses.user:null;updateCloudBtn();if(CU&&CU.id!==was)afterLogin()});
   let viaLink=false;
   if(!CU&&/access_token=/.test(location.hash)){ // abriu pelo link do e-mail
-    viaLink=true;
-    const err=await loginWith('',location.hash);history.replaceState(null,'',location.pathname);
-    if(!err){const r=await SB.auth.getSession();CU=r.data.session?r.data.session.user:null;if(CU)toast('Pronto ✦ Sincronizando seus cadernos…',4000);else viaLink=false}else viaLink=false
-  }else if(/error_description=/.test(location.hash)){history.replaceState(null,'',location.pathname);toast('O link venceu ou já foi usado. Peça outro.',6000)}
+    const hash=location.hash;history.replaceState(null,'',location.pathname);
+    // no iPhone/iPad o link abre no Safari, e o app da tela de início fica de fora: oferece levar o acesso para lá
+    const where=navigator.standalone===false?await openDlg(`<h2>Pronto, você entrou ✦</h2>
+      <p>O link abriu aqui no <b>Safari</b>. Se você usa o Sinapse instalado na <b>tela de início</b>, ele ainda não entrou.</p>
+      <div class="menu"><button type="button" data-w="app"><span><span>Levar o acesso para o app da tela de início</span><span class="sub">Copia o acesso. Abra o Sinapse da tela de início, toque em ☁ › Já tenho o código ou link e cole.</span></span></button>
+      <button type="button" data-w="here"><span><span>Usar aqui no Safari</span></span></button></div>`,
+      (d,done)=>{$('[data-w=here]',d).onclick=()=>done('here');$('[data-w=app]',d).onclick=()=>{
+        const t='sinapse-acesso '+hash;
+        (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>done('app'),()=>{const ta=document.createElement('textarea');ta.value=t;d.querySelector('.menu').after(ta);ta.select();toast('Copie o texto selecionado e cole no app.',6000)})}}):'here';
+    if(where==='app'){toast('Acesso copiado ✦ Agora abra o Sinapse da tela de início e cole em ☁.',8000)}
+    viaLink=where==='here';
+    const err=viaLink?await loginWith('',hash):null;
+    if(viaLink&&!err){const r=await SB.auth.getSession();CU=r.data.session?r.data.session.user:null;if(CU)toast('Pronto ✦ Sincronizando seus cadernos…',4000);else viaLink=false}else viaLink=false
+  }else if(/error_description=/.test(location.hash)){const why=decodeURIComponent((location.hash.match(/error_description=([^&]+)/)||[])[1]||'').replace(/\+/g,' ');history.replaceState(null,'',location.pathname);
+    toast('O link não funcionou'+(/expired|invalid/i.test(why)?': ele venceu ou já foi usado':'')+'. Peça outro em ☁.',7000)}
   updateCloudBtn();if(CU&&!viaLink)afterLogin();
   const m=location.hash.match(/^#join=([\w-]+)/);if(m){LSS('sinapse-join',m[1]);history.replaceState(null,'',location.pathname);if(!CU)cloudDialog()}
   addEventListener('online',()=>schedSync(300));
@@ -3318,9 +3333,9 @@ async function unpackJSON(z,g){
 }
 async function csInit(){
   setCloudState('conn');
-  const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
-  CS.as=await claude.use('assets').catch(()=>null);
-  const id=db&&user?await user.id():null;
+  let db=null,id=null;
+  try{const [d,user]=await Promise.all([claude.use('db'),claude.use('user')]);db=d;id=d&&user?await user.id():null}catch(e){console.warn('nuvem do Claude',e)}
+  CS.as=await Promise.resolve(claude.use('assets')).catch(()=>null);
   if(!id){setCloudState('local');return}
   CS.db=db;CS.uid=id;CS.base=db.doc('data/users/'+id+'/sinapse');
   if(SY.owner!=='claude:'+id){ // primeira vez nesta conta neste aparelho: sobe tudo
@@ -3368,7 +3383,7 @@ async function csFetchBlob(bid){
   const miss=()=>CS.miss.set(bid,(CS.miss.get(bid)||0)+1);
   const sn=await csCol('b').doc(bid).get();const m=sn.exists?sn.data():null;
   if(!m||!m.a){miss();return}
-  const r=await fetch('/_blob/'+m.a);if(!r.ok){miss();return}
+  let r=null;for(const u of [m.url,'/_blob/'+m.a].filter(Boolean)){try{r=await fetch(u);if(r.ok)break}catch(e){r=null}}if(!r||!r.ok){miss();return}
   const blob=await r.blob();
   await DB._put('blobs',{id:bid,blob:m.t&&blob.type!==m.t?new Blob([blob],{type:m.t}):blob});SY.up.add(bid);CS.miss.delete(bid);saveSY();
   if(S.nb)S.pages.forEach(rt=>{if(rt.d.bg===bid&&rt.canvas){rt.bgImg=null;rt.bgLoading=false;detach(rt);attach(rt)}});IMG.delete(bid);
@@ -3382,12 +3397,13 @@ async function csPush(){
     if(!x.del){const rt=st==='pages'&&S.nb?S.pages.find(r=>r.d.id===x.id):null;rec=rt?rt.d:await DB.get(st,x.id)}
     const prevN=CS.nmap[k]||0,ref=csCol('idx').doc(st+'~'+x.id);
     if(!rec){
-      const u=Date.now();await ref.set({s:st,id:x.id,nb:x.nb||null,u,del:true,n:0,g:0});
+      const u=Date.now();CS.seen[k]=u;await ref.set({s:st,id:x.id,nb:x.nb||null,u,del:true,n:0,g:0});
       for(let i=0;i<prevN;i++)await csCol('c').doc(st+'~'+x.id+'~'+i).delete();
       CS.seen[k]=u;CS.nmap[k]=0;
     }else{
       if(st==='pages'){prepPage(rec);SY.applying++;try{await DB._put('pages',rec)}finally{SY.applying--}}
       const u=rec.u||Date.now(),{g,z}=await packJSON(clean(rec)),n=Math.max(1,Math.ceil(z.length/CHUNK));
+      CS.seen[k]=u; // antes de gravar: o aviso da própria gravação não baixa tudo de novo
       for(let i=0;i<n;i++)await csCol('c').doc(st+'~'+x.id+'~'+i).set({u,z:z.slice(i*CHUNK,(i+1)*CHUNK)});
       await ref.set({s:st,id:x.id,nb:rec.nb||null,u,del:false,n,g});
       for(let i=n;i<prevN;i++)await csCol('c').doc(st+'~'+x.id+'~'+i).delete();
@@ -3397,16 +3413,19 @@ async function csPush(){
   }
   if(pushed||SY.blobDirty)await csPushBlobs();
 }
-const CS_TYPES=/^(image\/(png|jpeg|webp|gif)|application\/pdf|video\/)/;
+const CS_TYPES=/^(image\/(png|jpeg|webp|gif)|application\/pdf|video\/|audio\/(mp4|webm|x-m4a|aac))/;
 async function csPushBlobs(){
   SY.blobDirty=false;if(!CS.as)return;
   const ids=new Set();
   for(const p of await DB.all('pages'))for(const b of blobIdsOf(p))ids.add(b);
   for(const c of await DB.all('cards'))for(const b of [c.qi,c.ai])if(b)ids.add(b);
+  for(const nb of await DB.all('notebooks'))for(const r of nb.recs||[])if(r.bid)ids.add(r.bid);
   for(const bid of ids){
     if(SY.up.has(bid))continue;const rec=await DB.get('blobs',bid);if(!rec)continue;
     const t=rec.blob.type||'';if(!CS_TYPES.test(t)){SY.up.add(bid);continue}
-    try{const r=await CS.as.upload(rec.blob);await csCol('b').doc(bid).set({a:r.id,t})}
+    try{ // áudio sobe como vídeo (é o mesmo formato mp4/webm) e volta com o tipo original
+      const up=t.startsWith('audio/')?new Blob([rec.blob],{type:/webm/.test(t)?'video/webm':'video/mp4'}):rec.blob;
+      const r=await CS.as.upload(up);await csCol('b').doc(bid).set({a:r.id,url:r.url||'',t})}
     catch(e){if(e&&['too_large','unsupported_type','invalid_request','quota_exceeded'].includes(e.code)){console.warn('arquivo não subiu',bid,e.code);if(e.code==='too_large')toast('Um PDF é grande demais para a nuvem do Claude (máximo 20 MB). Ele continua neste aparelho.',6000);SY.up.add(bid);continue}throw e}
     SY.up.add(bid);saveSY();
   }
@@ -3535,11 +3554,15 @@ async function cloudDialog(){
   }
   if(!SB){await cloudInit();if(!SB){toast('Não consegui carregar a nuvem. Confira a internet.',5000);return}}
   if(!CU){
-    const email=await ask('Entrar na nuvem','', 'Enviar código');if(!email)return;
-    const {error}=await SB.auth.signInWithOtp({email,options:{shouldCreateUser:true}});
-    if(error){toast('Não consegui enviar o código: '+error.message,6000);return}
-    const code=await openDlg(`<h2>Confira o e-mail ✉</h2><p>Mandei uma mensagem para <b>${esc(email)}</b>.</p>
-      <p>Se veio um <b>código</b>, digite aqui. Se veio um <b>link</b>, toque e segure nele, escolha <b>Copiar Link</b> e cole aqui.</p>
+    const st=await openDlg(`<h2>Entrar na nuvem ☁</h2><p>Digite seu e-mail. Vai chegar uma mensagem para entrar, sem senha.</p>
+      <form><input type="email" maxlength="120" autocomplete="email" aria-label="E-mail" placeholder="seu@email.com"><div class="actions"><button type="button" class="btn" data-have style="margin-right:auto">Já tenho o código ou link</button><button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Enviar</button></div></form>`,
+      (d,done)=>{const i=$('input',d);setTimeout(()=>i.focus(),50);$('[data-x]',d).onclick=()=>done(null);$('[data-have]',d).onclick=()=>done({have:true});
+        $('form',d).onsubmit=e=>{e.preventDefault();const v=i.value.trim();if(v)done({email:v})}});
+    if(!st)return;const email=st.email||'';
+    if(email){const {error}=await SB.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});
+      if(error){toast(/rate|seconds|limit/i.test(error.message)?'Muitos e-mails pedidos seguidos. Espere alguns minutos e tente de novo.':'Não consegui enviar: '+error.message,7000);return}}
+    const code=await openDlg(`<h2>${email?'Confira o e-mail ✉':'Colar o código ou link'}</h2>${email?`<p>Mandei uma mensagem para <b>${esc(email)}</b> (pode cair no Spam).</p>`:''}
+      <p>Se veio um <b>código</b>, digite aqui. Se veio um <b>link</b>, <b>toque e segure</b> nele, escolha <b>Copiar Link</b> e cole aqui. Se você tocou no link e ele abriu no Safari, use o “Levar o acesso para o app” que apareceu lá e cole aqui.</p>
       <form><input type="text" maxlength="3000" autocomplete="one-time-code" aria-label="Código ou link" placeholder="Código ou link"><div class="actions"><button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Entrar</button></div></form>`,
       (d,done)=>{const i=$('input',d);setTimeout(()=>i.focus(),50);$('[data-x]',d).onclick=()=>done(null);$('form',d).onsubmit=e=>{e.preventDefault();done(i.value.trim()||null)}});
     if(!code)return;
@@ -3660,8 +3683,8 @@ async function offerFile(file,title,heading,shareSub){
     ...(canShare?[{id:'share',label:'Compartilhar',sub:shareSub}]:[]),
     {id:'down',label:IN_CLAUDE?'Salvar o arquivo':'Baixar o arquivo',sub:file.name}
   ]);
-  if(a==='share'){try{await navigator.share({files:[file],title});return true}catch(e){if(e.name!=='AbortError'){download(file);return true}return false}}
-  if(a==='down'){download(file);return true}
+  if(a==='share'){try{await navigator.share({files:[file],title});return true}catch(e){if(e.name!=='AbortError')return (await download(file))!==false;return false}}
+  if(a==='down')return (await download(file))!==false;
   return false;
 }
 
@@ -3713,8 +3736,10 @@ $('#btnBackup').onclick=async()=>{
 $('#backupInput').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)restoreBackup(f)};
 function openLink(u){const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';document.body.append(a);a.click();a.remove()}
 async function download(file){
-  if(IN_CLAUDE){const dl=await claude.use('downloads');if(!dl){toast('Daqui não dá para salvar arquivos.',4000);return}
-    try{await dl.save({filename:file.name,data:file})}catch(e){if(!/declin|cancel|dismiss/.test(String(e&&e.code)))toast('Não consegui salvar o arquivo.',4000)}return}
+  if(IN_CLAUDE){
+    try{const dl=await claude.use('downloads');if(!dl){toast('Daqui não dá para salvar arquivos.',4000);return false}
+      await dl.save({filename:file.name,data:file});return true}
+    catch(e){if(!/declin|cancel|dismiss/.test(String(e&&e.code)))toast('Não consegui salvar o arquivo.',4000);return false}}
   const u=URL.createObjectURL(file),a=document.createElement('a');a.href=u;a.download=file.name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),10000)}
 
 /* =====================================================================

@@ -460,7 +460,7 @@ dialog::backdrop{background:rgba(40,16,70,.30);-webkit-backdrop-filter:blur(6px)
 .dlg h2{margin:0 0 14px;font:italic 700 24px/1.15 var(--f-serif);letter-spacing:-.01em}
 .dlg p{margin:0 0 14px;color:var(--muted)}
 .dlg label.f{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
-.dlg input[type=text]{width:100%;min-height:48px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 16px;font:inherit}
+.dlg input[type=text],.dlg input[type=email],.dlg input[type=password]{width:100%;min-height:48px;border-radius:16px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);padding:0 16px;font:inherit}
 .dlg .actions{display:flex;justify-content:flex-end;gap:8px;margin-top:24px}
 .covers{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:10px}
 .cv-pick{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted)}
@@ -3554,10 +3554,31 @@ async function cloudDialog(){
   }
   if(!SB){await cloudInit();if(!SB){toast('Não consegui carregar a nuvem. Confira a internet.',5000);return}}
   if(!CU){
-    const st=await openDlg(`<h2>Entrar na nuvem ☁</h2><p>Digite seu e-mail. Vai chegar uma mensagem para entrar, sem senha.</p>
-      <form><input type="email" maxlength="120" autocomplete="email" aria-label="E-mail" placeholder="seu@email.com"><div class="actions"><button type="button" class="btn" data-have style="margin-right:auto">Já tenho o código ou link</button><button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Enviar</button></div></form>`,
-      (d,done)=>{const i=$('input',d);setTimeout(()=>i.focus(),50);$('[data-x]',d).onclick=()=>done(null);$('[data-have]',d).onclick=()=>done({have:true});
-        $('form',d).onsubmit=e=>{e.preventDefault();const v=i.value.trim();if(v)done({email:v})}});
+    const st=await openDlg(`<h2>Entrar na nuvem ☁</h2><p>Entre com seu e-mail e sua senha do Sinapse.</p>
+      <form><label class="f" for="lgE">E-mail</label><input id="lgE" type="email" maxlength="120" autocomplete="username" placeholder="seu@email.com">
+      <label class="f" for="lgP">Senha</label><input id="lgP" type="password" maxlength="72" autocomplete="current-password" placeholder="sua senha">
+      <p data-er style="color:var(--danger)" hidden></p>
+      <div class="actions"><button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Entrar</button></div>
+      <div class="menu" style="margin-top:10px"><button type="button" data-new><span><span>Primeira vez? Criar conta com senha</span></span></button>
+      <button type="button" data-mail><span><span>Entrar sem senha, por e-mail</span><span class="sub">Manda um link para o seu e-mail</span></span></button>
+      <button type="button" data-have><span><span>Já tenho um código ou link</span></span></button></div></form>`,
+      (d,done)=>{const e=$('#lgE',d),pw=$('#lgP',d),er=$('[data-er]',d);setTimeout(()=>e.focus(),50);
+        const err=m=>{er.textContent=m;er.hidden=false};
+        const go=async create=>{const email=e.value.trim(),pass=pw.value;
+          if(!email||!/@/.test(email))return err('Digite seu e-mail.');if(pass.length<6)return err('A senha precisa ter pelo menos 6 caracteres.');
+          er.hidden=true;const r=create?await SB.auth.signUp({email,password:pass}):await SB.auth.signInWithPassword({email,password:pass});
+          if(r.error){const m=r.error.message||'';
+            if(/already|registered|exists/i.test(m))return err('Esse e-mail já tem conta. Digite a senha e toque em Entrar. Se você nunca criou uma senha, veja o passo a passo que te mandei para criar.');
+            if(/invalid login|credentials/i.test(m))return err('E-mail ou senha não conferem.');
+            if(/confirm/i.test(m))return err('Falta confirmar o e-mail desta conta.');
+            if(/rate|limit/i.test(m))return err('Muitas tentativas seguidas. Espere alguns minutos.');
+            return err('Não deu certo: '+m)}
+          if(!r.data.session)return err('A conta foi criada, mas precisa confirmar o e-mail antes de entrar.');
+          done({ok:true})};
+        $('form',d).onsubmit=ev=>{ev.preventDefault();go(false)};$('[data-new]',d).onclick=()=>go(true);
+        $('[data-x]',d).onclick=()=>done(null);$('[data-have]',d).onclick=()=>done({have:true});
+        $('[data-mail]',d).onclick=()=>{const v=e.value.trim();if(!v||!/@/.test(v))return err('Digite seu e-mail primeiro.');done({email:v})}});
+    if(st&&st.ok){toast('Pronto ✦ Sincronizando seus cadernos…',4000);return}
     if(!st)return;const email=st.email||'';
     if(email){const {error}=await SB.auth.signInWithOtp({email,options:{shouldCreateUser:true,emailRedirectTo:location.origin+location.pathname}});
       if(error){toast(/rate|seconds|limit/i.test(error.message)?'Muitos e-mails pedidos seguidos. Espere alguns minutos e tente de novo.':'Não consegui enviar: '+error.message,7000);return}}
@@ -3574,9 +3595,13 @@ async function cloudDialog(){
   const a=await menu('☁ '+(CU.email||'Sua conta'),[
     {id:'sync',label:'Sincronizar agora',sub:SY.lastOk?'Última vez: '+new Date(SY.lastOk).toLocaleString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+(pend?' · '+pend+' alterações para enviar':''):'Ainda não sincronizou'},
     ...(SY.state==='erro'?[{id:'err',label:'Ver o erro',sub:String(SY.err&&SY.err.message||SY.err||'')}]:[]),
+    {id:'pass',label:'Criar ou trocar a senha',sub:'Para entrar nos outros aparelhos sem precisar de e-mail'},
     {id:'out',label:'Sair da conta',sub:'Os cadernos continuam neste aparelho'}
   ]);
   if(a==='sync')cloudSync();
+  else if(a==='pass'){const pw=await openDlg(`<h2>Senha do Sinapse</h2><p>Com a senha, você entra em qualquer aparelho com <b>${esc(CU.email||'')}</b> e ela, sem esperar e-mail.</p><form><input type="password" maxlength="72" autocomplete="new-password" placeholder="nova senha (6 ou mais caracteres)"><div class="actions"><button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">Salvar senha</button></div></form>`,
+      (d,done)=>{const i=$('input',d);setTimeout(()=>i.focus(),50);$('[data-x]',d).onclick=()=>done(null);$('form',d).onsubmit=e=>{e.preventDefault();done(i.value)}});
+    if(pw){if(pw.length<6){toast('A senha precisa ter pelo menos 6 caracteres.',4000);return}const {error}=await SB.auth.updateUser({password:pw});toast(error?'Não consegui salvar a senha: '+error.message:'Senha salva ✦ Use e-mail e senha nos outros aparelhos.',6000)}}
   else if(a==='out'){await SB.auth.signOut();CU=null;if(RT){try{SB.removeChannel(RT)}catch(e){}RT=null}updateCloudBtn();toast('Você saiu da conta.')}
 }
 

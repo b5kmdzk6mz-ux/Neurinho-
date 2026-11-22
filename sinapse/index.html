@@ -1433,7 +1433,17 @@ async function flushSaves(){
   clearTimeout(nbTimer);if(S.nb&&nbDirty){nbDirty=false;await DB.put('notebooks',S.nb).catch(saveFail)}
 }
 function saveFail(e){console.error(e);toast('Não consegui salvar. O aparelho pode estar sem espaço.',5000)}
-document.addEventListener('visibilitychange',()=>{if(document.hidden)flushSaves()});
+// Ao ir para outro app, solta a memória das páginas (o iPad mata o app da tela de início quando falta memória,
+// e na volta ele pode ficar branco). Ao voltar, redesenha o que está na tela.
+function releaseCanvases(){if(!S.nb)return;S.pages.forEach(rt=>{if(rt.canvas&&!(act&&act.rt===rt))detach(rt)})}
+function restoreCanvases(){
+  if(!S.nb)return;const v=desk.getBoundingClientRect(),m=v.height*1.2;
+  for(const rt of S.pages){if(!rt.el)continue;const r=rt.el.getBoundingClientRect();if(isBoard()||(r.bottom>v.top-m&&r.top<v.bottom+m))attach(rt)}
+  S.pages.forEach(rt=>rt.canvas&&renderPage(rt));
+  const h=document.documentElement;h.style.transform='translateZ(0)';requestAnimationFrame(()=>{h.style.transform=''});
+}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){flushSaves();releaseCanvases()}else restoreCanvases()});
+window.addEventListener('pageshow',e=>{if(e.persisted)restoreCanvases()});
 window.addEventListener('pagehide',()=>flushSaves());
 
 /* ---------- Desfazer / refazer ---------- */
@@ -2798,6 +2808,10 @@ function parseLooseJSON(t){
 const b64File=(b64,name,type)=>{const bin=atob(b64),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new File([u],name,{type})};
 async function claudeBridge(messages,schema){
   hideToast();
+  if(AIACT&&S.nb)LSS('sinapse-ponte',{...AIACT,nb:S.nb.id,cur:S.cur,scope:aiScope,t:Date.now()});AIACT=null;
+  try{return await claudeBridge0(messages,schema)}finally{try{localStorage.removeItem('sinapse-ponte')}catch(e){}}
+}
+async function claudeBridge0(messages,schema){
   const texts=[],imgs=[];
   for(const m of messages){const parts=typeof m.content==='string'?[{type:'text',text:m.content}]:m.content;
     const t=[];for(const b of parts){if(b.type==='text')t.push(b.text);else if(b.type==='image'&&m.role==='user')imgs.push(b);}
@@ -2923,8 +2937,9 @@ function renderChips(){
   box.querySelectorAll('button').forEach(b=>b.onclick=()=>aiChip(b.dataset.c));
 }
 const where=()=>aiScope==='page'?'esta página':'este caderno';
+let AIACT=null; // pedido de IA em andamento, para retomar se o iPad reiniciar o app
 function aiChip(id){
-  if(aiBusy)return;
+  if(aiBusy)return;AIACT={c:id};
   if(id==='sum')aiRun('Resumir '+where(),`Faça um resumo de estudo de ${where()}: os conceitos principais, como se ligam e o que vale decorar. Termine com 3 perguntas para eu testar se entendi.`);
   else if(id==='explain')aiRun('Explicar '+where(),`Explique o conteúdo de ${where()} de um jeito simples, com exemplos do dia a dia. Aponte o que costuma confundir.`);
   else if(id==='tidy')aiRun('Reorganizar '+where(),`Reescreva o conteúdo de ${where()} de forma organizada e limpa, como anotações passadas a limpo: títulos, tópicos e definições. Não invente conteúdo novo.`);
@@ -2975,7 +2990,7 @@ async function aiRun(label,instruction,opt={}){
 }
 $('.ai-ask',aiPanel).onsubmit=e=>{
   e.preventDefault();const ta=$('textarea',aiPanel),q=ta.value.trim();if(!q||aiBusy)return;ta.value='';
-  aiRun(q,q,{fresh:!AIC.msgs.length});
+  AIACT=AIC.msgs.length?null:{q};aiRun(q,q,{fresh:!AIC.msgs.length});
 };
 $('textarea',aiPanel).addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('.ai-ask',aiPanel).requestSubmit()}});
 function textItem(txt,w){return {t:'text',x:0,y:0,w,txt,f:P.textFont,s:SIZES.text[0],c:P.textColor}}
@@ -3052,6 +3067,7 @@ async function aiConvert(s){
   }catch(e){console.error(e);hideToast();toast(aiErr(e),6000)}finally{aiBusy=false}
 }
 async function aiSelectionMenu(){
+  AIACT=null;
   const s=S.sel;if(!s)return;const hasText=s.items.some(st=>st.t==='text'||st.t==='node'),hasInkSel=s.items.some(st=>st.t==='pen'||st.t==='hl');
   const a=await menu('IA ✦ com a seleção',[
     ...(hasInkSel?[{id:'conv',label:'Converter em texto digitado',sub:'Sua letra vira texto na fonte '+fontOf(P.textFont)[2]}]:[]),
@@ -3785,6 +3801,15 @@ $('#btnImport').onclick=()=>{pdfTarget=null;$('#pdfInput').click()};
   if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{fontEpoch++;if(S.nb)S.pages.forEach(rt=>rt.canvas&&renderPage(rt))});
   await renderLibrary();backupNote();updateStudyBtn();
   if(m)openNotebook(m[1]);
+  const pb=!IN_CLAUDE&&LSJ('sinapse-ponte',null);
+  if(pb&&Date.now()-pb.t<3*3600e3&&iaMode()==='app'){ // o iPad reiniciou o app no meio de um pedido ao Claude
+    try{localStorage.removeItem('sinapse-ponte')}catch(e){}
+    await openNotebook(pb.nb);
+    if(S.nb&&S.nb.id===pb.nb){S.cur=Math.min(pb.cur||0,S.pages.length-1);gotoPage(S.cur);aiScope=pb.scope||'page';
+      aiPanel.querySelectorAll('.ai-scope button').forEach(x=>x.setAttribute('aria-pressed',x.dataset.s===aiScope));
+      toast('Voltando ao seu pedido ao Claude ✦ É só colar a resposta.',5000);
+      setTimeout(()=>{if(pb.q){AIACT={q:pb.q};aiRun(pb.q,pb.q,{})}else aiChip(pb.c)},400)}
+  }
   if(!IN_CLAUDE&&'serviceWorker' in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
 </script>

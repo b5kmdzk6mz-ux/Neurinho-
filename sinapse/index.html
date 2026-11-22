@@ -639,10 +639,13 @@ const DB={
     if(q)q.onsuccess=()=>{out=q.result};
     t.oncomplete=()=>res(out);t.onerror=()=>rej(t.error);t.onabort=()=>rej(t.error);
   })},
-  get:(s,id)=>DB.tx(s,'readonly',x=>x.get(id)),
-  put:(s,v)=>DB.tx(s,'readwrite',x=>x.put(v)),
+  // Arquivos (fotos, fundos de PDF, áudios) ficam guardados como bytes, não como Blob: no Safari,
+  // dentro de outro app (como o Claude) ou na tela de início, um Blob guardado às vezes não pode ser lido de volta.
+  get:async(s,id)=>DB.unpack(s,await DB.tx(s,'readonly',x=>x.get(id))),
+  put:async(s,v)=>{if(s==='blobs'&&v&&v.blob instanceof Blob)v={id:v.id,buf:await v.blob.arrayBuffer(),type:v.blob.type||''};return DB.tx(s,'readwrite',x=>x.put(v))},
   del:(s,id)=>DB.tx(s,'readwrite',x=>x.delete(id)),
-  all:s=>DB.tx(s,'readonly',x=>x.getAll()),
+  all:async s=>{const l=await DB.tx(s,'readonly',x=>x.getAll());return s==='blobs'?l.map(r=>DB.unpack(s,r)):l},
+  unpack:(s,r)=>{if(s==='blobs'&&r&&r.buf&&!r.blob)r.blob=new Blob([r.buf],{type:r.type||''});return r},
   pagesOf:id=>DB.tx('pages','readonly',x=>x.index('nb').getAll(id)),
   cardsOf:id=>DB.tx('cards','readonly',x=>x.index('nb').getAll(id))
 };

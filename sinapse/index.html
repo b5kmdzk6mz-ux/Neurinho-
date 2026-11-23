@@ -3237,7 +3237,9 @@ async function cloudSync(pushOnly){
   catch(e){console.error('sync',e);setCloudState('erro',e);diag('sincronizar',e);if(IN_CLAUDE&&e&&['resource_exhausted','unavailable'].includes(e.code)){clearTimeout(SY.t);SY.t=setTimeout(()=>cloudSync(),20000)}}
   finally{SY.busy=false;saveSY();if(SY.again){SY.again=false;schedSync(600)}}
 }
-const clean=o=>JSON.parse(JSON.stringify(o),(k,v)=>typeof v==='string'&&/[\u0000]/.test(v)?v.replace(/\u0000/g,''):v);
+const BADCH=/\u0000|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(^|[^\uD800-\uDBFF])[\uDC00-\uDFFF]/g;
+const fixStr=v=>v.replace(BADCH,(m,pre)=>pre||'');
+const clean=o=>JSON.parse(JSON.stringify(o),(k,v)=>typeof v==='string'&&BADCH.test(v)?(BADCH.lastIndex=0,fixStr(v)):v);
 function prepPage(d){
   const ids=[];for(const st of d.strokes){if(!st.id)st.id=uid();ids.push(st.id)}
   const now=new Set(ids),gone=new Set(d.gone||[]);for(const i of d._ids||[])if(!now.has(i))gone.add(i);
@@ -3535,9 +3537,13 @@ async function csPushBlobs(){
    instalado usam a mesma nuvem. Os arquivos vêm da tabela blobs (o conector não vê o Storage). */
 const MS={on:false,proj:(CLOUD_URL.match(/^https:\/\/([a-z0-9]+)\./)||[])[1],q:[],qOn:false,fails:new Map(),done:0,total:0};
 // registro de problemas: guardado no aparelho e na nuvem do Claude (só da pessoa), para dar para ver o que falhou
-const DIAG=LSJ('sinapse-diag',[]);let diagT=0;
+const APPV='32';
+const DIAG=LSJ('sinapse-diag',[]);let diagT=0,diagQ=[],diagQT=0;
 function diag(what,e){
-  DIAG.push({t:new Date().toISOString(),o:what,e:e?String(e.code||'')+' '+String(e.message||e).slice(0,300):''});while(DIAG.length>60)DIAG.shift();LSS('sinapse-diag',DIAG);
+  const item={t:new Date().toISOString(),o:what,e:e?String(e.code||'')+' '+String(e.message||e).slice(0,300)+(e.details?' | '+String(e.details).slice(0,200):'')+(e.hint?' | '+String(e.hint).slice(0,120):''):''};
+  DIAG.push(item);while(DIAG.length>60)DIAG.shift();LSS('sinapse-diag',DIAG);
+  if(!IN_CLAUDE&&SB&&CU&&diagQ.length<40){diagQ.push({v:APPV+(navigator.standalone?' tela de início':' navegador'),o:item.o.slice(0,300),e:item.e});clearTimeout(diagQT);
+    diagQT=setTimeout(async()=>{const rows=diagQ.splice(0);if(rows.length)try{await SB.from('diag').insert(rows)}catch(x){}},4000)}
   clearTimeout(diagT);diagT=setTimeout(async()=>{try{if(!IN_CLAUDE)return;const db=await claude.use('db'),u=await claude.use('user'),id=db&&u&&await u.id();if(id)await db.doc('data/users/'+id+'/diag').set({l:DIAG.slice(-60),ua:navigator.userAgent})}catch(x){}},3000);
 }
 const MS_MAX=1200000; // limite de cada pedido ao conector (ele recusa consultas acima de ~2 MB)
@@ -3903,7 +3909,7 @@ async function importPDF(file,target,after){
     const d={id:uid(),nb:nb.id,tpl:'pdf',paper:'white',w:PAGE_W,h:Math.round(PAGE_W*vp1.height/vp1.width),strokes:[],bg:bid};
     try{const tc=await page.getTextContent(),k=PAGE_W/vp1.width;
       d.pt=tc.items.filter(it=>it.str&&it.str.trim()).map(it=>{const [x,y]=vp1.convertToViewportPoint(it.transform[4],it.transform[5]),fh=Math.hypot(it.transform[2],it.transform[3])||10;
-        return {s:it.str.replace(/\u0000/g,''),x:r1(x*k),y:r1((y-fh)*k),w:r1((it.width||fh*it.str.length*.5)*k),h:r1(fh*1.2*k)}})}catch(e){}
+        return {s:fixStr(it.str),x:r1(x*k),y:r1((y-fh)*k),w:r1((it.width||fh*it.str.length*.5)*k),h:r1(fh*1.2*k)}})}catch(e){}
     await DB.put('pages',d);added.push(d);
   }
   // PDF novo vira caderno; num caderno aberto, entra logo depois da página escolhida (ou no fim)

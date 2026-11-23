@@ -1,5 +1,5 @@
 /* Sinapse: service worker. Troque a versão quando mudar os arquivos. */
-var VER='sinapse-29';
+var VER='sinapse-30';
 var CORE=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png','../vendor/pdf.min.mjs','../OpenDyslexic-Regular.otf','../vendor/anthropic-sdk.mjs','../vendor/supabase.js','../vendor/pdf.worker.min.mjs',
   'arte/capa-aura.jpg','arte/capa-holo.jpg','arte/capa-peach.jpg','arte/capa-waves.jpg','arte/capa-mystic.jpg'].concat(
   ['brilho','lua','olho','cristal','borboleta','laco','morango','coracao','estrela-cadente','nuvem','bolha','neuronios'].map(function(n){return 'arte/adesivos/'+n+'.webp'}));

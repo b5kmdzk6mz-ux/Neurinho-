@@ -1216,7 +1216,7 @@ function openDlg(html,setup,wide){
 }
 function menu(title,items){
   return openDlg(`<h2>${esc(title)}</h2><div class="menu">${items.map((it,i)=>`<button data-i="${i}" class="${it.danger?'danger':''}"><span><span>${esc(it.label)}</span>${it.sub?`<span class="sub">${esc(it.sub)}</span>`:''}</span>${it.check!==undefined?`<span class="chk ${it.check?'on':''}" aria-hidden="true"></span>`:''}</button>`).join('')}</div>`,
-    (d,done)=>d.querySelectorAll('.menu button').forEach(b=>b.onclick=()=>done(items[+b.dataset.i].id)));
+    (d,done)=>d.querySelectorAll('.menu button').forEach(b=>b.onclick=()=>{const it=items[+b.dataset.i];done(it.id);if(it.now)it.now()}));
 }
 function ask(title,value,ok='Salvar'){
   return openDlg(`<h2>${esc(title)}</h2><form><input type="text" maxlength="80" value="${esc(value)}" aria-label="${esc(title)}"><div class="actions"><button type="button" class="btn" data-x>Cancelar</button><button class="btn primary">${esc(ok)}</button></div></form>`,
@@ -1318,8 +1318,8 @@ function buildPages(){
   const add=document.createElement('button');add.className='add-page';add.id='addPage';
   add.innerHTML='<svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Nova página';
   add.onclick=async()=>{
-    const a=await menu('Adicionar no fim do caderno',[{id:'blank',label:'Página em branco'},{id:'pdf',label:'PDF',sub:'As páginas do PDF entram no fim deste caderno'}]);
-    if(a==='blank')addPage(S.pages.length-1);else if(a==='pdf'){pdfTarget=S.nb;pdfAfter=S.pages.length-1;$('#pdfInput').click()}};
+    const a=await menu('Adicionar no fim do caderno',[{id:'blank',label:'Página em branco'},{id:'pdf',label:'PDF',sub:'As páginas do PDF entram no fim deste caderno',now:()=>{pdfTarget=S.nb;pdfAfter=S.pages.length-1;$('#pdfInput').click()}}]);
+    if(a==='blank')addPage(S.pages.length-1)};
   pagesEl.append(add);
   layout();
   for(const rt of S.pages)io.observe(rt.el);
@@ -2386,8 +2386,8 @@ async function editorMenu(){
     {id:'review',label:S.review?'Sair do modo revisão':'Modo revisão',sub:'Cobre o que está com marca-texto; toque para revelar'},
     {id:'present',label:'Apresentar',sub:'Tela cheia com ponteiro laser. Espelhe o iPad na TV ou no projetor'},
     {id:'search',label:'Buscar neste caderno'},
-    {id:'img',label:'Inserir imagem ou foto',sub:'Da galeria, da câmera ou dos arquivos'},
-    ...(isBoard()?[]:[{id:'pdfIn',label:'Adicionar outro PDF aqui',sub:'Entra logo depois desta página ('+(i+1)+')'}]),
+    {id:'img',label:'Inserir imagem ou foto',sub:'Da galeria, da câmera ou dos arquivos',now:()=>$('#imgInput').click()},
+    ...(isBoard()?[]:[{id:'pdfIn',label:'Adicionar outro PDF aqui',sub:'Entra logo depois desta página ('+(i+1)+')',now:()=>{pdfTarget=S.nb;pdfAfter=i;$('#pdfInput').click()}}]),
     {id:'pdfOut',label:'Exportar caderno em PDF'},
     {id:'penOnly',label:'Só a caneta escreve',sub:P.penOnly?'O dedo rola a página e a palma da mão é ignorada':'O dedo também escreve. Role com dois dedos',check:P.penOnly},
     {id:'rename',label:'Renomear caderno'},
@@ -2406,8 +2406,6 @@ async function editorMenu(){
   else if(a==='share'){await flushSaves();shareDialog(S.nb)}
   else if(a==='review')setReview(!S.review);
   else if(a==='search'){togglePanel(true);setTimeout(()=>$('#pageSearch').focus(),50)}
-  else if(a==='img')$('#imgInput').click();
-  else if(a==='pdfIn'){pdfTarget=S.nb;pdfAfter=i;$('#pdfInput').click()}
   else if(a==='pdfOut'){await flushSaves();exportPDF(S.nb.title,S.pages.map(r=>r.d))}
   else if(a==='penOnly')toggleFinger();
   else if(a==='rename')renameCurrent();
@@ -4004,9 +4002,9 @@ function backupNote(){
 $('#btnBackup').onclick=async()=>{
   const a=await menu('Backup',[
     {id:'save',label:'Fazer backup agora',sub:'Um arquivo com todos os cadernos, para guardar na nuvem'},
-    {id:'load',label:'Restaurar um backup',sub:'Traz de volta os cadernos de um arquivo de backup'}
+    {id:'load',label:'Restaurar um backup',sub:'Traz de volta os cadernos de um arquivo de backup',now:()=>$('#backupInput').click()}
   ]);
-  if(a==='save')makeBackup();else if(a==='load')$('#backupInput').click();
+  if(a==='save')makeBackup();
 };
 $('#backupInput').onchange=e=>{const f=e.target.files[0];e.target.value='';if(f)restoreBackup(f)};
 function openLink(u){const a=document.createElement('a');a.href=u;a.target='_blank';a.rel='noopener';document.body.append(a);a.click();a.remove()}

@@ -198,6 +198,20 @@ create policy bl_write on public.blobs for insert with check (owner = auth.uid()
 create policy bl_update on public.blobs for update using (owner = auth.uid()) with check (owner = auth.uid());
 create policy bl_delete on public.blobs for delete using (owner = auth.uid());
 
+-- ---------- Registro de problemas do app (só a própria pessoa vê) ----------
+create table if not exists public.diag (
+  id bigint generated always as identity primary key,
+  owner uuid not null default auth.uid() references auth.users on delete cascade,
+  t timestamptz not null default now(),
+  v text, o text, e text
+);
+alter table public.diag enable row level security;
+drop policy if exists dg_insert on public.diag;
+drop policy if exists dg_select on public.diag;
+create policy dg_insert on public.diag for insert with check (owner = auth.uid());
+create policy dg_select on public.diag for select using (owner = auth.uid());
+grant select, insert on public.diag to authenticated;
+
 -- ---------- Permissões (projetos novos do Supabase não liberam as tabelas sozinhos) ----------
 -- só quem entrou na conta; as regras acima decidem o que cada pessoa vê
 grant usage on schema public to authenticated;

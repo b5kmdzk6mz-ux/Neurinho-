@@ -3237,14 +3237,14 @@ async function cloudSync(pushOnly){
   catch(e){console.error('sync',e);setCloudState('erro',e);diag('sincronizar',e);if(IN_CLAUDE&&e&&['resource_exhausted','unavailable'].includes(e.code)){clearTimeout(SY.t);SY.t=setTimeout(()=>cloudSync(),20000)}}
   finally{SY.busy=false;saveSY();if(SY.again){SY.again=false;schedSync(600)}}
 }
-const clean=o=>JSON.parse(JSON.stringify(o));
+const clean=o=>JSON.parse(JSON.stringify(o),(k,v)=>typeof v==='string'&&/[\u0000]/.test(v)?v.replace(/\u0000/g,''):v);
 function prepPage(d){
   const ids=[];for(const st of d.strokes){if(!st.id)st.id=uid();ids.push(st.id)}
   const now=new Set(ids),gone=new Set(d.gone||[]);for(const i of d._ids||[])if(!now.has(i))gone.add(i);
   d.gone=[...gone].slice(-800);d._ids=ids;
 }
 async function push(){
-  const keys=Object.keys(SY.out);let pushed=false;
+  const keys=Object.keys(SY.out),skip=new Set();let pushed=false;SY.bad=SY.bad||{};
   for(const st of ORDER){
     const items=keys.filter(k=>k.startsWith(st+':')).map(k=>[k,SY.out[k]]);
     for(let i=0;i<items.length;i+=40){
@@ -3260,11 +3260,13 @@ async function push(){
         const {error}=await SB.from(st).upsert(rows,{onConflict:'id'});
         if(error){ // tenta um por um: o que a nuvem recusar por permissão sai da fila em vez de travar tudo
           for(const row of rows){const {error:e1}=await SB.from(st).upsert([row],{onConflict:'id'});
-            if(e1){if(e1.code==='42501'||/row-level security|permission/i.test(e1.message||''))console.warn('recusado pela nuvem',st,row.id,e1.message);else throw e1}}
+            if(e1){if(e1.code==='42501'||/row-level security|permission/i.test(e1.message||''))console.warn('recusado pela nuvem',st,row.id,e1.message);
+              else{const k=st+':'+row.id,n=(SY.bad[k]||0)+1;SY.bad[k]=n;diag('a nuvem recusou '+k+' (tentativa '+n+')',e1);
+                if(n<3)skip.add(k)}}}
         }
         pushed=true;
       }
-      for(const [k,x] of chunk)if(SY.out[k]===x)delete SY.out[k];
+      for(const [k,x] of chunk)if(SY.out[k]===x&&!skip.has(k))delete SY.out[k];
       saveSY();
     }
   }
@@ -3901,7 +3903,7 @@ async function importPDF(file,target,after){
     const d={id:uid(),nb:nb.id,tpl:'pdf',paper:'white',w:PAGE_W,h:Math.round(PAGE_W*vp1.height/vp1.width),strokes:[],bg:bid};
     try{const tc=await page.getTextContent(),k=PAGE_W/vp1.width;
       d.pt=tc.items.filter(it=>it.str&&it.str.trim()).map(it=>{const [x,y]=vp1.convertToViewportPoint(it.transform[4],it.transform[5]),fh=Math.hypot(it.transform[2],it.transform[3])||10;
-        return {s:it.str,x:r1(x*k),y:r1((y-fh)*k),w:r1((it.width||fh*it.str.length*.5)*k),h:r1(fh*1.2*k)}})}catch(e){}
+        return {s:it.str.replace(/\u0000/g,''),x:r1(x*k),y:r1((y-fh)*k),w:r1((it.width||fh*it.str.length*.5)*k),h:r1(fh*1.2*k)}})}catch(e){}
     await DB.put('pages',d);added.push(d);
   }
   // PDF novo vira caderno; num caderno aberto, entra logo depois da página escolhida (ou no fim)

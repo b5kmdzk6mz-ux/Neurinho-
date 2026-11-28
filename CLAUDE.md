@@ -7,3 +7,4 @@
 ## Projetos
 - `index.html` (raiz): Neurinho, app de estudos de Enfermagem.
 - `sinapse/`: Sinapse, app de cadernos à mão (PWA). `sinapse/claude-build.py` gera a versão que roda dentro do Claude (artifact). A nuvem é o Supabase (`sinapse/nuvem.sql`, guia em `sinapse/NUVEM.md`).
+- `transcritor/`: Transcritor, app que transforma vídeo/áudio em texto (PWA). Arquivos: Whisper no aparelho (`worker.js`). YouTube: Edge Function `legendas-youtube` no Supabase do Sinapse (código em `transcritor/supabase/`).

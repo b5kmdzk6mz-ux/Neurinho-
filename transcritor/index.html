@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transcritor</title>
+<meta name="description" content="Transforma vídeos e áudios em texto, de graça, no próprio aparelho.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Transcritor">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#F3E7FF">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Fraunces:ital,wght@1,600;1,800&family=Shrikhand&display=swap" rel="stylesheet">
+<style>
+:root{
+  --lilas:#E3C2FF;--rosa:#FFC2DD;--pessego:#FFD9BD;--ceu:#C7D6FF;
+  --violeta:#7A4FE0;--violeta2:#8B5CF6;--choque:#E2549C;
+  --tinta:#2A1B3D;--tinta2:#5B4A70;--fundo:#F7EFFF;
+  --vidro:rgba(255,255,255,.62);--borda:rgba(122,79,224,.18);--sombra:0 10px 30px rgba(74,40,140,.12);
+  --campo:#fff;--ok:#1E8A5A;--erro:#C0304A;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --tinta:#F2E9FF;--tinta2:#C8B8E0;--fundo:#120B22;
+  --vidro:rgba(36,24,64,.66);--borda:rgba(190,160,255,.2);--sombra:0 10px 30px rgba(0,0,0,.4);
+  --campo:#1C1233;--ok:#5FD3A0;--erro:#FF8FA3;
+}}
+:root[data-theme="dark"]{
+  --tinta:#F2E9FF;--tinta2:#C8B8E0;--fundo:#120B22;
+  --vidro:rgba(36,24,64,.66);--borda:rgba(190,160,255,.2);--sombra:0 10px 30px rgba(0,0,0,.4);
+  --campo:#1C1233;--ok:#5FD3A0;--erro:#FF8FA3;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:"DM Sans",system-ui,-apple-system,sans-serif;color:var(--tinta);background:var(--fundo);
+  min-height:100vh;min-height:100dvh;-webkit-text-size-adjust:100%;
+  padding:env(safe-area-inset-top) 16px calc(32px + env(safe-area-inset-bottom));
+}
+body::before{
+  content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;filter:blur(60px);opacity:.75;
+  background:
+    radial-gradient(40% 35% at 15% 20%,var(--lilas),transparent 70%),
+    radial-gradient(35% 30% at 85% 15%,var(--rosa),transparent 70%),
+    radial-gradient(40% 35% at 80% 85%,var(--pessego),transparent 70%),
+    radial-gradient(35% 30% at 20% 80%,var(--ceu),transparent 70%);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body::before{opacity:.22}}
+:root[data-theme="dark"] body::before{opacity:.22}
+main{max-width:760px;margin:0 auto}
+header{text-align:center;padding:28px 0 8px}
+h1{font-family:Shrikhand,Georgia,serif;font-weight:400;font-size:clamp(40px,9vw,60px);margin:0;line-height:1;
+  background:linear-gradient(100deg,var(--violeta),var(--choque) 60%,#F09A6A);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:600;color:var(--tinta2);margin:10px 0 0;font-size:18px}
+.cartao{background:var(--vidro);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border:1px solid var(--borda);
+  border-radius:24px;box-shadow:var(--sombra);padding:20px;margin-top:18px}
+.abas{display:flex;gap:6px;background:var(--vidro);border:1px solid var(--borda);border-radius:999px;padding:5px;margin-top:22px}
+.abas button{flex:1;border:0;background:transparent;color:var(--tinta2);font:inherit;font-weight:700;font-size:16px;padding:12px 8px;border-radius:999px;cursor:pointer}
+.abas button[aria-selected="true"]{background:linear-gradient(100deg,var(--violeta),var(--choque));color:#fff;box-shadow:0 4px 14px rgba(122,79,224,.35)}
+h2{font-family:Fraunces,Georgia,serif;font-style:italic;font-weight:800;font-size:22px;margin:0 0 6px}
+p{line-height:1.5}
+.dica{color:var(--tinta2);font-size:15px;margin:4px 0 14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:16px;font:inherit;font-weight:700;font-size:17px;
+  padding:14px 20px;cursor:pointer;color:#fff;background:linear-gradient(100deg,var(--violeta),var(--choque));box-shadow:0 6px 18px rgba(122,79,224,.3);min-height:50px}
+.btn:disabled{opacity:.5;cursor:default}
+.btn.sec{background:var(--campo);color:var(--violeta);border:1.5px solid var(--borda);box-shadow:none}
+:root[data-theme="dark"] .btn.sec{color:#C9B2FF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.sec{color:#C9B2FF}}
+.btn.largo{width:100%}
+.solta{border:2px dashed var(--borda);border-radius:20px;padding:26px 16px;text-align:center;cursor:pointer;background:var(--campo)}
+.solta.sobre{border-color:var(--violeta2)}
+.solta b{display:block;font-size:18px;margin-bottom:4px}
+.solta span{color:var(--tinta2);font-size:15px}
+.arquivo{margin-top:12px;font-weight:700;word-break:break-word}
+label.f{display:block;font-weight:700;font-size:15px;margin:16px 0 6px}
+select,input[type=url],input[type=text]{width:100%;font:inherit;font-size:17px;color:var(--tinta);background:var(--campo);border:1.5px solid var(--borda);border-radius:14px;padding:13px 14px;-webkit-appearance:none;appearance:none}
+select{background-image:linear-gradient(45deg,transparent 50%,var(--tinta2) 50%),linear-gradient(135deg,var(--tinta2) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 14px) 50%;background-size:6px 6px;background-repeat:no-repeat;padding-right:40px}
+.linha{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:520px){.linha{grid-template-columns:1fr}}
+.acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.acoes .btn{flex:1 1 160px}
+.barra{height:12px;background:var(--campo);border-radius:999px;overflow:hidden;border:1px solid var(--borda);margin:12px 0 8px}
+.barra i{display:block;height:100%;width:0;background:linear-gradient(90deg,#FFC2E2,#D9C6FF,#BDE6FF,#FFF1C2);transition:width .3s}
+.estado{font-weight:700}
+.estado small{display:block;font-weight:400;color:var(--tinta2);margin-top:4px;font-size:14px}
+.texto{white-space:pre-wrap;line-height:1.65;font-size:17px;background:var(--campo);border:1px solid var(--borda);border-radius:16px;padding:16px;max-height:60vh;overflow:auto;margin-top:12px;outline:none;-webkit-user-select:text;user-select:text}
+.texto:empty::before{content:"O texto vai aparecendo aqui…";color:var(--tinta2)}
+.aviso{border-radius:16px;padding:14px 16px;margin-top:14px;font-size:15px;line-height:1.5}
+.aviso.erro{background:rgba(226,38,63,.1);border:1px solid rgba(226,38,63,.3)}
+.aviso.info{background:rgba(122,79,224,.08);border:1px solid var(--borda)}
+.aviso ol{margin:8px 0 0;padding-left:22px}
+.aviso li{margin:4px 0}
+details summary{cursor:pointer;font-weight:700;color:var(--violeta)}
+:root[data-theme="dark"] details summary{color:#C9B2FF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) details summary{color:#C9B2FF}}
+.hist{list-style:none;margin:8px 0 0;padding:0}
+.hist li{display:flex;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--borda)}
+.hist li:first-child{border-top:0}
+.hist .nome{flex:1;min-width:0}
+.hist .nome b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hist .nome small{color:var(--tinta2)}
+.hist button{border:0;background:none;font:inherit;color:var(--violeta);font-weight:700;padding:8px;cursor:pointer}
+:root[data-theme="dark"] .hist button{color:#C9B2FF}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .hist button{color:#C9B2FF}}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--tinta);color:var(--fundo);
+  padding:12px 20px;border-radius:999px;font-weight:700;transition:.25s;pointer-events:none;z-index:9}
+.toast.vis{opacity:1;transform:translateX(-50%)}
+[hidden]{display:none!important}
+.rodape{text-align:center;color:var(--tinta2);font-size:13px;margin-top:26px}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Transcritor</h1>
+    <p class="sub">vídeo vira texto, sem sair do iPad</p>
+  </header>
+
+  <div class="abas" role="tablist">
+    <button role="tab" id="abaArq" aria-selected="true">📁 Arquivo</button>
+    <button role="tab" id="abaYt" aria-selected="false">▶️ Link do YouTube</button>
+  </div>
+
+  <!-- ===== Arquivo ===== -->
+  <section class="cartao" id="painelArq">
+    <h2>Escolha um vídeo ou áudio</h2>
+    <p class="dica">Funciona com gravações de tela, aulas gravadas, áudios do WhatsApp… Tudo é feito no próprio aparelho, de graça. O arquivo não é enviado para lugar nenhum.</p>
+    <div class="solta" id="solta" tabindex="0" role="button">
+      <b>Tocar para escolher</b>
+      <span>da Fototeca ou do app Arquivos</span>
+    </div>
+    <input type="file" id="entrada" accept="video/*,audio/*,.mp4,.mov,.m4a,.mp3,.wav,.aac,.ogg,.opus,.webm" hidden>
+    <div class="arquivo" id="nomeArq" hidden></div>
+    <div class="linha">
+      <div>
+        <label class="f" for="modelo">Qualidade</label>
+        <select id="modelo">
+          <option value="rapido">Rápido (baixa uns 80 MB na 1ª vez)</option>
+          <option value="preciso">Mais preciso (baixa uns 250 MB na 1ª vez)</option>
+        </select>
+      </div>
+      <div>
+        <label class="f" for="idioma">Idioma falado</label>
+        <select id="idioma">
+          <option value="portuguese">Português</option>
+          <option value="english">Inglês</option>
+          <option value="spanish">Espanhol</option>
+          <option value="auto">Descobrir sozinho</option>
+        </select>
+      </div>
+    </div>
+    <div class="acoes">
+      <button class="btn largo" id="btnTranscrever" disabled>✨ Transcrever</button>
+    </div>
+    <details style="margin-top:16px">
+      <summary>Como pegar o áudio de um vídeo do YouTube</summary>
+      <div class="aviso info">
+        Se o link não funcionar, grave a tela enquanto o vídeo toca. O som entra na gravação.
+        <ol>
+          <li>Abra os <b>Ajustes</b> › <b>Central de Controle</b> e confira se <b>Gravação de Tela</b> está na lista (se não estiver, toque no <b>+</b> verde).</li>
+          <li>Abra o vídeo no app do YouTube, deixe pronto no começo e com o som ligado.</li>
+          <li>Deslize o dedo para baixo a partir do <b>canto superior direito</b> da tela para abrir a Central de Controle.</li>
+          <li>Toque no botão de <b>gravar</b> (um círculo dentro de outro). Ele conta 3 segundos.</li>
+          <li>Feche a Central e dê play no vídeo. Pode deixar a tela escurecer, mas não bloqueie o iPad.</li>
+          <li>No fim, toque no <b>relógio vermelho</b> no alto da tela e em <b>Parar</b>. A gravação vai para o app <b>Fotos</b>.</li>
+          <li>Volte aqui, toque em <b>Tocar para escolher</b> › <b>Fototeca</b> e escolha a gravação.</li>
+        </ol>
+      </div>
+    </details>
+  </section>
+
+  <!-- ===== YouTube ===== -->
+  <section class="cartao" id="painelYt" hidden>
+    <h2>Cole o link do vídeo</h2>
+    <p class="dica">O app busca as legendas do próprio YouTube (as escritas pelo autor ou as automáticas). Só funciona em vídeos que têm legenda, e às vezes o YouTube bloqueia.</p>
+    <label class="f" for="link">Link do YouTube</label>
+    <input type="url" id="link" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://youtu.be/…">
+    <div class="acoes">
+      <button class="btn sec" id="btnColar">📋 Colar</button>
+      <button class="btn" id="btnBuscar">✨ Buscar texto</button>
+    </div>
+    <p class="dica" style="margin-top:14px">Para copiar o link no app do YouTube: toque em <b>Compartilhar</b> embaixo do vídeo e depois em <b>Copiar link</b>.</p>
+  </section>
+
+  <!-- ===== Andamento e resultado ===== -->
+  <section class="cartao" id="painelRes" hidden>
+    <div class="estado" id="estado">Preparando…</div>
+    <div class="barra" id="barraBox"><i id="barra"></i></div>
+    <div id="erroBox"></div>
+    <input type="text" id="titulo" placeholder="Nome desta transcrição" aria-label="Nome desta transcrição" style="margin-top:8px">
+    <div class="texto" id="texto" contenteditable="true" spellcheck="false"></div>
+    <div class="acoes" id="acoesRes">
+      <button class="btn" id="btnCopiar">📋 Copiar texto</button>
+      <button class="btn sec" id="btnBaixar">⬇️ Baixar .txt</button>
+      <button class="btn sec" id="btnParar" hidden>⏹ Parar</button>
+    </div>
+  </section>
+
+  <!-- ===== Histórico ===== -->
+  <section class="cartao" id="painelHist" hidden>
+    <h2>Minhas transcrições</h2>
+    <p class="dica" style="margin-bottom:0">Ficam guardadas só neste aparelho.</p>
+    <ul class="hist" id="hist"></ul>
+  </section>
+
+  <p class="rodape">A transcrição de arquivos usa o Whisper, que roda no próprio aparelho.</p>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const LEGENDAS_URL='https://kiokrkhirgjiacsldrdx.supabase.co/functions/v1/legendas-youtube';
+const LEGENDAS_KEY='sb_publishable_JCmLnm_Uccd8TV0pVBHDQA_0ONeqw1P'; // chave pública (pode ficar no app)
+const $=(id)=>document.getElementById(id);
+
+/* ---------- guardar no aparelho ---------- */
+function ler(k,padrao){try{const v=localStorage.getItem(k);return v?JSON.parse(v):padrao}catch(e){return padrao}}
+function gravar(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}}
+
+let trechos=[],atualId=null,arquivo=null,worker=null,trabalhando=false,trava=null;
+
+function toast(t){const e=$('toast');e.textContent=t;e.classList.add('vis');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('vis'),2200)}
+function relogio(s){s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=s%60;return (h?h+':'+String(m).padStart(2,'0'):m)+':'+String(x).padStart(2,'0')}
+function mb(b){return (b/1048576).toFixed(b>1e8?0:1).replace('.',',')+' MB'}
+
+/* ---------- abas ---------- */
+function aba(qual){
+  $('abaArq').setAttribute('aria-selected',qual==='arq');
+  $('abaYt').setAttribute('aria-selected',qual==='yt');
+  $('painelArq').hidden=qual!=='arq';$('painelYt').hidden=qual!=='yt';
+  gravar('tr-aba',qual);
+}
+$('abaArq').onclick=()=>aba('arq');$('abaYt').onclick=()=>aba('yt');
+
+/* ---------- texto montado em parágrafos ---------- */
+function textoCorrido(){
+  const par=[];let atual='',ini=0,ant=0;
+  for(const t of trechos){
+    if(atual&&(t.inicio-ant>4||atual.length>700&&/[.!?]$/.test(atual))){par.push(atual);atual=''}
+    if(!atual)ini=t.inicio;
+    atual=(atual?atual+' ':'')+t.texto;ant=t.inicio;
+  }
+  if(atual)par.push(atual);
+  return par.join('\n\n');
+}
+function mostrar(){
+  const el=$('texto'),embaixo=el.scrollHeight-el.scrollTop-el.clientHeight<40;
+  el.textContent=textoCorrido();
+  if(embaixo&&trabalhando)el.scrollTop=el.scrollHeight;
+}
+function estado(t,sub){$('estado').innerHTML='';$('estado').append(t);if(sub){const s=document.createElement('small');s.textContent=sub;$('estado').append(s)}}
+function barra(f){$('barraBox').hidden=f==null;$('barra').style.width=Math.round((f||0)*100)+'%'}
+function erro(html){$('erroBox').innerHTML=html?'<div class="aviso erro">'+html+'</div>':''}
+
+function mostraTexto(sim){$('texto').hidden=$('titulo').hidden=$('acoesRes').hidden=!sim}
+function novoResultado(titulo){
+  trechos=[];atualId=Date.now();$('titulo').value=titulo||'';$('texto').textContent='';mostraTexto(true);erro('');
+  $('painelRes').hidden=false;$('painelRes').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+/* ---------- histórico ---------- */
+function salvar(){
+  const texto=$('texto').textContent.trim();if(!texto||!atualId)return;
+  let h=ler('tr-hist',[]).filter(x=>x.id!==atualId);
+  h.unshift({id:atualId,titulo:$('titulo').value.trim()||'Sem nome',texto,quando:atualId});
+  h=h.slice(0,30);
+  while(!gravar('tr-hist',h)&&h.length>1)h.pop(); // se a memória encher, apaga as mais antigas
+  desenhaHist();
+}
+function desenhaHist(){
+  const h=ler('tr-hist',[]),ul=$('hist');ul.innerHTML='';$('painelHist').hidden=!h.length;
+  for(const x of h){
+    const li=document.createElement('li');
+    const n=document.createElement('div');n.className='nome';
+    const b=document.createElement('b');b.textContent=x.titulo;
+    const s=document.createElement('small');s.textContent=new Date(x.quando).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})+' · '+x.texto.split(/\s+/).length+' palavras';
+    n.append(b,s);
+    const abrir=document.createElement('button');abrir.textContent='Abrir';
+    abrir.onclick=()=>{if(trabalhando)return toast('Espere terminar a transcrição atual');
+      trechos=[];atualId=x.id;$('titulo').value=x.titulo;$('texto').textContent=x.texto;erro('');mostraTexto(true);estado('Transcrição guardada');barra(null);
+      $('btnParar').hidden=true;$('painelRes').hidden=false;$('painelRes').scrollIntoView({behavior:'smooth'})};
+    const apagar=document.createElement('button');apagar.textContent='Apagar';apagar.setAttribute('aria-label','Apagar '+x.titulo);
+    apagar.onclick=()=>{if(!confirm('Apagar "'+x.titulo+'"?'))return;gravar('tr-hist',ler('tr-hist',[]).filter(y=>y.id!==x.id));desenhaHist()};
+    li.append(n,abrir,apagar);ul.append(li);
+  }
+}
+$('titulo').addEventListener('change',salvar);
+$('texto').addEventListener('blur',()=>{if(!trabalhando)salvar()});
+
+/* ---------- copiar e baixar ---------- */
+$('btnCopiar').onclick=async()=>{
+  const t=$('texto').textContent.trim();if(!t)return toast('Ainda não tem texto');
+  try{await navigator.clipboard.writeText(t);toast('Texto copiado ✓')}
+  catch(e){const r=document.createRange();r.selectNodeContents($('texto'));const s=getSelection();s.removeAllRanges();s.addRange(r);document.execCommand('copy');toast('Texto copiado ✓')}
+};
+$('btnBaixar').onclick=async()=>{
+  const t=$('texto').textContent.trim();if(!t)return toast('Ainda não tem texto');
+  const nome=($('titulo').value.trim()||'transcricao').replace(/[\\/:*?"<>|]+/g,'').slice(0,80)+'.txt';
+  const f=new File([t+'\n'],nome,{type:'text/plain'});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]});return}catch(e){if(e.name==='AbortError')return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(f);a.download=nome;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+};
+
+/* ---------- manter a tela acesa ---------- */
+async function acender(){try{trava=await navigator.wakeLock.request('screen')}catch(e){}}
+function apagarTela(){try{trava&&trava.release()}catch(e){}trava=null}
+document.addEventListener('visibilitychange',()=>{if(trabalhando&&document.visibilityState==='visible')acender()});
+
+/* ---------- arquivo ---------- */
+$('solta').onclick=()=>$('entrada').click();
+$('solta').onkeydown=(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('entrada').click()}};
+['dragover','dragenter'].forEach(ev=>$('solta').addEventListener(ev,e=>{e.preventDefault();$('solta').classList.add('sobre')}));
+['dragleave','drop'].forEach(ev=>$('solta').addEventListener(ev,e=>{e.preventDefault();$('solta').classList.remove('sobre')}));
+$('solta').addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(f)escolheu(f)});
+$('entrada').onchange=()=>{const f=$('entrada').files[0];if(f)escolheu(f);$('entrada').value=''};
+function escolheu(f){
+  arquivo=f;$('nomeArq').hidden=false;$('nomeArq').textContent='🎞 '+f.name+' ('+mb(f.size)+')';
+  $('btnTranscrever').disabled=false;
+  if(f.size>1.2e9)toast('Arquivo bem grande: pode faltar memória');
+}
+$('modelo').value=ler('tr-modelo','rapido');$('modelo').onchange=()=>gravar('tr-modelo',$('modelo').value);
+$('idioma').value=ler('tr-idioma','portuguese');$('idioma').onchange=()=>gravar('tr-idioma',$('idioma').value);
+
+async function decodificar(f){
+  const buf=await f.arrayBuffer();
+  const AC=window.AudioContext||window.webkitAudioContext;
+  let ctx;try{ctx=new AC({sampleRate:16000})}catch(e){ctx=new AC()}
+  let ab;
+  try{ab=await new Promise((ok,falha)=>{const p=ctx.decodeAudioData(buf,ok,falha);if(p&&p.then)p.then(ok,falha)})}
+  finally{try{ctx.close()}catch(e){}}
+  // junta os canais em um só (mono)
+  let mono;
+  if(ab.numberOfChannels>1){const a=ab.getChannelData(0),b=ab.getChannelData(1);mono=new Float32Array(a.length);for(let i=0;i<a.length;i++)mono[i]=(a[i]+b[i])/2}
+  else mono=new Float32Array(ab.getChannelData(0));
+  if(ab.sampleRate===16000)return mono;
+  // reamostra para 16 kHz, que é o que o Whisper entende
+  const off=new OfflineAudioContext(1,Math.ceil(mono.length*16000/ab.sampleRate),16000);
+  const src=off.createBufferSource();const b=off.createBuffer(1,mono.length,ab.sampleRate);b.copyToChannel(mono,0);src.buffer=b;src.connect(off.destination);src.start();
+  return (await off.startRendering()).getChannelData(0);
+}
+
+function fim(){trabalhando=false;apagarTela();$('btnParar').hidden=true;$('btnTranscrever').disabled=!arquivo;$('btnBuscar').disabled=false}
+
+$('btnTranscrever').onclick=async()=>{
+  if(!arquivo||trabalhando)return;
+  trabalhando=true;$('btnTranscrever').disabled=true;$('btnBuscar').disabled=true;
+  novoResultado(arquivo.name.replace(/\.[^.]+$/,''));
+  estado('Lendo o áudio do arquivo…','Isso pode levar um minutinho em vídeos longos.');barra(null);
+  acender();
+  let audio;
+  try{audio=await decodificar(arquivo)}
+  catch(e){console.error(e);estado('Não consegui ler esse arquivo');mostraTexto(false);
+    erro('O iPad não conseguiu abrir o som deste arquivo. Tente um vídeo .mp4 ou .mov, ou um áudio .m4a ou .mp3. Se for muito longo, falta memória: divida em partes menores (no app <b>Fotos</b>, toque em <b>Editar</b> e corte o vídeo).');
+    return fim()}
+  const dur=audio.length/16000;
+  if(dur<0.5){estado('Esse arquivo não tem som');return fim()}
+  if(!worker){worker=new Worker('worker.js',{type:'module'});worker.onerror=(e)=>{console.error(e);estado('O motor de transcrição falhou');erro('Não deu para iniciar o Whisper. Confira a internet (na primeira vez ele precisa baixar o modelo) e tente de novo.');fim();worker=null}}
+  const t0=Date.now();let tIni=0;
+  worker.onmessage=(e)=>{
+    const m=e.data;
+    if(m.tipo==='status')estado(m.texto);
+    else if(m.tipo==='baixando'){estado('Baixando o modelo (só na primeira vez)…',mb(m.feito)+' de '+mb(m.total)+'. Depois funciona até sem internet.');barra(m.feito/m.total)}
+    else if(m.tipo==='pronto'||m.tipo==='recomecar'){if(m.tipo==='recomecar')trechos=[];tIni=Date.now();estado('Transcrevendo… 0%','Áudio de '+relogio(dur)+'. Usando o '+m.motor+'. Deixe esta tela aberta.');barra(0);$('btnParar').hidden=false}
+    else if(m.tipo==='trechos'||m.tipo==='progresso'){
+      if(m.trechos){trechos.push(...m.trechos);mostrar()}
+      const f=m.feito/m.total,gasto=(Date.now()-tIni)/1000,falta=f>0.02?gasto/f*(1-f):null;
+      estado('Transcrevendo… '+Math.round(f*100)+'%',relogio(m.feito)+' de '+relogio(m.total)+(falta!=null?' · faltam uns '+Math.max(1,Math.round(falta/60))+' min':'')+'. Deixe esta tela aberta.');
+      barra(f);if(m.trechos)salvar();
+    }
+    else if(m.tipo==='fim'){mostrar();salvar();barra(1);
+      estado(trechos.length?'Pronto! ✓':'Terminei, mas não ouvi fala nenhuma','Levou '+relogio((Date.now()-t0)/1000)+'. Você pode corrigir o texto tocando nele.');fim()}
+    else if(m.tipo==='cancelado'){salvar();estado('Transcrição parada','O que já foi feito ficou guardado.');barra(null);fim()}
+    else if(m.tipo==='erro'){console.error(m.texto);estado('Algo deu errado');
+      erro('A transcrição parou no meio. '+(trechos.length?'O que já tinha saído ficou guardado. ':'')+'Se for falta de memória, escolha a qualidade <b>Rápido</b> ou use um vídeo mais curto.<br><small>'+String(m.texto).replace(/[<>&]/g,'')+'</small>');salvar();fim()}
+  };
+  worker.postMessage({tipo:'transcrever',audio,modelo:$('modelo').value,idioma:$('idioma').value},[audio.buffer]);
+};
+$('btnParar').onclick=()=>{if(worker&&trabalhando){worker.postMessage({tipo:'cancelar'});estado('Parando no fim deste trecho…')}};
+
+/* ---------- YouTube ---------- */
+$('btnColar').onclick=async()=>{try{const t=await navigator.clipboard.readText();if(t){$('link').value=t.trim();toast('Link colado')}}catch(e){$('link').focus();toast('Toque no campo e escolha Colar')}};
+$('link').addEventListener('keydown',e=>{if(e.key==='Enter')$('btnBuscar').click()});
+$('btnBuscar').onclick=async()=>{
+  const link=$('link').value.trim();
+  if(!link){$('link').focus();return toast('Cole o link primeiro')}
+  if(trabalhando)return;
+  trabalhando=true;$('btnBuscar').disabled=true;$('btnTranscrever').disabled=true;
+  novoResultado('');estado('Buscando as legendas no YouTube…','Pode levar até meio minuto.');barra(null);
+  try{
+    const r=await fetch(LEGENDAS_URL,{method:'POST',headers:{'Content-Type':'application/json',apikey:LEGENDAS_KEY,Authorization:'Bearer '+LEGENDAS_KEY},body:JSON.stringify({link})});
+    const j=await r.json().catch(()=>({}));
+    if(!r.ok||!j.trechos){
+      estado(j.erro==='link_invalido'?'Link não reconhecido':'Não consegui o texto desse vídeo');
+      erro((j.mensagem||'O servidor não respondeu.')+'<br><br>Plano B: use a <b>Gravação de Tela</b> e transcreva o arquivo. Abra a aba <b>📁 Arquivo</b> e toque em <b>Como pegar o áudio de um vídeo do YouTube</b>.');
+      mostraTexto(false);
+      return fim();
+    }
+        trechos=j.trechos;$('titulo').value=j.titulo||('Vídeo do YouTube '+j.id);mostrar();salvar();
+    const ling=j.idioma&&!/^pt/i.test(j.idioma)?' A legenda está em "'+j.idioma+'", não em português.':'';
+    estado('Pronto! ✓',(j.automatica?'Legenda automática do YouTube: pode ter erros de pontuação.':'Legenda feita pelo autor do vídeo.')+ling);
+  }catch(e){console.error(e);estado('Sem conexão');erro('Não deu para falar com o servidor. Confira a internet e tente de novo.')}
+  fim();
+};
+
+/* ---------- iniciar ---------- */
+aba(ler('tr-aba','arq'));desenhaHist();
+// link compartilhado para o app (ex.: ?link=...)
+const qs=new URLSearchParams(location.search);if(qs.get('link')||qs.get('text')){$('link').value=qs.get('link')||qs.get('text');aba('yt')}
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+</body>
+</html>

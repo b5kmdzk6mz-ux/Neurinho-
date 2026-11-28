@@ -1208,14 +1208,19 @@ function gcStart(){
 /* O bloqueio só liga quando LIC_PUB, PAY.pix e PAY.zap estão preenchidos.
    LIC_PUB é a chave pública do Gerador (gerador.html). Ela não é secreta: serve só para
    conferir os códigos. A chave secreta, que cria os códigos, fica só no aparelho da Erika. */
-var LIC_PUB={"kty":"EC","crv":"P-256","x":"OxPH1F2iN-JbheKbfR4cmdLOlqVPn32lqAl_lJVpaKY","y":"ecwz1J0F786kSsu_pfdvBXIyatbz6JwaSIst_XAT_mw"};
+/* Chaves aceitas: a primeira do Gerador e a atual (o Gerador criou uma chave nova em nov/2026).
+   Os códigos feitos com qualquer uma delas continuam valendo. */
+var LIC_PUB=[
+  {"kty":"EC","crv":"P-256","x":"OxPH1F2iN-JbheKbfR4cmdLOlqVPn32lqAl_lJVpaKY","y":"ecwz1J0F786kSsu_pfdvBXIyatbz6JwaSIst_XAT_mw"},
+  {"kty":"EC","crv":"P-256","x":"NfAmvah7eMHaULYJoKQ2Zm-IXYri90jSyYtWKOxVDWI","y":"c0M92a0ge2tWNaHcJUloXHVu9dZ8_orWqr3aswz0468"}
+];
 var PAY={valor:'R$ 9,99',pix:'erikamourato88@hotmail.com',pixTipo:'e-mail',zap:'5586995900958',nome:'Erika'};
 var TRIAL_DAYS=7;
 var LKEY='neurinho.lic';
 var LIC=(function(){try{var l=JSON.parse(localStorage.getItem(LKEY)||'{}');return l&&typeof l==='object'?l:{}}catch(e){return {}}})();
 var licFlash=null;
 function licSave(){try{localStorage.setItem(LKEY,JSON.stringify(LIC))}catch(e){}}
-function payOn(){return !!(LIC_PUB&&PAY.pix&&PAY.zap&&window.crypto&&crypto.subtle)}
+function payOn(){return !!(LIC_PUB&&LIC_PUB.length&&PAY.pix&&PAY.zap&&window.crypto&&crypto.subtle)}
 function dDiff(a,b){var p=a.split('-').map(Number),q=b.split('-').map(Number);return Math.round((Date.UTC(q[0],q[1]-1,q[2])-Date.UTC(p[0],p[1]-1,p[2]))/864e5)}
 function fmtBR(d){var p=String(d||'').split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:''}
 /* Se o relógio do aparelho voltar no tempo, vale a data mais recente já vista. */
@@ -1238,7 +1243,7 @@ function licState(){
 function licLeft(){var s=licState();return s==='paid'?dDiff(licNow(),LIC.x)+1:s==='trial'?dDiff(licNow(),trialEnd())+1:0}
 function b64uDec(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
 var licKeyP=null;
-function licKey(){if(!licKeyP)licKeyP=crypto.subtle.importKey('jwk',LIC_PUB,{name:'ECDSA',namedCurve:'P-256'},false,['verify']);return licKeyP}
+function licKey(){if(!licKeyP)licKeyP=Promise.all(LIC_PUB.map(function(j){return crypto.subtle.importKey('jwk',j,{name:'ECDSA',namedCurve:'P-256'},false,['verify']).catch(function(){return null})}));return licKeyP}
 /* Código = base64url(dados em JSON) + "." + base64url(assinatura ECDSA P-256). Aceita o link inteiro também. */
 function licParse(raw){
   var s=String(raw||''),m=s.match(/ativar=([A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+)/);
@@ -1254,7 +1259,7 @@ function licParse(raw){
 function licVerify(raw){
   var c=licParse(raw);
   if(!c||!payOn())return Promise.resolve(null);
-  return licKey().then(function(k){return crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},k,c.sig,c.data)})
+  return licKey().then(function(ks){return ks.reduce(function(pr,k){return pr.then(function(ok){return ok||!k?ok:crypto.subtle.verify({name:'ECDSA',hash:'SHA-256'},k,c.sig,c.data).catch(function(){return false})})},Promise.resolve(false))})
     .then(function(ok){return ok?c:null},function(){return null});
 }
 function licActivate(raw){
